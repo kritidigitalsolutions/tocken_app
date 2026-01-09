@@ -5,7 +5,7 @@ import 'package:token_app/utils/text_style.dart';
 import 'package:token_app/view/home_screen/location_screen.dart';
 
 class PlotLandPage extends StatelessWidget {
-  PlotLandPage({super.key});
+  const PlotLandPage({super.key});
 
   @override
   Widget build(BuildContext context) {

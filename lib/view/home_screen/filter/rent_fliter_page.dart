@@ -456,7 +456,7 @@ void showChecklistBottomSheet({
                 Navigator.pop(context);
               },
             );
-          }).toList(),
+          }),
           SizedBox(height: 10),
         ],
       );

@@ -12,7 +12,7 @@ import 'package:token_app/view/post_property_page/type_property_page.dart';
 import 'package:token_app/viewModel/afterLogin/home_screen_controller.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({super.key});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
