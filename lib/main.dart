@@ -1,0 +1,130 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:token_app/resources/app_colors.dart';
+import 'package:provider/provider.dart';
+import 'package:token_app/utils/bottom_navigationbar.dart';
+import 'package:token_app/view/beforeLogin/onboarding_screen.dart';
+import 'package:token_app/view/post_property_page/type_property_page.dart';
+import 'package:token_app/viewModel/afterLogin/account_pages_provider/account_pages_provider.dart';
+import 'package:token_app/viewModel/afterLogin/filter_pages_provider/filter_provider.dart';
+import 'package:token_app/viewModel/afterLogin/home_screen_controller.dart';
+import 'package:token_app/viewModel/afterLogin/leadScreenProvider/leads_screen_controller.dart';
+import 'package:token_app/viewModel/afterLogin/plans_provider/plan_provider.dart';
+import 'package:token_app/viewModel/afterLogin/post_property_provider/post_propert_providers.dart';
+import 'package:token_app/viewModel/beforeLogin/auth_provider.dart';
+
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: Colors.white,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ),
+  );
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => HomeScreenController()),
+        ChangeNotifierProvider(create: (_) => LeadsScreenController()),
+        ChangeNotifierProvider(create: (_) => TypePropertyProvider()),
+        ChangeNotifierProvider(create: (_) => PropertyDetailsProvider()),
+        ChangeNotifierProvider(create: (_) => AddressDetailsProvider()),
+        ChangeNotifierProvider(create: (_) => PlanDetailsProvider()),
+        ChangeNotifierProvider(create: (_) => ProfilePagesProvider()),
+        ChangeNotifierProvider(create: (_) => OnboardingProvider()),
+        ChangeNotifierProvider(create: (_) => PhoneNumberProvider()),
+        ChangeNotifierProvider(create: (_) => OtpVerificationProvider()),
+        ChangeNotifierProvider(create: (_) => UserDetailsProvider()),
+        ChangeNotifierProvider(create: (_) => DirectLeadsProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => FeedbackProvider()),
+        ChangeNotifierProvider(create: (_) => BookmarkProvider()),
+        ChangeNotifierProvider(create: (_) => FilterProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: AppColors.white,
+          surfaceTintColor: Colors.transparent,
+          scrolledUnderElevation: 0,
+          elevation: 0,
+        ),
+      ),
+      home: OnboardingScreen(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  final int? screenIndex;
+  const MyHomePage({super.key, this.screenIndex});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final ctr = Provider.of<HomeScreenController>(context, listen: false);
+      ctr.toggelPage(widget.screenIndex ?? 0);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ctr = Provider.of<HomeScreenController>(context);
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: Colors.white,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+      child: Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 0,
+          backgroundColor: AppColors.white,
+          automaticallyImplyLeading: false,
+        ),
+        backgroundColor: AppColors.background,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: const CustomBottomNavBar(),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: AppColors.mainColors,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusDirectional.circular(30),
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => TypePropertyPage()),
+            );
+          },
+          child: Icon(Icons.add, size: 24, color: AppColors.white),
+        ),
+        body: IndexedStack(index: ctr.pageIndex, children: ctr.screenPage),
+      ),
+    );
+  }
+}
