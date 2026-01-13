@@ -289,7 +289,8 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => AddressDetailsPage(),
+                                builder: (context) =>
+                                    AddressDetailsPage(path: ""),
                               ),
                             );
                           },

@@ -5,7 +5,6 @@ import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
 import 'package:token_app/view/post_property_page/success_page.dart';
-import 'package:token_app/view/post_property_page/type_property_page.dart';
 import 'package:token_app/viewModel/afterLogin/post_property_provider/post_propert_providers.dart';
 
 class PreviewPropertyScreen extends StatelessWidget {
@@ -286,13 +285,13 @@ class PreviewPropertyScreen extends StatelessWidget {
                           typeProProvider.clearAll();
                           propertyDetailSPr.clearData();
                           addressProvider.clearAll();
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TypePropertyPage(),
-                            ),
-                            (route) => route.isFirst,
-                          );
+                          // Navigator.pushAndRemoveUntil(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => TypePropertyPage(),
+                          //   ),
+                          //   (route) => route.isFirst,
+                          // );
                         },
                         backgroundColor: AppColors.white,
                         textColor: AppColors.black,

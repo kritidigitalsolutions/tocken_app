@@ -116,11 +116,22 @@ class _MyHomePageState extends State<MyHomePage> {
             borderRadius: BorderRadiusDirectional.circular(30),
           ),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => TypePropertyPage()),
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: AppColors.white,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              builder: (context) {
+                return ChangeNotifierProvider.value(
+                  value: context.read<TypePropertyProvider>(),
+                  child: const TypePropertySheet(), // Bottom sheet widget
+                );
+              },
             );
           },
+
           child: Icon(Icons.add, size: 24, color: AppColors.white),
         ),
         body: IndexedStack(index: ctr.pageIndex, children: ctr.screenPage),

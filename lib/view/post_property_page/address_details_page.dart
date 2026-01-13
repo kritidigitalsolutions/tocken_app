@@ -3,11 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/textfield.dart';
+import 'package:token_app/view/post_property_page/co_living_pages/pricing_details_page.dart';
 import 'package:token_app/view/post_property_page/preview_property_page.dart';
 import 'package:token_app/viewModel/afterLogin/post_property_provider/post_propert_providers.dart';
 
 class AddressDetailsPage extends StatelessWidget {
-  const AddressDetailsPage({super.key});
+  final String path;
+  const AddressDetailsPage({super.key, required this.path});
 
   @override
   Widget build(BuildContext context) {
@@ -162,12 +164,22 @@ class AddressDetailsPage extends StatelessWidget {
                       onTap: !value
                           ? null
                           : () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => PreviewPropertyScreen(),
-                                ),
-                              );
+                              if (path == "CO-L") {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PricingDetailsPage(),
+                                  ),
+                                );
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        PreviewPropertyScreen(),
+                                  ),
+                                );
+                              }
                             },
                     ),
                   ),

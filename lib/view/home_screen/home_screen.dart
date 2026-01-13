@@ -8,7 +8,6 @@ import 'package:token_app/view/home_screen/location_screen.dart';
 import 'package:token_app/view/home_screen/notification_screen.dart';
 import 'package:token_app/view/home_screen/property_list_page.dart';
 import 'package:token_app/view/home_screen/property_review_page.dart';
-import 'package:token_app/view/post_property_page/type_property_page.dart';
 import 'package:token_app/viewModel/afterLogin/home_screen_controller.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -91,10 +90,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 _developerSection(),
                 const SizedBox(height: 12),
-                _projectHeader("Broker Section"),
-                const SizedBox(height: 12),
-                _brokenSection(),
-                const SizedBox(height: 12),
+                // _projectHeader("Broker Section"),
+                // const SizedBox(height: 12),
+                // _brokenSection(),
+                // const SizedBox(height: 12),
                 _projectHeader("Most Viewed"),
                 _mostLikedProCard(context),
                 const SizedBox(height: 12),
@@ -143,10 +142,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => TypePropertyPage()),
-            );
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(builder: (_) => TypePropertyPage()),
+            // );
           },
           icon: const Icon(Icons.add, color: AppColors.white),
           label: Text(
@@ -384,7 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // 🏢 Project List
   Widget _projectList(BuildContext context) {
     return SizedBox(
-      height: 240,
+      height: 120,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
@@ -417,6 +416,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcSjde-MLv29X0KU-ShJ35hHoKqJIdfaZyvLNvyzQq07W-SZoB3_",
             ),
           ),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => PropertyReviewPage()),
+              );
+            },
+            child: _projectCard(
+              title: "Skyline Heights",
+              location: "Andheri West",
+              image:
+                  "https://i0.wp.com/riddhirealtors.com/wp-content/uploads/2022/02/architecture.jpg?fit=1900,1425&ssl=1",
+              tag: "Upcoming",
+            ),
+          ),
         ],
       ),
     );
@@ -429,7 +443,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String? tag,
   }) {
     return Container(
-      width: 190,
+      width: 180,
       margin: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
