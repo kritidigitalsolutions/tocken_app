@@ -4,6 +4,7 @@ import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
 import 'package:token_app/utils/textfield.dart';
 
+// ignore: must_be_immutable
 class OtherDetailsPage extends StatelessWidget {
   OtherDetailsPage({super.key});
 
