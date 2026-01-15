@@ -48,7 +48,7 @@ class PlansPage extends StatelessWidget {
                       crossAxisCount: 2,
                       mainAxisSpacing: 14,
                       crossAxisSpacing: 14,
-                      childAspectRatio: 1.1,
+                      childAspectRatio: 1.5,
                     ),
                     itemBuilder: (context, index) {
                       final role = provider.roles[index];
@@ -128,6 +128,7 @@ class PlansPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                SizedBox(height: 15),
               ],
             ),
           ),

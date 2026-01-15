@@ -138,3 +138,22 @@ class BookmarkProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+class DeleteAccountProvider extends ChangeNotifier {
+  String? selectedReason;
+  final TextEditingController feedbackController = TextEditingController();
+
+  void selectReason(String value) {
+    selectedReason = value;
+    notifyListeners();
+  }
+
+  bool get isValid =>
+      selectedReason != null && feedbackController.text.trim().isNotEmpty;
+
+  @override
+  void dispose() {
+    feedbackController.dispose();
+    super.dispose();
+  }
+}

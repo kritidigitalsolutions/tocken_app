@@ -129,35 +129,80 @@ class PropertyDetailsProvider extends ChangeNotifier {
 // Address details
 
 class AddressDetailsProvider extends ChangeNotifier {
-  final TextEditingController localityCtr = TextEditingController();
-  final TextEditingController addressCtr = TextEditingController();
-
-  AddressDetailsProvider() {
-    localityCtr.addListener(_onTextChanged);
-    addressCtr.addListener(_onTextChanged);
-  }
-
-  void _onTextChanged() {
-    notifyListeners();
-  }
-
   String? city;
+
+  final localityCtr = TextEditingController();
+  final addressCtr = TextEditingController();
+  final cityCtr = TextEditingController();
+
+  /// city selected or not
+  bool get isCitySelected => cityCtr.text.trim().isNotEmpty;
+
+  /// full form validation
+  bool get isFormValid =>
+      isCitySelected &&
+      localityCtr.text.isNotEmpty &&
+      addressCtr.text.isNotEmpty;
 
   void setCity(String value) {
     city = value;
     notifyListeners();
   }
 
-  bool get isFormValid {
-    return city != null &&
-        localityCtr.text.trim().isNotEmpty &&
-        addressCtr.text.trim().isNotEmpty;
+  @override
+  void dispose() {
+    localityCtr.dispose();
+    addressCtr.dispose();
+    super.dispose();
+  }
+}
+
+class RoomDetailsProvider extends ChangeNotifier {
+  DateTime? availableFrom;
+  String? bhk;
+  String? furnishType;
+  Set<String> roomDetails = {};
+  final totalFloorsCtrl = TextEditingController();
+  final yourFloorCtrl = TextEditingController();
+
+  final furnishTypes = ["Fully Furnished", "Semi Furnished", "Unfurnished"];
+
+  final bhkOptions = ["1RK", "1BHK", "2BHK", "3BHK", "4BHK", "5BHK"];
+
+  final roomDetailOptions = [
+    "Attached Bathroom",
+    "Attached Balcony",
+    "AC Room",
+  ];
+
+  void setDate(DateTime date) {
+    availableFrom = date;
+    notifyListeners();
   }
 
-  void clearAll() {
-    localityCtr.clear();
-    addressCtr.clear();
-
-    city = null;
+  void setBhk(String value) {
+    bhk = value;
+    notifyListeners();
   }
+
+  void setFurnish(String value) {
+    furnishType = value;
+    notifyListeners();
+  }
+
+  void toggleRoomDetail(String value) {
+    if (roomDetails.contains(value)) {
+      roomDetails.remove(value);
+    } else {
+      roomDetails.add(value);
+    }
+    notifyListeners();
+  }
+
+  bool get isValid =>
+      availableFrom != null &&
+      bhk != null &&
+      furnishType != null &&
+      totalFloorsCtrl.text.isNotEmpty &&
+      yourFloorCtrl.text.isNotEmpty;
 }

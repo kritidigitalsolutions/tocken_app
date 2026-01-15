@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
-import 'package:token_app/view/post_property_page/rent_&_sale/residential/summary_page.dart';
+import 'package:token_app/view/post_property_page/summary_page.dart';
 
 class PhotosPage extends StatefulWidget {
   const PhotosPage({super.key});
@@ -174,14 +174,14 @@ class _PhotosPageState extends State<PhotosPage> {
             AppButton(
               text: "Save & Next",
               onTap: () {
-                if (_images.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Please add at least one image"),
-                    ),
-                  );
-                  return;
-                }
+                // if (_images.isEmpty) {
+                //   ScaffoldMessenger.of(context).showSnackBar(
+                //     const SnackBar(
+                //       content: Text("Please add at least one image"),
+                //     ),
+                //   );
+                //   return;
+                // }
 
                 Navigator.push(
                   context,
@@ -202,8 +202,6 @@ class _PhotosPageState extends State<PhotosPage> {
               textColor: AppColors.black,
               backgroundColor: AppColors.red.shade100,
             ),
-
-            const SizedBox(height: 20),
           ],
         ),
       ),

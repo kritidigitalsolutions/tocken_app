@@ -6,10 +6,12 @@ import 'package:token_app/utils/bottom_navigationbar.dart';
 import 'package:token_app/view/beforeLogin/onboarding_screen.dart';
 import 'package:token_app/view/post_property_page/type_property_page.dart';
 import 'package:token_app/viewModel/afterLogin/account_pages_provider/account_pages_provider.dart';
+import 'package:token_app/viewModel/afterLogin/account_pages_provider/my_listing_provider.dart';
 import 'package:token_app/viewModel/afterLogin/filter_pages_provider/filter_provider.dart';
 import 'package:token_app/viewModel/afterLogin/home_screen_controller.dart';
 import 'package:token_app/viewModel/afterLogin/leadScreenProvider/leads_screen_controller.dart';
 import 'package:token_app/viewModel/afterLogin/plans_provider/plan_provider.dart';
+import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provider.dart';
 import 'package:token_app/viewModel/afterLogin/post_property_provider/post_propert_providers.dart';
 import 'package:token_app/viewModel/beforeLogin/auth_provider.dart';
 
@@ -44,6 +46,10 @@ void main() {
         ChangeNotifierProvider(create: (_) => FeedbackProvider()),
         ChangeNotifierProvider(create: (_) => BookmarkProvider()),
         ChangeNotifierProvider(create: (_) => FilterProvider()),
+        ChangeNotifierProvider(create: (_) => PgDetailsProvider()),
+        ChangeNotifierProvider(create: (_) => DeleteAccountProvider()),
+        ChangeNotifierProvider(create: (_) => MyListingProvider()),
+        ChangeNotifierProvider(create: (_) => RoomDetailsProvider()),
       ],
       child: const MyApp(),
     ),

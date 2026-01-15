@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
-import 'package:token_app/view/post_property_page/rent_&_sale/residential/pricing_page.dart';
+import 'package:token_app/view/post_property_page/pricing_page.dart';
 
 class ApartmentDetailsPage extends StatefulWidget {
   final String type;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/textfield.dart';
+import 'package:token_app/view/post_property_page/pricing_page.dart';
 
 class OfficeLayoutPage extends StatefulWidget {
   const OfficeLayoutPage({super.key});
@@ -114,7 +115,9 @@ class _OfficeLayoutPageState extends State<OfficeLayoutPage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => OfficeLayoutPage()),
+                  MaterialPageRoute(
+                    builder: (_) => PricingPage(propertyType: "COM"),
+                  ),
                 );
               },
             ),

@@ -8,7 +8,9 @@ import 'package:token_app/view/home_screen/location_screen.dart';
 import 'package:token_app/view/home_screen/notification_screen.dart';
 import 'package:token_app/view/home_screen/property_list_page.dart';
 import 'package:token_app/view/home_screen/property_review_page.dart';
+import 'package:token_app/view/post_property_page/type_property_page.dart';
 import 'package:token_app/viewModel/afterLogin/home_screen_controller.dart';
+import 'package:token_app/viewModel/afterLogin/post_property_provider/post_propert_providers.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -142,10 +144,20 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           onPressed: () {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(builder: (_) => TypePropertyPage()),
-            // );
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: AppColors.white,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              builder: (context) {
+                return ChangeNotifierProvider.value(
+                  value: context.read<TypePropertyProvider>(),
+                  child: const TypePropertySheet(), // Bottom sheet widget
+                );
+              },
+            );
           },
           icon: const Icon(Icons.add, color: AppColors.white),
           label: Text(
@@ -736,67 +748,67 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _brokenSection() {
-    return Column(
-      children: List.generate(2, (index) {
-        return Container(
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-          child: Column(
-            children: [
-              ListTile(
-                leading: ClipOval(
-                  child: Image.network(
-                    'https://images.unsplash.com/photo-1560250097-0b93528c311a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200',
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        Icon(Icons.image),
-                  ),
-                ),
-                title: Text('Amit Kumar', style: textStyle16(FontWeight.bold)),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.location_on_outlined),
-                        Text('Location'),
-                      ],
-                    ),
-                    Text("REFN No. 1234566777"),
-                  ],
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text('45'),
-                      SizedBox(height: 5),
-                      Text('Projects'),
-                    ],
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text('45'),
-                      SizedBox(height: 5),
-                      Text('Projects'),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      }),
-    );
-  }
+  // Widget _brokenSection() {
+  //   return Column(
+  //     children: List.generate(2, (index) {
+  //       return Container(
+  //         decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+  //         child: Column(
+  //           children: [
+  //             ListTile(
+  //               leading: ClipOval(
+  //                 child: Image.network(
+  //                   'https://images.unsplash.com/photo-1560250097-0b93528c311a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=200',
+  //                   width: 50,
+  //                   height: 50,
+  //                   fit: BoxFit.cover,
+  //                   errorBuilder: (context, error, stackTrace) =>
+  //                       Icon(Icons.image),
+  //                 ),
+  //               ),
+  //               title: Text('Amit Kumar', style: textStyle16(FontWeight.bold)),
+  //               subtitle: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   Row(
+  //                     children: [
+  //                       Icon(Icons.location_on_outlined),
+  //                       Text('Location'),
+  //                     ],
+  //                   ),
+  //                   Text("REFN No. 1234566777"),
+  //                 ],
+  //               ),
+  //             ),
+  //             Row(
+  //               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //               children: [
+  //                 Column(
+  //                   mainAxisAlignment: MainAxisAlignment.center,
+  //                   crossAxisAlignment: CrossAxisAlignment.center,
+  //                   children: [
+  //                     Text('45'),
+  //                     SizedBox(height: 5),
+  //                     Text('Projects'),
+  //                   ],
+  //                 ),
+  //                 Column(
+  //                   mainAxisAlignment: MainAxisAlignment.center,
+  //                   crossAxisAlignment: CrossAxisAlignment.center,
+  //                   children: [
+  //                     Text('45'),
+  //                     SizedBox(height: 5),
+  //                     Text('Projects'),
+  //                   ],
+  //                 ),
+  //               ],
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     }),
+  //   );
+  // }
 
   Widget _mostViewed(BuildContext context) {
     return SingleChildScrollView(

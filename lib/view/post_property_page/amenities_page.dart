@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
-import 'package:token_app/view/post_property_page/rent_&_sale/residential/photo_upload_page.dart';
+import 'package:token_app/view/post_property_page/address_details_page.dart';
+import 'package:token_app/view/post_property_page/photo_upload_page.dart';
 
 class ContactAmenitiesPage extends StatefulWidget {
-  const ContactAmenitiesPage({super.key});
+  final String? propertyType;
+  const ContactAmenitiesPage({super.key, this.propertyType});
 
   @override
   State<ContactAmenitiesPage> createState() => _ContactAmenitiesPageState();
@@ -45,6 +47,8 @@ class _ContactAmenitiesPageState extends State<ContactAmenitiesPage> {
     AmenityModel(title: "Gender Restrictions", icon: "assets/icons/water.png"),
     AmenityModel(title: "No Alcohol", icon: "assets/icons/parking.png"),
   ];
+
+  String? lastEntryTime;
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +166,9 @@ class _ContactAmenitiesPageState extends State<ContactAmenitiesPage> {
 
                   /// Preferences
                   _selectTile(
-                    title: "Preferences",
+                    title: widget.propertyType != "PG"
+                        ? "Preferences"
+                        : "PG Rules",
                     subtitle: "Please choose your Preferences",
                     onTap: () {
                       openAmenitiesBottomSheet(
@@ -173,6 +179,29 @@ class _ContactAmenitiesPageState extends State<ContactAmenitiesPage> {
                     },
                   ),
 
+                  if (widget.propertyType == "PG") ...[
+                    _sectionTitle("Last Entry Time"),
+                    _dropdown(
+                      lastEntryTime,
+                      ["10:00 PM", "11:00 PM", "12:00 AM", "No Restriction"],
+                      (val) {
+                        setState(() {
+                          lastEntryTime = val;
+                        });
+                      },
+                    ),
+                    SizedBox(height: 15),
+                    _sectionTitle("Common Areas"),
+                    Wrap(
+                      spacing: 10,
+                      children: [
+                        _choiceChip("Living Room", "", (_) {}),
+                        _choiceChip("Kitchen", "", (_) {}),
+                        _choiceChip("Dining Hall", "", (_) {}),
+                      ],
+                    ),
+                  ],
+
                   const SizedBox(height: 30),
                 ],
               ),
@@ -181,29 +210,78 @@ class _ContactAmenitiesPageState extends State<ContactAmenitiesPage> {
 
           /// 🔹 Bottom Buttons
           /// Save Button
-          AppButton(
-            text: "Save & Next",
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => PhotosPage()),
-              );
-            },
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: AppButton(
+              text: "Save & Next",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => PhotosPage()),
+                );
+              },
+            ),
           ),
           SizedBox(height: 15),
-          AppButton(
-            text: "Cancel",
-            onTap: () {},
-            textColor: AppColors.black,
-            backgroundColor: AppColors.red.shade100,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: AppButton(
+              text: "Cancel",
+              onTap: () {},
+              textColor: AppColors.black,
+              backgroundColor: AppColors.red.shade100,
+            ),
           ),
-          SizedBox(height: 20),
         ],
       ),
     );
   }
 
   /// ================== Widgets ==================
+
+  Widget _choiceChip(String label, String selected, Function(String) onTap) {
+    final bool isSelected = label == selected;
+    return GestureDetector(
+      onTap: () => onTap(label),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(25),
+          border: Border.all(
+            color: isSelected ? AppColors.mainColors : Colors.grey.shade300,
+          ),
+          color: isSelected
+              ? AppColors.mainColors.withOpacity(.1)
+              : Colors.white,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? AppColors.mainColors : Colors.grey.shade700,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _dropdown(
+    String? value,
+    List<String> items,
+    Function(String) onChanged,
+  ) {
+    return DropdownButtonFormField<String>(
+      initialValue: value,
+      hint: const Text("Select"),
+      items: items
+          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+          .toList(),
+      onChanged: (v) {},
+      decoration: InputDecoration(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
 
   Widget _sectionTitle(String title) {
     return Padding(

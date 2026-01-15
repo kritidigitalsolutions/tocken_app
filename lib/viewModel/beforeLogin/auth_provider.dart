@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:token_app/data/api_response.dart';
+import 'package:token_app/repository/auth_repository.dart';
 
 class OnboardingProvider extends ChangeNotifier {
   int _currentIndex = 0;
@@ -18,6 +20,7 @@ class OnboardingProvider extends ChangeNotifier {
 // Phonenumber page
 
 class PhoneNumberProvider extends ChangeNotifier {
+  final authRepo = AuthRepository();
   final TextEditingController phoneController = TextEditingController();
 
   PhoneNumberProvider() {
@@ -29,6 +32,31 @@ class PhoneNumberProvider extends ChangeNotifier {
   }
 
   bool get isValid => phoneController.text.length == 10;
+
+  ApiResponse<dynamic> auth = ApiResponse.loading();
+
+  Future<void> login() async {
+    if (!isValid) return;
+
+    auth = ApiResponse.loading();
+    notifyListeners();
+
+    try {
+      final response = await authRepo.loginWithPhone(phoneController.text);
+
+      auth = ApiResponse.completed(response);
+    } catch (e) {
+      auth = ApiResponse.error(e.toString());
+    }
+
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    phoneController.dispose();
+    super.dispose();
+  }
 }
 
 // Otp verification screen

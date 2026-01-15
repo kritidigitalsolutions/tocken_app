@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/text_style.dart';
 import 'package:token_app/view/post_property_page/co_living_pages/profile_details_page.dart';
+import 'package:token_app/view/post_property_page/pg_pages/pg_details.dart';
 import 'package:token_app/view/post_property_page/rent_&_sale/commercial/office_details_page.dart';
 import 'package:token_app/view/post_property_page/rent_&_sale/residential/apartment_page.dart';
 
@@ -131,7 +132,12 @@ class TypePropertySheet extends StatelessWidget {
                 PropertyTile(
                   image: "assets/images/pg.svg",
                   label: 'PG',
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => PgDetailsPage()),
+                    );
+                  },
                 ),
               ],
             ),
@@ -432,7 +438,10 @@ Widget propertyTypeCo_livingBottomSheet(BuildContext context) {
           "Where Vision Meets Venue: List for Business",
           'assets/images/commercial.svg',
           () {
-            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => ProfileDetailsPage()),
+            );
           },
         ),
       ),

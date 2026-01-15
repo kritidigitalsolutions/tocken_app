@@ -3,6 +3,7 @@ import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/textfield.dart';
 import 'package:token_app/view/post_property_page/address_details_page.dart';
+import 'package:token_app/view/post_property_page/co_living_pages/room_details_page.dart';
 
 class ProfileDetailsPage extends StatefulWidget {
   const ProfileDetailsPage({super.key});
@@ -275,9 +276,7 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => AddressDetailsPage(path: "CO-L"),
-                  ),
+                  MaterialPageRoute(builder: (_) => RoomDetailsPage()),
                 );
               },
             ),
@@ -286,6 +285,7 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
               text: "Cancel",
               onTap: () {},
               backgroundColor: AppColors.red.shade100,
+              textColor: AppColors.black,
             ),
             SizedBox(height: 20),
           ],

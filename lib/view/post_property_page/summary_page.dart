@@ -15,6 +15,7 @@ class _SummaryPageState extends State<SummaryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         leading: const BackButton(),
         title: const Text("Summary"),
@@ -95,7 +96,6 @@ class _SummaryPageState extends State<SummaryPage> {
               textColor: AppColors.black,
               backgroundColor: AppColors.red.shade100,
             ),
-            SizedBox(height: 20),
           ],
         ),
       ),
