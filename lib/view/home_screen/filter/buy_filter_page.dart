@@ -5,23 +5,7 @@ import 'package:token_app/utils/text_style.dart';
 import 'package:token_app/view/home_screen/location_screen.dart';
 
 class BuyFilterPage extends StatelessWidget {
-  BuyFilterPage({super.key});
-
-  List<String> propertyType = [
-    "Apartment",
-    "Builder Floor",
-    "Independent House",
-    "Villa",
-  ];
-
-  List<String> propertyCondition = ["Ready to move", "Under Construction"];
-  List<String> bhkType = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK", "5+BHK"];
-
-  List<String> furnishType = [
-    "Fully Furnished",
-    " Semi Furnished",
-    "Unfurnished",
-  ];
+  const BuyFilterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -262,3 +246,19 @@ Widget budgetBox(String value, VoidCallback onTap) {
     ),
   );
 }
+
+List<String> propertyType = [
+  "Apartment",
+  "Builder Floor",
+  "Independent House",
+  "Villa",
+];
+
+List<String> propertyCondition = ["Ready to move", "Under Construction"];
+List<String> bhkType = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK", "5+BHK"];
+
+List<String> furnishType = [
+  "Fully Furnished",
+  " Semi Furnished",
+  "Unfurnished",
+];

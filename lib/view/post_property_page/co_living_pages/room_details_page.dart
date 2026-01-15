@@ -7,24 +7,8 @@ import 'package:token_app/view/post_property_page/amenities_page.dart';
 import 'package:token_app/viewModel/afterLogin/post_property_provider/post_propert_providers.dart';
 
 class RoomDetailsPage extends StatelessWidget {
-  RoomDetailsPage({super.key});
-  List<AmenityModel> amenitiesList = [
-    AmenityModel(title: "Lift", icon: "assets/icons/lift.png"),
-    AmenityModel(title: "Power Backup", icon: "assets/icons/power.png"),
-    AmenityModel(title: "Gym", icon: "assets/icons/gym.png"),
-    AmenityModel(title: "Swimming Pool", icon: "assets/icons/pool.png"),
-    AmenityModel(title: "CCTV Surveillance", icon: "assets/icons/cctv.png"),
-    AmenityModel(title: "Gated Community", icon: "assets/icons/gated.png"),
-    AmenityModel(title: "Water Supply", icon: "assets/icons/water.png"),
-    AmenityModel(title: "Parking Lot", icon: "assets/icons/parking.png"),
-    AmenityModel(title: "Kids Area", icon: "assets/icons/kids.png"),
-    AmenityModel(title: "Playground", icon: "assets/icons/playground.png"),
-    AmenityModel(title: "Community Garden", icon: "assets/icons/garden.png"),
-    AmenityModel(title: "Free Wifi", icon: "assets/icons/wifi.png"),
-    AmenityModel(title: "Club", icon: "assets/icons/club.png"),
-    AmenityModel(title: "Gas", icon: "assets/icons/gas.png"),
-    AmenityModel(title: "Sewage", icon: "assets/icons/sewage.png"),
-  ];
+  const RoomDetailsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -223,3 +207,21 @@ class RoomDetailsPage extends StatelessWidget {
     );
   }
 }
+
+List<AmenityModel> amenitiesList = [
+  AmenityModel(title: "Lift", icon: "assets/icons/lift.png"),
+  AmenityModel(title: "Power Backup", icon: "assets/icons/power.png"),
+  AmenityModel(title: "Gym", icon: "assets/icons/gym.png"),
+  AmenityModel(title: "Swimming Pool", icon: "assets/icons/pool.png"),
+  AmenityModel(title: "CCTV Surveillance", icon: "assets/icons/cctv.png"),
+  AmenityModel(title: "Gated Community", icon: "assets/icons/gated.png"),
+  AmenityModel(title: "Water Supply", icon: "assets/icons/water.png"),
+  AmenityModel(title: "Parking Lot", icon: "assets/icons/parking.png"),
+  AmenityModel(title: "Kids Area", icon: "assets/icons/kids.png"),
+  AmenityModel(title: "Playground", icon: "assets/icons/playground.png"),
+  AmenityModel(title: "Community Garden", icon: "assets/icons/garden.png"),
+  AmenityModel(title: "Free Wifi", icon: "assets/icons/wifi.png"),
+  AmenityModel(title: "Club", icon: "assets/icons/club.png"),
+  AmenityModel(title: "Gas", icon: "assets/icons/gas.png"),
+  AmenityModel(title: "Sewage", icon: "assets/icons/sewage.png"),
+];

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
-import 'package:token_app/view/post_property_page/address_details_page.dart';
 import 'package:token_app/view/post_property_page/photo_upload_page.dart';
 
 class ContactAmenitiesPage extends StatefulWidget {
@@ -407,7 +406,12 @@ void openAmenitiesBottomSheet(
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(12),
-                                child: Image.asset(item.icon),
+                                child: Image.asset(
+                                  item.icon,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Icon(Icons.error_outline);
+                                  },
+                                ),
                               ),
                             ),
                             const SizedBox(height: 8),
