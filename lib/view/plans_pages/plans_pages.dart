@@ -107,6 +107,9 @@ class PlansPage extends StatelessWidget {
                     ),
                     onPressed: provider.isSelected
                         ? () {
+                            provider.fetchPlans(
+                              provider.selectedRole?.toUpperCase() ?? '',
+                            );
                             Navigator.push(
                               context,
                               MaterialPageRoute(

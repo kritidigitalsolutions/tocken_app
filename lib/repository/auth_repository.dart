@@ -6,9 +6,18 @@ class AuthRepository {
 
   Future<dynamic> loginWithPhone(String mobile) async {
     try {
-      final response = await _api.postApi(AppUrl.loginWithPhone, {
-        "mobile": mobile,
-      });
+      final response = await _api.postApi(AppUrl.sendOtp, {"phone": mobile});
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // verify otp
+
+  Future<dynamic> verifyOtp(String mobile, String otp) async {
+    try {
+      final response = await _api.postApi(AppUrl.verifyOtp, {"phone": mobile});
       return response;
     } catch (e) {
       rethrow;

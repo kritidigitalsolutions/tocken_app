@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:token_app/data/api_response.dart';
 import 'package:token_app/repository/auth_repository.dart';
+import 'package:token_app/view/beforeLogin/otp_verification_page.dart';
 
 class OnboardingProvider extends ChangeNotifier {
   int _currentIndex = 0;
@@ -35,7 +36,7 @@ class PhoneNumberProvider extends ChangeNotifier {
 
   ApiResponse<dynamic> auth = ApiResponse.loading();
 
-  Future<void> login() async {
+  Future<void> login(BuildContext context) async {
     if (!isValid) return;
 
     auth = ApiResponse.loading();
@@ -45,6 +46,14 @@ class PhoneNumberProvider extends ChangeNotifier {
       final response = await authRepo.loginWithPhone(phoneController.text);
 
       auth = ApiResponse.completed(response);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              OtpVerificationScreen(phone: phoneController.text.trim()),
+        ),
+      );
+      print("auth otp -------  -$auth");
     } catch (e) {
       auth = ApiResponse.error(e.toString());
     }
@@ -61,7 +70,35 @@ class PhoneNumberProvider extends ChangeNotifier {
 
 // Otp verification screen
 
-class OtpVerificationProvider extends ChangeNotifier {}
+class OtpVerificationProvider extends ChangeNotifier {
+  final authRepo = AuthRepository();
+
+  // ApiResponse<dynamic> verifyedData = ApiResponse.loading();
+
+  //   Future<void> login(BuildContext context) async {
+
+  //     verifyedData = ApiResponse.loading();
+  //     notifyListeners();
+
+  //     try {
+  //       final response = await authRepo.loginWithPhone(phoneController.text);
+
+  //       verifyedData = ApiResponse.completed(response);
+  //       // Navigator.push(
+  //       //   context,
+  //       //   MaterialPageRoute(
+  //       //     builder: (_) =>
+  //       //         OtpVerificationScreen(phone: phoneController.text.trim()),
+  //       //   ),
+  //       // );
+  //       print("auth otp -------  -$verifyedData");
+  //     } catch (e) {
+  //       verifyedData = ApiResponse.error(e.toString());
+  //     }
+
+  //     notifyListeners();
+  //   }
+}
 
 // User details
 

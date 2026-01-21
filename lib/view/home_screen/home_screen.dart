@@ -395,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // 🏢 Project List
   Widget _projectList(BuildContext context) {
     return SizedBox(
-      height: 120,
+      height: 150,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
@@ -455,7 +455,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String? tag,
   }) {
     return Container(
-      width: 180,
+      width: 220,
       margin: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),

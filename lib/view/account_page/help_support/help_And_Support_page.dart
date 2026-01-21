@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/text_style.dart';
 import 'package:token_app/view/account_page/help_support/about_us.page.dart';
-import 'package:token_app/view/account_page/help_support/privacy_policy.dart';
-import 'package:token_app/view/account_page/help_support/terms_Condition_page.dart';
+import 'package:token_app/view/account_page/help_support/policy_page.dart';
+import 'package:token_app/viewModel/policy_view_model/policy_provider.dart';
 
 class HelpAndSupportPage extends StatelessWidget {
   const HelpAndSupportPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.read<PolicyProvider>();
     return Scaffold(
       appBar: AppBar(
         title: Text("Help", style: textStyle17(FontWeight.w900)),
@@ -24,6 +26,7 @@ class HelpAndSupportPage extends StatelessWidget {
             title: "About Us",
             icon: Icons.info_outline,
             onTap: () {
+              provider.fetchAboutUs();
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => AboutUsPage()),
@@ -35,9 +38,13 @@ class HelpAndSupportPage extends StatelessWidget {
             title: "Terms & Conditions",
             icon: Icons.description_outlined,
             onTap: () {
+              provider.fetchPolicy("terms");
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => TermsAndConditionsPage()),
+                MaterialPageRoute(
+                  builder: (_) =>
+                      PolicyPage(title: "Terms & Conditions", type: "terms"),
+                ),
               );
             },
           ),
@@ -47,9 +54,13 @@ class HelpAndSupportPage extends StatelessWidget {
             title: "Privacy Policy",
             icon: Icons.privacy_tip_outlined,
             onTap: () {
+              provider.fetchPolicy("privacy");
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => PrivacyPolicyPage()),
+                MaterialPageRoute(
+                  builder: (_) =>
+                      PolicyPage(title: "Privacy Policy", type: "privacy"),
+                ),
               );
             },
           ),

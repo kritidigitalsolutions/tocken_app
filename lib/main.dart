@@ -14,6 +14,7 @@ import 'package:token_app/viewModel/afterLogin/plans_provider/plan_provider.dart
 import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provider.dart';
 import 'package:token_app/viewModel/afterLogin/post_property_provider/post_propert_providers.dart';
 import 'package:token_app/viewModel/beforeLogin/auth_provider.dart';
+import 'package:token_app/viewModel/policy_view_model/policy_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,6 +51,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => DeleteAccountProvider()),
         ChangeNotifierProvider(create: (_) => MyListingProvider()),
         ChangeNotifierProvider(create: (_) => RoomDetailsProvider()),
+        ChangeNotifierProvider(create: (_) => PolicyProvider()),
       ],
       child: const MyApp(),
     ),

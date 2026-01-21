@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:token_app/data/status.dart';
 import 'package:token_app/resources/app_colors.dart';
+import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
+import 'package:token_app/viewModel/policy_view_model/policy_provider.dart';
 
 class AboutUsPage extends StatelessWidget {
   const AboutUsPage({super.key});
@@ -13,94 +17,50 @@ class AboutUsPage extends StatelessWidget {
         centerTitle: true,
       ),
       backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            _SectionTitle("Who We Are"),
-            _SectionText(
-              "We are a technology-driven real estate platform designed "
-              "to simplify the process of buying, selling, and renting "
-              "properties. Our mission is to provide a seamless and "
-              "transparent experience for all users.",
-            ),
-
-            SizedBox(height: 16),
-
-            _SectionTitle("Our Mission"),
-            _SectionText(
-              "Our mission is to connect people with the right properties "
-              "by leveraging modern technology, verified listings, and "
-              "user-friendly tools that make property transactions easy "
-              "and reliable.",
-            ),
-
-            SizedBox(height: 16),
-
-            _SectionTitle("What We Offer"),
-            _SectionText(
-              "• Verified property listings\n"
-              "• Easy search and filtering options\n"
-              "• Secure user authentication\n"
-              "• Personalized user experience\n"
-              "• Dedicated customer support",
-            ),
-
-            SizedBox(height: 16),
-
-            _SectionTitle("Why Choose Us"),
-            _SectionText(
-              "We focus on trust, transparency, and simplicity. Our platform "
-              "is built to ensure users find accurate information and enjoy "
-              "a smooth experience throughout their property journey.",
-            ),
-
-            SizedBox(height: 16),
-
-            _SectionTitle("Our Vision"),
-            _SectionText(
-              "To become the most trusted digital platform for real estate "
-              "services by continuously innovating and putting users first.",
-            ),
-
-            SizedBox(height: 24),
-
-            Center(
-              child: Text(
-                "© 2026 Token App. All rights reserved.",
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-              ),
-            ),
-          ],
-        ),
+      body: Consumer<PolicyProvider>(
+        builder: (context, provider, _) {
+          final aboutUsStatus = provider.aboutUs.status;
+          switch (aboutUsStatus) {
+            case Status.loading:
+              return Center(child: CircularProgressIndicator());
+            case Status.error:
+              final error = provider.aboutUs.message;
+              return Center(
+                child: errorMessage(error ?? "Failed to Fetch", () {
+                  provider.fetchAboutUs();
+                }),
+              );
+            case Status.completed:
+              final data = provider.aboutUs.data?.aboutUs;
+              return SingleChildScrollView(
+                padding: EdgeInsets.all(15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(data?.content ?? 'N/A'),
+                    SizedBox(height: 10),
+                    Text(data?.mission ?? 'N/A'),
+                    SizedBox(height: 10),
+                    Text(data?.vision ?? 'N/A'),
+                  ],
+                ),
+              );
+          }
+        },
       ),
     );
   }
-}
 
-class _SectionTitle extends StatelessWidget {
-  final String text;
-  const _SectionTitle(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-    );
-  }
-}
-
-class _SectionText extends StatelessWidget {
-  final String text;
-  const _SectionText(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(fontSize: 14, height: 1.6, color: Colors.black87),
+  Widget errorMessage(String text, VoidCallback onTap) {
+    return Column(
+      children: [
+        Text(text, style: textStyle15(FontWeight.w600)),
+        SizedBox(height: 12),
+        OutlinedButton(
+          onPressed: onTap,
+          child: Text("Retry", style: textStyle15(FontWeight.w500)),
+        ),
+      ],
     );
   }
 }

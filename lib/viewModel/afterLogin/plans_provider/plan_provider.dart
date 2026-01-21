@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:token_app/data/api_response.dart';
+import 'package:token_app/model/response_model/plan/plan_res_model.dart';
+import 'package:token_app/repository/plan_repo.dart';
 
 class PlanDetailsProvider extends ChangeNotifier {
+  final PlanRepo _repo = PlanRepo();
+
   List<String> featureOption = [
     'Secure payment gateway',
     "Cancel anytime, no questions",
@@ -26,6 +31,60 @@ class PlanDetailsProvider extends ChangeNotifier {
   }
 
   bool get isSelected => selectedRole != null;
+
+  // Plan fetch
+
+  ApiResponse<PlanResModel> plans = ApiResponse.loading();
+
+  Future<void> fetchPlans(String type) async {
+    plans = ApiResponse.loading();
+    notifyListeners();
+    fetchFaq();
+    try {
+      final data = await _repo.fetchPlans(type);
+      plans = ApiResponse.completed(data);
+      setInitialPlan();
+    } catch (e) {
+      print(e.toString());
+      plans = ApiResponse.error(e.toString());
+    }
+    notifyListeners();
+  }
+
+  // feature add
+
+  Plan? _selectedPlan;
+  Plan? get selectedPlan => _selectedPlan;
+
+  /// Call after API success
+  void setInitialPlan() {
+    if (plans.data != null && plans.data!.plans.isNotEmpty) {
+      _selectedPlan ??= plans.data!.plans.first;
+      notifyListeners();
+    }
+  }
+
+  void selectPlan(Plan plan) {
+    _selectedPlan = plan;
+    notifyListeners();
+  }
+
+  // FAQ fetch
+
+  ApiResponse<FAQResMOdel> faqs = ApiResponse.loading();
+
+  Future<void> fetchFaq() async {
+    faqs = ApiResponse.loading();
+    notifyListeners();
+    try {
+      final data = await _repo.fetchFaq();
+      faqs = ApiResponse.completed(data);
+    } catch (e) {
+      print(e.toString());
+      faqs = ApiResponse.error(e.toString());
+    }
+    notifyListeners();
+  }
 }
 
 class UserRole {
