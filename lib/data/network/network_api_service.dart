@@ -6,8 +6,8 @@ import 'base_api_service.dart';
 class NetworkApiService extends BaseApiService {
   final Dio _dio = Dio(
     BaseOptions(
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
+      // connectTimeout: const Duration(seconds: 30),
+      // receiveTimeout: const Duration(seconds: 30),
       responseType: ResponseType.json,
     ),
   );

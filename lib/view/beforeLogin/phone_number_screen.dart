@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:token_app/data/status.dart';
 import 'package:token_app/main.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
+import 'package:token_app/view/beforeLogin/otp_verification_page.dart';
 import 'package:token_app/viewModel/beforeLogin/auth_provider.dart';
 
 class PhoneNumberScreen extends StatefulWidget {
@@ -157,18 +157,27 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
                 /// 🔹 SEND OTP BUTTON
                 ///
                 Selector<PhoneNumberProvider, bool>(
-                  selector: (_, p) => p.auth.status == Status.loading,
+                  selector: (_, p) => p.isValid,
                   builder: (context, isLoading, child) {
                     return AppButton(
                       text: "Send OTP",
-                      isLoading: isLoading,
+                      // isLoading: isLoading,
                       height: 54,
-                      onTap: isLoading
+                      onTap: !isLoading
                           ? null
                           : () {
                               if (_formKey.currentState!.validate()) {
-                                context.read<PhoneNumberProvider>().login(
+                                // context.read<PhoneNumberProvider>().login(
+                                //   context,
+                                // );
+                                Navigator.push(
                                   context,
+                                  MaterialPageRoute(
+                                    builder: (_) => OtpVerificationScreen(
+                                      phone: provider.phoneController.text
+                                          .trim(),
+                                    ),
+                                  ),
                                 );
                               }
                             },

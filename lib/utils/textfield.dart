@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:token_app/resources/app_colors.dart';
 
 class AppTextField extends StatefulWidget {
@@ -13,6 +14,7 @@ class AppTextField extends StatefulWidget {
   final Color? fillColor;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
+  final bool? readOnly;
   final String? Function(String?)? validator;
 
   final Color borderColor;
@@ -30,6 +32,7 @@ class AppTextField extends StatefulWidget {
     this.prefixIcon,
     this.fillColor,
     this.filled,
+    this.readOnly,
     this.suffixIcon,
     this.focusNode,
     this.validator,
@@ -58,6 +61,7 @@ class _AppTextFieldState extends State<AppTextField> {
       controller: widget.controller,
       focusNode: widget.focusNode,
       keyboardType: widget.keyboardType,
+      readOnly: widget.readOnly ?? false,
       obscureText: widget.isPassword ? _obscureText : false,
       enabled: widget.enabled,
       maxLines: widget.isPassword ? 1 : widget.maxLines,
@@ -84,6 +88,94 @@ class _AppTextFieldState extends State<AppTextField> {
         focusedBorder: _border(widget.focusedBorderColor),
         errorBorder: _border(widget.errorBorderColor),
         focusedErrorBorder: _border(widget.errorBorderColor),
+        disabledBorder: _border(Colors.grey.shade300),
+      ),
+    );
+  }
+}
+
+class AppNumberField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hintText;
+  final int? maxLength;
+  final bool allowDecimal;
+  final int? min;
+  final int? max;
+  final Color borderColor;
+  final Color focusedBorderColor;
+  final Color errorBorderColor;
+  final ValueChanged<String>? onChanged;
+
+  const AppNumberField({
+    super.key,
+    required this.controller,
+    required this.hintText,
+    this.maxLength,
+    this.allowDecimal = false,
+    this.min,
+    this.max,
+    this.borderColor = AppColors.grey,
+    this.focusedBorderColor = AppColors.mainColors,
+    this.errorBorderColor = AppColors.mainColors,
+    this.onChanged,
+  });
+
+  OutlineInputBorder _border(Color color) {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: color, width: 1.5),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: TextInputType.numberWithOptions(
+        decimal: allowDecimal,
+        signed: false,
+      ),
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(
+          allowDecimal ? RegExp(r'^\d*\.?\d*$') : RegExp(r'^\d*$'),
+        ),
+        if (maxLength != null) LengthLimitingTextInputFormatter(maxLength),
+      ],
+      onChanged: (value) {
+        if (value.isEmpty) {
+          onChanged?.call(value);
+          return;
+        }
+
+        final numVal = allowDecimal
+            ? double.tryParse(value)
+            : int.tryParse(value);
+
+        if (numVal == null) return;
+
+        if (min != null && numVal < min!) {
+          controller.text = min.toString();
+          controller.selection = TextSelection.collapsed(
+            offset: controller.text.length,
+          );
+        }
+
+        if (max != null && numVal > max!) {
+          controller.text = max.toString();
+          controller.selection = TextSelection.collapsed(
+            offset: controller.text.length,
+          );
+        }
+
+        onChanged?.call(value);
+      },
+      decoration: InputDecoration(
+        hintText: hintText,
+        counterText: "",
+        enabledBorder: _border(borderColor),
+        focusedBorder: _border(focusedBorderColor),
+        errorBorder: _border(errorBorderColor),
+        focusedErrorBorder: _border(errorBorderColor),
         disabledBorder: _border(Colors.grey.shade300),
       ),
     );

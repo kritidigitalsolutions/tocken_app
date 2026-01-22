@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:token_app/data/status.dart';
 import 'package:token_app/resources/app_colors.dart';
-import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
 import 'package:token_app/viewModel/policy_view_model/policy_provider.dart';
 

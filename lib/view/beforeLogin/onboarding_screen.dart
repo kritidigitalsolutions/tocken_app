@@ -7,23 +7,49 @@ import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/view/beforeLogin/login_screen.dart';
 import 'package:token_app/viewModel/beforeLogin/auth_provider.dart';
 
-class OnboardingScreen extends StatelessWidget {
+class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
+
+  @override
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     context.read<OnboardingProvider>().getOnBoarding();
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<OnboardingProvider>();
+
+    /// 🔹 LOADING
+    if (provider.isLoading && provider.onboardingItems.isEmpty) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    /// 🔹 ERROR
+    if (provider.errorMessage != null && provider.onboardingItems.isEmpty) {
+      return Scaffold(body: Center(child: Text(provider.errorMessage!)));
+    }
+
+    final list = provider.onboardingItems;
 
     return Scaffold(
       body: Stack(
         children: [
           /// 🔹 IMAGE SLIDER
           CarouselSlider(
-            items: onboardingList.map((item) {
-              return Image.asset(
+            items: list.map((item) {
+              return Image.network(
                 item.image,
                 fit: BoxFit.cover,
                 width: double.infinity,
+                errorBuilder: (_, __, ___) => Container(color: Colors.grey),
               );
             }).toList(),
             options: CarouselOptions(
@@ -31,15 +57,11 @@ class OnboardingScreen extends StatelessWidget {
               viewportFraction: 1,
               autoPlay: true,
               autoPlayInterval: const Duration(seconds: 3),
-              autoPlayAnimationDuration: const Duration(milliseconds: 600),
               onPageChanged: (index, reason) {
                 provider.updateIndex(index);
               },
             ),
           ),
-
-          /// 🔹 DARK OVERLAY
-          // Container(color: Colors.black.withOpacity(0.35)),
 
           /// 🔹 TEXT
           Positioned(
@@ -49,7 +71,7 @@ class OnboardingScreen extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  onboardingList[provider.currentIndex].title,
+                  list[provider.currentIndex].title,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Colors.white,
@@ -59,7 +81,7 @@ class OnboardingScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  onboardingList[provider.currentIndex].subtitle,
+                  list[provider.currentIndex].subtitle,
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.white70, fontSize: 14),
                 ),
@@ -67,7 +89,7 @@ class OnboardingScreen extends StatelessWidget {
             ),
           ),
 
-          /// 🔹 DOT INDICATOR
+          /// 🔹 DOTS
           Positioned(
             bottom: 100,
             left: 0,
@@ -75,7 +97,7 @@ class OnboardingScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
-                onboardingList.length,
+                list.length,
                 (index) => AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -92,8 +114,6 @@ class OnboardingScreen extends StatelessWidget {
             ),
           ),
 
-          /// Skip login button
-
           /// 🔹 TOP BAR
           SafeArea(
             child: Padding(
@@ -108,7 +128,7 @@ class OnboardingScreen extends StatelessWidget {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(builder: (_) => MyHomePage()),
-                        (route) => route.isFirst,
+                        (route) => false,
                       );
                     },
                     color: AppColors.black,
@@ -118,7 +138,7 @@ class OnboardingScreen extends StatelessWidget {
             ),
           ),
 
-          /// 🔹 GET STARTED BUTTON
+          /// 🔹 GET STARTED
           Positioned(
             bottom: 30,
             left: 20,
@@ -139,34 +159,34 @@ class OnboardingScreen extends StatelessWidget {
   }
 }
 
-final List<OnboardingItem> onboardingList = [
-  OnboardingItem(
-    image: 'assets/onboarding/one.jpg',
-    title: "Discover Nearby PG’s",
-    subtitle:
-        "Discover the PG’s all over India, that suit your lifestyle and budget!",
-  ),
-  OnboardingItem(
-    image: 'assets/onboarding/two.jpg',
-    title: "Affordable Living Spaces",
-    subtitle:
-        "Find affordable PGs with modern amenities in your preferred location.",
-  ),
-  OnboardingItem(
-    image: 'assets/onboarding/three.jpg',
-    title: "Safe & Comfortable Homes",
-    subtitle: "Verified PGs with safety, comfort, and convenience guaranteed.",
-  ),
-];
+// final List<OnboardingItem> onboardingList = [
+//   OnboardingItem(
+//     image: 'assets/onboarding/one.jpg',
+//     title: "Discover Nearby PG’s",
+//     subtitle:
+//         "Discover the PG’s all over India, that suit your lifestyle and budget!",
+//   ),
+//   OnboardingItem(
+//     image: 'assets/onboarding/two.jpg',
+//     title: "Affordable Living Spaces",
+//     subtitle:
+//         "Find affordable PGs with modern amenities in your preferred location.",
+//   ),
+//   OnboardingItem(
+//     image: 'assets/onboarding/three.jpg',
+//     title: "Safe & Comfortable Homes",
+//     subtitle: "Verified PGs with safety, comfort, and convenience guaranteed.",
+//   ),
+// ];
 
-class OnboardingItem {
-  final String image;
-  final String title;
-  final String subtitle;
+// class OnboardingItem {
+//   final String image;
+//   final String title;
+//   final String subtitle;
 
-  OnboardingItem({
-    required this.image,
-    required this.title,
-    required this.subtitle,
-  });
-}
+//   OnboardingItem({
+//     required this.image,
+//     required this.title,
+//     required this.subtitle,
+//   });
+// }

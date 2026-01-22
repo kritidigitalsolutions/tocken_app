@@ -30,7 +30,7 @@ class AddGstNumber extends StatelessWidget {
               ],
             ),
             SizedBox(height: 15),
-            _inputItem("Username", ctr, "Username"),
+            _inputItem("Username", ctr, "Username", readOnly: true),
             SizedBox(height: 15),
             Text("Phone Number", style: textStyle15(FontWeight.w900)),
             SizedBox(height: 10),
@@ -68,7 +68,7 @@ class AddGstNumber extends StatelessWidget {
             SizedBox(height: 15),
             _inputItem("GST Number", ctr, "GST Number"),
             SizedBox(height: 15),
-            _inputItem("Role", ctr, "role"),
+            _inputItem("Role", ctr, "role", readOnly: true),
             SizedBox(height: 20),
             AppButton(text: "Save", onTap: () {}),
           ],
@@ -80,8 +80,9 @@ class AddGstNumber extends StatelessWidget {
   Widget _inputItem(
     String title,
     TextEditingController controller,
-    String hint,
-  ) {
+    String hint, {
+    bool readOnly = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -90,7 +91,8 @@ class AddGstNumber extends StatelessWidget {
         AppTextField(
           controller: controller,
           hintText: hint,
-          fillColor: AppColors.white,
+          readOnly: readOnly,
+          fillColor: readOnly ? AppColors.white70 : AppColors.white,
           filled: true,
         ),
       ],

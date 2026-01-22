@@ -38,7 +38,9 @@ void main() {
         ChangeNotifierProvider(create: (_) => AddressDetailsProvider()),
         ChangeNotifierProvider(create: (_) => PlanDetailsProvider()),
         ChangeNotifierProvider(create: (_) => ProfilePagesProvider()),
-        ChangeNotifierProvider(create: (_) => OnboardingProvider()),
+        ChangeNotifierProvider(
+          create: (_) => OnboardingProvider()..getOnBoarding(),
+        ),
         ChangeNotifierProvider(create: (_) => PhoneNumberProvider()),
         ChangeNotifierProvider(create: (_) => OtpVerificationProvider()),
         ChangeNotifierProvider(create: (_) => UserDetailsProvider()),

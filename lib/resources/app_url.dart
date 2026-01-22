@@ -1,7 +1,9 @@
 class AppUrl {
-  static const String baseUrl = 'https://q769bgq4-5000.inc1.devtunnels.ms/api';
+  static const String baseUrl = 'http://192.168.29.185:5000/api';
 
   // Login
+
+  static const String onBoarding = "$baseUrl/wallpapers";
 
   static const String sendOtp = "$baseUrl/auth/send-otp";
   static const String verifyOtp = "$baseUrl/auth/verify-otp";
@@ -9,6 +11,10 @@ class AppUrl {
   // Policy
 
   static const String policy = "$baseUrl/legal";
+
+  // Feedback
+
+  static const String feedback = "$baseUrl/feedback";
 
   // about -us
 
@@ -18,4 +24,8 @@ class AppUrl {
 
   static const String plans = "$baseUrl/plans?userType=";
   static const String faq = "$baseUrl/faqs";
+
+  // acount page
+
+  static const String personalDetails = "$baseUrl/wallpapers";
 }

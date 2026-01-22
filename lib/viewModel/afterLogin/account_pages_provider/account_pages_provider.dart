@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:token_app/model/request_model/account/feedback_req_model.dart';
+import 'package:token_app/repository/account_repo.dart';
+import 'package:token_app/utils/app_snackbar.dart';
 
 class ProfilePagesProvider extends ChangeNotifier {
   final ImagePicker _picker = ImagePicker();
@@ -106,13 +109,38 @@ class FeedbackProvider extends ChangeNotifier {
     "Report a problem",
     "Raise a question",
     "Suggestion/Improvement",
-    "Compliment Hexdome",
+    "Compliment Tocken",
     "Others",
   ];
 
   void toggle(String type) {
     selectedType = type;
     notifyListeners();
+  }
+
+  // post Feedback
+
+  final AccountRepo _repo = AccountRepo();
+
+  Future<void> postFeedback(BuildContext context) async {
+    try {
+      final model = FeedbackReqModel(
+        type: selectedType,
+        description: feedbackController.text.trim(),
+        name: nameController.text.trim(),
+        phone: '9999999999',
+      );
+      await _repo.postFeedback(model);
+      AppSnackBar.success(
+        context,
+        "Thank you! Your feedback has been submitted.",
+      );
+    } catch (e) {
+      AppSnackBar.error(
+        context,
+        "Failed to submit feedback. Please try again.",
+      );
+    }
   }
 }
 

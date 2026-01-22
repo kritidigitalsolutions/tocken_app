@@ -4,16 +4,60 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:token_app/data/api_response.dart';
+import 'package:token_app/model/response_model/auth/auth_response_model.dart';
 import 'package:token_app/repository/auth_repository.dart';
 import 'package:token_app/view/beforeLogin/otp_verification_page.dart';
 
-class OnboardingProvider extends ChangeNotifier {
-  int _currentIndex = 0;
+class OnboardingItem {
+  final String image;
+  final String title;
+  final String subtitle;
 
-  int get currentIndex => _currentIndex;
+  OnboardingItem({
+    required this.image,
+    required this.title,
+    required this.subtitle,
+  });
+}
+
+class OnboardingProvider extends ChangeNotifier {
+  final AuthRepository authRepo = AuthRepository();
+
+  bool isLoading = false;
+  String? errorMessage;
+  int currentIndex = 0;
+
+  /// 🔹 FINAL LIST USED BY UI
+  List<OnboardingItem> onboardingItems = [];
 
   void updateIndex(int index) {
-    _currentIndex = index;
+    currentIndex = index;
+    notifyListeners();
+  }
+
+  Future<void> getOnBoarding() async {
+    isLoading = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      final OnBoardingResModel res = await authRepo.onBoarding();
+
+      onboardingItems = (res.wall ?? []).map((e) {
+        return OnboardingItem(
+          image: e.image ?? '',
+          title: e.title ?? '',
+          subtitle: e.des ?? '',
+        );
+      }).toList();
+
+      currentIndex = 0;
+    } catch (e) {
+      errorMessage = e.toString();
+      print('ofdfsfd=--d-sf-dsf- ${e.toString()}');
+    }
+
+    isLoading = false;
     notifyListeners();
   }
 }
