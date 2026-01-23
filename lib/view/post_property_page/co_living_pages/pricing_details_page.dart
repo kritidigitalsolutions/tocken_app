@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
+import 'package:token_app/utils/textfield.dart';
 import 'package:token_app/view/post_property_page/co_living_pages/sharing_pre_page.dart';
+import 'package:token_app/viewModel/afterLogin/post_property_provider/co_living_provider.dart';
 
-class PricingDetailsPage extends StatelessWidget {
-  const PricingDetailsPage({super.key});
+class PricingDetailsPage extends StatefulWidget {
+  final bool isSharing;
+  const PricingDetailsPage({super.key, required this.isSharing});
 
   @override
+  State<PricingDetailsPage> createState() => _PricingDetailsPageState();
+}
+
+class _PricingDetailsPageState extends State<PricingDetailsPage> {
+  @override
   Widget build(BuildContext context) {
+    final provider = context.read<CoLivingProvider>();
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -20,11 +30,11 @@ class PricingDetailsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Pricing Details",
+              "Pricing",
               style: TextStyle(fontWeight: FontWeight.w600),
             ),
             Text(
-              "Co-living > Need Room/Flat",
+              "Co-living > Need Roommate",
               style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
             ),
           ],
@@ -37,62 +47,160 @@ class PricingDetailsPage extends StatelessWidget {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Budget", style: textStyle15(FontWeight.bold)),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(child: budgetBox("1K", () {})),
-                SizedBox(width: 10),
-                Expanded(child: budgetBox("50K+", () {})),
-              ],
+            /// Rent
+            Text("Rent Amount *", style: textStyle14(FontWeight.w600)),
+            const SizedBox(height: 8),
+            AppNumberField(
+              controller: provider.rentCtrl,
+              hintText: "Enter rent",
+              icon: Icon(Icons.currency_rupee_sharp),
             ),
-            Spacer(),
-            SizedBox(height: 20),
+
+            const SizedBox(height: 14),
+
+            /// Add more pricing
+            GestureDetector(
+              onTap: () => _openMorePricingSheet(context, provider),
+              child: Text(
+                "+ Add More Pricing Details",
+                style: TextStyle(
+                  color: AppColors.mainColors,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            /// Checkboxes
+            Selector<CoLivingProvider, bool>(
+              selector: (_, provider) => provider.negotiable,
+              builder: (context, value, child) {
+                return _checkTile(
+                  "Is the price negotiable?",
+                  value,
+                  (v) => provider.toggleNegotiable(v),
+                );
+              },
+            ),
+
+            Selector<CoLivingProvider, bool>(
+              selector: (_, provider) => provider.utilitiesIncluded,
+              builder: (context, value, child) {
+                return _checkTile(
+                  "Is electricity charges included?",
+                  value,
+                  (v) => provider.toggleutilitiesIncludede(v),
+                );
+              },
+            ),
+            const Spacer(),
+
             AppButton(
               text: "Save & Next",
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => SharingPreferencePage()),
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        SharingPreferencePage(isSharing: widget.isSharing),
+                  ),
                 );
               },
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 12),
             AppButton(
               text: "Cancel",
+              backgroundColor: AppColors.grey.shade200,
               onTap: () {},
-              backgroundColor: AppColors.red.shade100,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 12),
           ],
         ),
       ),
     );
   }
-}
 
-Widget budgetBox(String value, VoidCallback onTap) {
-  return GestureDetector(
-    onTap: onTap,
-    child: Container(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        border: Border.all(width: 1, color: AppColors.grey.shade300),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Center(
-        child: Row(
-          children: [
-            Text(value),
-            Spacer(),
-            Icon(Icons.keyboard_arrow_down_outlined),
-          ],
-        ),
-      ),
-    ),
-  );
+  /// Checkbox tile
+  Widget _checkTile(String text, bool value, ValueChanged<bool> onChanged) {
+    return CheckboxListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(text),
+      value: value,
+      activeColor: AppColors.mainColors,
+      onChanged: (v) => onChanged(v!),
+    );
+  }
+
+  void _openMorePricingSheet(BuildContext context, CoLivingProvider p) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return Container(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  height: 4,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade400,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+              Text(
+                "Add more Pricing Details",
+                style: textStyle15(FontWeight.bold),
+              ),
+
+              const SizedBox(height: 16),
+              AppNumberField(
+                controller: p.maintenanceCtrl,
+                hintText: "Maintenance charges (per month)",
+                icon: Icon(Icons.currency_rupee_sharp),
+              ),
+
+              const SizedBox(height: 12),
+              AppNumberField(
+                controller: p.bookingCtrl,
+                hintText: "Booking amount",
+                icon: Icon(Icons.currency_rupee_sharp),
+              ),
+
+              const SizedBox(height: 12),
+              AppNumberField(
+                controller: p.otherCtrl,
+                hintText: "Other charges",
+                icon: Icon(Icons.currency_rupee_sharp),
+              ),
+
+              const SizedBox(height: 20),
+              AppButton(text: "Done", onTap: () => Navigator.pop(context)),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }

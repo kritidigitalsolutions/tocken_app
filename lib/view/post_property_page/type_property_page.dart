@@ -276,7 +276,7 @@ Widget typeProperty(
                 children: [
                   Text(label, textAlign: TextAlign.center),
                   const SizedBox(height: 6),
-                  Text(subtitle, textAlign: TextAlign.center),
+                  Text(subtitle, style: textStyle12(FontWeight.w500)),
                 ],
               ),
             ),
@@ -420,12 +420,17 @@ Widget propertyTypeCo_livingBottomSheet(BuildContext context) {
       Expanded(
         child: typeProperty(
           "Looking for Room/Flat",
-          "Turning, Spaces into Places, List with Heart",
+          "List your profile let the right people get in touch with you for shared living",
           'assets/images/residen.svg',
           () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => ProfileDetailsPage()),
+              MaterialPageRoute(
+                builder: (_) => ProfileDetailsPage(
+                  needRoom: "Need Room/Flat",
+                  isShare: false,
+                ),
+              ),
             );
             // Navigator.pop(context);
           },
@@ -435,12 +440,17 @@ Widget propertyTypeCo_livingBottomSheet(BuildContext context) {
       Expanded(
         child: typeProperty(
           "Have a Room/Flat to share",
-          "Where Vision Meets Venue: List for Business",
+          "Post your room/flat ad and discover roommates to split the rent!",
           'assets/images/commercial.svg',
           () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => ProfileDetailsPage()),
+              MaterialPageRoute(
+                builder: (_) => ProfileDetailsPage(
+                  needRoom: "Need Roommate",
+                  isShare: true,
+                ),
+              ),
             );
           },
         ),

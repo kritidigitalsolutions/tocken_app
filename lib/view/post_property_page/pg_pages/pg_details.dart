@@ -5,7 +5,6 @@ import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
 import 'package:token_app/utils/textfield.dart';
 import 'package:token_app/view/post_property_page/pg_pages/pg_price.dart';
-import 'package:token_app/view/post_property_page/pricing_page.dart';
 import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provider.dart';
 
 class PgDetailsPage extends StatelessWidget {

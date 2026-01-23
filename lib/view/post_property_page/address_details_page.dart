@@ -10,7 +10,8 @@ import 'package:token_app/viewModel/afterLogin/post_property_provider/post_prope
 
 class AddressDetailsPage extends StatelessWidget {
   final String path;
-  const AddressDetailsPage({super.key, required this.path});
+  final bool? isSharing;
+  const AddressDetailsPage({super.key, required this.path, this.isSharing});
 
   @override
   Widget build(BuildContext context) {
@@ -106,18 +107,25 @@ class AddressDetailsPage extends StatelessWidget {
                   if (path == "CO-LIVING") {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => PricingDetailsPage()),
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            PricingDetailsPage(isSharing: isSharing ?? false),
+                      ),
                     );
                   } else if (path == "COM") {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => ContactAmenitiesPage()),
                     );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            ContactAmenitiesPage(propertyType: path),
+                      ),
+                    );
                   }
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => ContactAmenitiesPage()),
-                  );
                 },
               ),
             ),

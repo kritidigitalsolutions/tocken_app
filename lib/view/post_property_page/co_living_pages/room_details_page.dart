@@ -2,150 +2,221 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
+import 'package:token_app/utils/text_style.dart';
 import 'package:token_app/view/post_property_page/address_details_page.dart';
 import 'package:token_app/view/post_property_page/amenities_page.dart';
-import 'package:token_app/viewModel/afterLogin/post_property_provider/post_propert_providers.dart';
+import 'package:token_app/view/post_property_page/co_living_pages/profile_details_page.dart';
+import 'package:token_app/view/post_property_page/pg_pages/pg_details.dart';
+import 'package:token_app/view/post_property_page/pg_pages/pg_price.dart';
+import 'package:token_app/viewModel/afterLogin/post_property_provider/co_living_provider.dart';
+import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provider.dart';
 
 class RoomDetailsPage extends StatelessWidget {
-  const RoomDetailsPage({super.key});
+  final String needFor;
+  final bool isSharing;
+  const RoomDetailsPage({
+    super.key,
+    required this.needFor,
+    required this.isSharing,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => RoomDetailsProvider(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Room Details"),
-          centerTitle: true,
-          actions: [TextButton(onPressed: () {}, child: const Text("Help"))],
+    return Scaffold(
+      appBar: AppBar(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Room Details", style: textStyle17(FontWeight.bold)),
+            Text("Co-living > $needFor", style: textStyle13(FontWeight.bold)),
+          ],
         ),
-        body: Consumer<RoomDetailsProvider>(
-          builder: (context, p, _) {
-            return Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _label("Available from *"),
-                        _dateField(context, p),
 
-                        const SizedBox(height: 20),
-                        _label("BHK *"),
-                        Wrap(
-                          spacing: 8,
-                          children: p.bhkOptions.map((e) {
-                            final selected = p.bhk == e;
-                            return ChoiceChip(
-                              label: Text(e),
-                              selected: selected,
-                              onSelected: (_) => p.setBhk(e),
-                            );
-                          }).toList(),
-                        ),
+        actions: [TextButton(onPressed: () {}, child: const Text("Help"))],
+      ),
+      body: Consumer<CoLivingProvider>(
+        builder: (context, p, _) {
+          return Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _label("Available from *"),
+                      _dateField(context, p),
 
-                        const SizedBox(height: 20),
-                        _label("Furnish Type *"),
-                        DropdownButtonFormField<String>(
-                          initialValue: p.furnishType,
-                          hint: const Text("Select the Furnish Type"),
-                          items: p.furnishTypes
-                              .map(
-                                (e) =>
-                                    DropdownMenuItem(value: e, child: Text(e)),
-                              )
-                              .toList(),
-                          onChanged: (v) {
-                            p.setFurnish(v ?? '');
-                          },
-                          decoration: _inputDecoration(),
-                        ),
+                      const SizedBox(height: 20),
+                      _label("BHK *"),
+                      Wrap(
+                        spacing: 8,
+                        children: p.bhkOptions.map((e) {
+                          return choiceChip(e, p.bhk ?? '', (_) => p.setBhk(e));
+                        }).toList(),
+                      ),
 
-                        const SizedBox(height: 20),
-                        _label("Room details"),
-                        Wrap(
-                          spacing: 8,
-                          children: p.roomDetailOptions.map((e) {
-                            return ChoiceChip(
-                              label: Text(e),
-                              selected: p.roomDetails.contains(e),
-                              onSelected: (_) => p.toggleRoomDetail(e),
-                            );
-                          }).toList(),
-                        ),
+                      const SizedBox(height: 20),
+                      _label("Furnish Type *"),
+                      _dropdown(p.furnishType, p.furnishTypes, (value) {
+                        p.setFurnishType(value);
 
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _textField(
-                                label: "Total Floors *",
-                                controller: p.totalFloorsCtrl,
+                        if (p.canOpenFurnishing) {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(20),
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _textField(
-                                label: "Your Floor *",
-                                controller: p.yourFloorCtrl,
+                            builder: (_) => const FurnishingBottomSheet(),
+                          );
+                        }
+                      }),
+                      if (p.furnishType == "Fully Furnished")
+                        Column(
+                          children: [
+                            Text(
+                              'Please select 6 amenities',
+                              style: textStyle14(
+                                FontWeight.w500,
+                                color: AppColors.mainColors,
                               ),
+                            ),
+                            AppButton(
+                              text: "Select Amenities",
+                              onTap: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(20),
+                                    ),
+                                  ),
+                                  builder: (_) => const FurnishingBottomSheet(),
+                                );
+                              },
                             ),
                           ],
                         ),
 
-                        const SizedBox(height: 20),
-                        ListTile(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: const BorderSide(color: Colors.grey),
-                          ),
-                          title: const Text("Amenities"),
-                          subtitle: const Text("Please choose your Amenities"),
-                          trailing: const Icon(Icons.add_circle_outline),
-                          onTap: () {
-                            openAmenitiesBottomSheet(
-                              context,
-                              "Select the Amenities",
-                              amenitiesList,
-                            );
-                          },
+                      if (p.furnishType == "Semi Furnished")
+                        Column(
+                          children: [
+                            Text(
+                              'Please select 3 amenities',
+                              style: textStyle14(
+                                FontWeight.w500,
+                                color: AppColors.mainColors,
+                              ),
+                            ),
+                            AppButton(
+                              text: "Select Amenities",
+                              onTap: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  constraints: BoxConstraints(
+                                    maxHeight:
+                                        MediaQuery.of(context).size.height *
+                                        0.7,
+                                  ),
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(20),
+                                    ),
+                                  ),
+                                  builder: (_) => const FurnishingBottomSheet(),
+                                );
+                              },
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                ),
 
-                /// ACTION BUTTONS
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: AppButton(
-                    text: "Save & Next",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => AddressDetailsPage(path: "CO-LIVING"),
+                      const SizedBox(height: 20),
+                      _label("Room details"),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: p.roomDetailOptions.map((e) {
+                          return boolChoiceChip(
+                            e,
+                            p.roomDetails.contains(e),
+                            () => p.toggleRoomDetail(e),
+                          );
+                        }).toList(),
+                      ),
+
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _textField(
+                              label: "Total Floors *",
+                              controller: p.totalFloorsCtrl,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _textField(
+                              label: "Your Floor *",
+                              controller: p.yourFloorCtrl,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+                      selectTile(
+                        title: "Amenities",
+                        subtitle: "Please choose your Amenities",
+                        list: p.selectedAmenityModel(amenitiesList),
+                        onTap: () {
+                          openAmenitiesBottomSheet(
+                            context,
+                            "Select the Amenities",
+                            amenitiesList,
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              /// ACTION BUTTONS
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: AppButton(
+                  text: "Save & Next",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AddressDetailsPage(
+                          path: "CO-LIVING",
+                          isSharing: isSharing,
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
-                SizedBox(height: 15),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: AppButton(
-                    text: "Cancel",
-                    onTap: () {},
-                    textColor: AppColors.black,
-                    backgroundColor: AppColors.red.shade100,
-                  ),
+              ),
+              SizedBox(height: 15),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: AppButton(
+                  text: "Cancel",
+                  onTap: () {},
+                  textColor: AppColors.black,
+                  backgroundColor: AppColors.red.shade100,
                 ),
-              ],
-            );
-          },
-        ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -157,7 +228,7 @@ class RoomDetailsPage extends StatelessWidget {
     child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600)),
   );
 
-  Widget _dateField(BuildContext context, RoomDetailsProvider p) {
+  Widget _dateField(BuildContext context, CoLivingProvider p) {
     return InkWell(
       onTap: () async {
         final date = await showDatePicker(
@@ -175,6 +246,24 @@ class RoomDetailsPage extends StatelessWidget {
               ? "Select date"
               : "${p.availableFrom!.day}/${p.availableFrom!.month}/${p.availableFrom!.year}",
         ),
+      ),
+    );
+  }
+
+  Widget _dropdown(
+    String? value,
+    List<String> items,
+    Function(String) onChanged,
+  ) {
+    return DropdownButtonFormField<String>(
+      initialValue: value,
+      hint: const Text("Select"),
+      items: items
+          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+          .toList(),
+      onChanged: (v) => onChanged(v!),
+      decoration: InputDecoration(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -208,20 +297,121 @@ class RoomDetailsPage extends StatelessWidget {
   }
 }
 
-List<AmenityModel> amenitiesList = [
-  AmenityModel(title: "Lift", icon: "assets/icons/lift.png"),
-  AmenityModel(title: "Power Backup", icon: "assets/icons/power.png"),
-  AmenityModel(title: "Gym", icon: "assets/icons/gym.png"),
-  AmenityModel(title: "Swimming Pool", icon: "assets/icons/pool.png"),
-  AmenityModel(title: "CCTV Surveillance", icon: "assets/icons/cctv.png"),
-  AmenityModel(title: "Gated Community", icon: "assets/icons/gated.png"),
-  AmenityModel(title: "Water Supply", icon: "assets/icons/water.png"),
-  AmenityModel(title: "Parking Lot", icon: "assets/icons/parking.png"),
-  AmenityModel(title: "Kids Area", icon: "assets/icons/kids.png"),
-  AmenityModel(title: "Playground", icon: "assets/icons/playground.png"),
-  AmenityModel(title: "Community Garden", icon: "assets/icons/garden.png"),
-  AmenityModel(title: "Free Wifi", icon: "assets/icons/wifi.png"),
-  AmenityModel(title: "Club", icon: "assets/icons/club.png"),
-  AmenityModel(title: "Gas", icon: "assets/icons/gas.png"),
-  AmenityModel(title: "Sewage", icon: "assets/icons/sewage.png"),
-];
+void openAmenitiesBottomSheet(
+  BuildContext context,
+  String header,
+  List<AmenityModel> list,
+) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) {
+      return Consumer<CoLivingProvider>(
+        builder: (context, provider, child) {
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.85,
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: 12),
+                Container(
+                  height: 4,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade400,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                /// Title
+                Text(
+                  header,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+
+                const SizedBox(height: 20),
+
+                /// Grid
+                Expanded(
+                  child: GridView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                          childAspectRatio: 0.9,
+                        ),
+                    itemCount: list.length,
+                    itemBuilder: (context, index) {
+                      final item = list[index];
+                      return GestureDetector(
+                        onTap: () {
+                          provider.toggleItem(list, index);
+                        },
+                        child: Column(
+                          children: [
+                            Container(
+                              height: 64,
+                              width: 64,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: item.isSelected
+                                      ? AppColors.mainColors
+                                      : Colors.grey.shade300,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Image.asset(
+                                  item.icon,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Icon(Icons.error_outline);
+                                  },
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              item.title,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: item.isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                /// Done Button
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: AppButton(
+                    text: "Done",
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
+import 'package:token_app/view/post_property_page/pg_pages/pg_price.dart';
 import 'package:token_app/view/post_property_page/photo_upload_page.dart';
+import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provider.dart';
 
 class ContactAmenitiesPage extends StatefulWidget {
   final String? propertyType;
@@ -13,42 +16,6 @@ class ContactAmenitiesPage extends StatefulWidget {
 }
 
 class _ContactAmenitiesPageState extends State<ContactAmenitiesPage> {
-  bool hideNumber = false;
-
-  List<AmenityModel> amenitiesList = [
-    AmenityModel(title: "Lift", icon: "assets/icons/lift.png"),
-    AmenityModel(title: "Power Backup", icon: "assets/icons/power.png"),
-    AmenityModel(title: "Gym", icon: "assets/icons/gym.png"),
-    AmenityModel(title: "Swimming Pool", icon: "assets/icons/pool.png"),
-    AmenityModel(title: "CCTV Surveillance", icon: "assets/icons/cctv.png"),
-    AmenityModel(title: "Gated Community", icon: "assets/icons/gated.png"),
-    AmenityModel(title: "Water Supply", icon: "assets/icons/water.png"),
-    AmenityModel(title: "Parking Lot", icon: "assets/icons/parking.png"),
-    AmenityModel(title: "Kids Area", icon: "assets/icons/kids.png"),
-    AmenityModel(title: "Playground", icon: "assets/icons/playground.png"),
-    AmenityModel(title: "Community Garden", icon: "assets/icons/garden.png"),
-    AmenityModel(title: "Free Wifi", icon: "assets/icons/wifi.png"),
-    AmenityModel(title: "Club", icon: "assets/icons/club.png"),
-    AmenityModel(title: "Gas", icon: "assets/icons/gas.png"),
-    AmenityModel(title: "Sewage", icon: "assets/icons/sewage.png"),
-  ];
-
-  List<AmenityModel> preferencesList = [
-    AmenityModel(title: "Bachelor", icon: "assets/icons/lift.png"),
-    AmenityModel(title: "Family", icon: "assets/icons/power.png"),
-    AmenityModel(title: "Living Couple", icon: "assets/icons/gym.png"),
-    AmenityModel(title: "Professional", icon: "assets/icons/pool.png"),
-    AmenityModel(title: "No Pets", icon: "assets/icons/cctv.png"),
-    AmenityModel(title: "No Smoking", icon: "assets/icons/gated.png"),
-    AmenityModel(title: "Student", icon: "assets/icons/water.png"),
-    AmenityModel(title: "Guests are allowed", icon: "assets/icons/parking.png"),
-    AmenityModel(title: "Only Veg", icon: "assets/icons/gated.png"),
-    AmenityModel(title: "Gender Restrictions", icon: "assets/icons/water.png"),
-    AmenityModel(title: "No Alcohol", icon: "assets/icons/parking.png"),
-  ];
-
-  String? lastEntryTime;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,188 +48,179 @@ class _ContactAmenitiesPageState extends State<ContactAmenitiesPage> {
         ],
       ),
 
-      body: Column(
-        children: [
-          /// 🔹 Content
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  /// Phone Number
-                  _sectionTitle("Phone Number *"),
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: AppColors.grey.shade300,
-                      border: Border.all(color: AppColors.grey.shade400),
-                    ),
-                    child: Row(
-                      children: [
-                        Image.asset("assets/auth/india_flag.png", height: 20),
-                        const SizedBox(width: 6),
-                        Text("(+91) 9999999999"),
-                        const Spacer(),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  /// Hide Number Switch
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Keep my phone number private"),
-                      Switch(
-                        value: hideNumber,
-                        onChanged: (v) {
-                          setState(() => hideNumber = v);
-                        },
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 6),
-
-                  /// Info Text
-                  Row(
+      body: Consumer<PgDetailsProvider>(
+        builder: (context, provider, child) {
+          return Column(
+            children: [
+              /// 🔹 Content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.info_outline, size: 18, color: Colors.grey),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          "Turning on the switch keeps your number private, "
-                          "though leads can reach you through Request Callback Option.",
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey.shade700,
-                          ),
+                      /// Phone Number
+                      _sectionTitle("Phone Number *"),
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: AppColors.grey.shade300,
+                          border: Border.all(color: AppColors.grey.shade400),
+                        ),
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              "assets/auth/india_flag.png",
+                              height: 20,
+                            ),
+                            const SizedBox(width: 6),
+                            Text("(+91) 9999999999"),
+                            const Spacer(),
+                          ],
                         ),
                       ),
+
+                      const SizedBox(height: 12),
+
+                      /// Hide Number Switch
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Keep my phone number private"),
+                          Switch(
+                            value: provider.hideNumber,
+                            onChanged: (v) {
+                              provider.toggleHideNumber(v);
+                            },
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 6),
+
+                      /// Info Text
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            size: 18,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              "Turning on the switch keeps your number private, "
+                              "though leads can reach you through Request Callback Option.",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      /// Amenities
+                      selectTile(
+                        title: "Amenities",
+                        subtitle: "Please choose your Amenities",
+                        list: provider.selectedAmenityModel(amenitiesList),
+                        onTap: () {
+                          _openAmenitiesBottomSheet(
+                            context,
+                            "Select the Amenities",
+                            amenitiesList,
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      /// Preferences
+                      selectTile(
+                        title: widget.propertyType != "PG"
+                            ? "Preferences"
+                            : "PG Rules",
+                        subtitle: "Please choose your Preferences",
+                        list: provider.selectedAmenityModel(preferencesList),
+                        onTap: () {
+                          _openAmenitiesBottomSheet(
+                            context,
+                            "Select the Preferences",
+                            preferencesList,
+                          );
+                        },
+                      ),
+
+                      if (widget.propertyType == "PG") ...[
+                        _sectionTitle("Last Entry Time"),
+                        _dropdown(
+                          provider.lastEntryTime,
+                          provider.entryTimeList,
+                          (val) {
+                            provider.toggleEntryTime(val);
+                          },
+                        ),
+                        SizedBox(height: 15),
+                        _sectionTitle("Common Areas"),
+                        Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: provider.commonAreaList.map((area) {
+                            return boolChoiceChip(
+                              area,
+                              provider.isSelectedArea(area),
+                              () {
+                                provider.toggelArea(area);
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ],
+
+                      const SizedBox(height: 30),
                     ],
                   ),
-
-                  const SizedBox(height: 24),
-
-                  /// Amenities
-                  _selectTile(
-                    title: "Amenities",
-                    subtitle: "Please choose your Amenities",
-                    onTap: () {
-                      openAmenitiesBottomSheet(
-                        context,
-                        "Select the Amenities",
-                        amenitiesList,
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  /// Preferences
-                  _selectTile(
-                    title: widget.propertyType != "PG"
-                        ? "Preferences"
-                        : "PG Rules",
-                    subtitle: "Please choose your Preferences",
-                    onTap: () {
-                      openAmenitiesBottomSheet(
-                        context,
-                        "Select the Preferences",
-                        preferencesList,
-                      );
-                    },
-                  ),
-
-                  if (widget.propertyType == "PG") ...[
-                    _sectionTitle("Last Entry Time"),
-                    _dropdown(
-                      lastEntryTime,
-                      ["10:00 PM", "11:00 PM", "12:00 AM", "No Restriction"],
-                      (val) {
-                        setState(() {
-                          lastEntryTime = val;
-                        });
-                      },
-                    ),
-                    SizedBox(height: 15),
-                    _sectionTitle("Common Areas"),
-                    Wrap(
-                      spacing: 10,
-                      children: [
-                        _choiceChip("Living Room", "", (_) {}),
-                        _choiceChip("Kitchen", "", (_) {}),
-                        _choiceChip("Dining Hall", "", (_) {}),
-                      ],
-                    ),
-                  ],
-
-                  const SizedBox(height: 30),
-                ],
+                ),
               ),
-            ),
-          ),
 
-          /// 🔹 Bottom Buttons
-          /// Save Button
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: AppButton(
-              text: "Save & Next",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => PhotosPage()),
-                );
-              },
-            ),
-          ),
-          SizedBox(height: 15),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: AppButton(
-              text: "Cancel",
-              onTap: () {},
-              textColor: AppColors.black,
-              backgroundColor: AppColors.red.shade100,
-            ),
-          ),
-        ],
+              /// 🔹 Bottom Buttons
+              /// Save Button
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: AppButton(
+                  text: "Save & Next",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => PhotosPage()),
+                    );
+                  },
+                ),
+              ),
+              SizedBox(height: 15),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: AppButton(
+                  text: "Cancel",
+                  onTap: () {},
+                  textColor: AppColors.black,
+                  backgroundColor: AppColors.red.shade100,
+                ),
+              ),
+              SizedBox(height: 15),
+            ],
+          );
+        },
       ),
     );
   }
 
   /// ================== Widgets ==================
-
-  Widget _choiceChip(String label, String selected, Function(String) onTap) {
-    final bool isSelected = label == selected;
-    return GestureDetector(
-      onTap: () => onTap(label),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(25),
-          border: Border.all(
-            color: isSelected ? AppColors.mainColors : Colors.grey.shade300,
-          ),
-          color: isSelected
-              ? AppColors.mainColors.withOpacity(.1)
-              : Colors.white,
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? AppColors.mainColors : Colors.grey.shade700,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _dropdown(
     String? value,
@@ -288,49 +246,86 @@ class _ContactAmenitiesPageState extends State<ContactAmenitiesPage> {
       child: Text(title, style: textStyle15(FontWeight.w600)),
     );
   }
-
-  Widget _selectTile({
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: textStyle14(FontWeight.w600)),
-                  const SizedBox(height: 4),
-                  Text(subtitle, style: TextStyle(color: Colors.grey.shade600)),
-                ],
-              ),
-            ),
-            Icon(Icons.add_circle_outline, color: AppColors.mainColors),
-            const SizedBox(width: 6),
-            Text(
-              "Select",
-              style: TextStyle(
-                color: AppColors.mainColors,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
-void openAmenitiesBottomSheet(
+Widget selectTile({
+  required String title,
+  required String subtitle,
+  required List<AmenityModel> list,
+  required VoidCallback onTap,
+}) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: textStyle14(FontWeight.w600)),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(color: Colors.grey.shade600),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.add_circle_outline, color: AppColors.mainColors),
+              const SizedBox(width: 6),
+              Text(
+                "Select",
+                style: TextStyle(
+                  color: AppColors.mainColors,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          if (list.isNotEmpty) ...[
+            SizedBox(height: 10),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: list.map((item) {
+                return Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.grey.shade300, width: 2),
+                  ),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(2),
+                      child: Image.asset(
+                        item.icon,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(Icons.error_outline);
+                        },
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ],
+      ),
+    ),
+  );
+}
+
+void _openAmenitiesBottomSheet(
   BuildContext context,
   String header,
   List<AmenityModel> list,
@@ -340,12 +335,12 @@ void openAmenitiesBottomSheet(
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (_) {
-      return StatefulBuilder(
-        builder: (context, setState) {
+      return Consumer<PgDetailsProvider>(
+        builder: (context, provider, child) {
           return Container(
             height: MediaQuery.of(context).size.height * 0.85,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: Column(
@@ -386,9 +381,7 @@ void openAmenitiesBottomSheet(
                       final item = list[index];
                       return GestureDetector(
                         onTap: () {
-                          setState(() {
-                            item.isSelected = !item.isSelected;
-                          });
+                          provider.toggleItem(list, index);
                         },
                         child: Column(
                           children: [
@@ -435,27 +428,11 @@ void openAmenitiesBottomSheet(
                 /// Done Button
                 Padding(
                   padding: const EdgeInsets.all(16),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.mainColors,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text(
-                        "Done",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
+                  child: AppButton(
+                    text: "Done",
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
                   ),
                 ),
               ],
@@ -465,16 +442,4 @@ void openAmenitiesBottomSheet(
       );
     },
   );
-}
-
-class AmenityModel {
-  final String title;
-  final String icon; // asset path
-  bool isSelected;
-
-  AmenityModel({
-    required this.title,
-    required this.icon,
-    this.isSelected = false,
-  });
 }

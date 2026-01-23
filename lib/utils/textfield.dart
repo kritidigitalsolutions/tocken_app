@@ -104,6 +104,7 @@ class AppNumberField extends StatelessWidget {
   final Color borderColor;
   final Color focusedBorderColor;
   final Color errorBorderColor;
+  final Widget? icon;
   final ValueChanged<String>? onChanged;
 
   const AppNumberField({
@@ -114,6 +115,7 @@ class AppNumberField extends StatelessWidget {
     this.allowDecimal = false,
     this.min,
     this.max,
+    this.icon,
     this.borderColor = AppColors.grey,
     this.focusedBorderColor = AppColors.mainColors,
     this.errorBorderColor = AppColors.mainColors,
@@ -135,6 +137,7 @@ class AppNumberField extends StatelessWidget {
         decimal: allowDecimal,
         signed: false,
       ),
+
       inputFormatters: [
         FilteringTextInputFormatter.allow(
           allowDecimal ? RegExp(r'^\d*\.?\d*$') : RegExp(r'^\d*$'),
@@ -171,6 +174,7 @@ class AppNumberField extends StatelessWidget {
       },
       decoration: InputDecoration(
         hintText: hintText,
+        prefixIcon: icon,
         counterText: "",
         enabledBorder: _border(borderColor),
         focusedBorder: _border(focusedBorderColor),

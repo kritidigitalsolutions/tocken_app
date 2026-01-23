@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
 import 'package:token_app/utils/textfield.dart';
+import 'package:token_app/view/post_property_page/address_details_page.dart';
 import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provider.dart';
 
 class PgPrice extends StatefulWidget {
@@ -15,30 +15,16 @@ class PgPrice extends StatefulWidget {
 }
 
 class _PgPriceState extends State<PgPrice> {
-  /// Controllers
-  final TextEditingController rentCtr = TextEditingController();
-  final TextEditingController mealAmountCtr = TextEditingController();
-
-  /// Chip selections (IMPORTANT: separate values)
-  String serviceType = "";
-  String mealsAvailable = "";
-  String mealType = "";
-  String mealTime = "";
-
-  int noticePeriod = 1;
-  bool negotiable = false;
-  bool utilitiesIncluded = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
 
       /// APP BAR
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: AppColors.white,
+        foregroundColor: AppColors.black,
         leading: const BackButton(),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,7 +35,7 @@ class _PgPriceState extends State<PgPrice> {
             ),
             Text(
               "PG",
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+              style: TextStyle(color: AppColors.grey.shade600, fontSize: 13),
             ),
           ],
         ),
@@ -97,7 +83,7 @@ class _PgPriceState extends State<PgPrice> {
                           Wrap(
                             spacing: 10,
                             children: [
-                              _boolChoiceChip(
+                              boolChoiceChip(
                                 "Fixed",
                                 provider.getSecurityType(room) ==
                                     SecurityDepositType.fixed,
@@ -106,7 +92,7 @@ class _PgPriceState extends State<PgPrice> {
                                   SecurityDepositType.fixed,
                                 ),
                               ),
-                              _boolChoiceChip(
+                              boolChoiceChip(
                                 "Multiple of Rent",
                                 provider.getSecurityType(room) ==
                                     SecurityDepositType.multiple,
@@ -115,7 +101,7 @@ class _PgPriceState extends State<PgPrice> {
                                   SecurityDepositType.multiple,
                                 ),
                               ),
-                              _boolChoiceChip(
+                              boolChoiceChip(
                                 "None",
                                 provider.getSecurityType(room) ==
                                     SecurityDepositType.none,
@@ -170,13 +156,13 @@ class _PgPriceState extends State<PgPrice> {
                 /// Checkboxes
                 _checkTile(
                   "Is the price negotiable ?",
-                  negotiable,
-                  (v) => setState(() => negotiable = v),
+                  provider.negotiable,
+                  (v) => provider.toggleNegotiable(v),
                 ),
                 _checkTile(
                   "Is electricity and water charge included?",
-                  utilitiesIncluded,
-                  (v) => setState(() => utilitiesIncluded = v),
+                  provider.utilitiesIncluded,
+                  (v) => provider.toggleutilitiesIncludede(v),
                 ),
 
                 const SizedBox(height: 24),
@@ -188,7 +174,7 @@ class _PgPriceState extends State<PgPrice> {
                   runSpacing: 10,
                   children: List.generate(provider.serviceList.length, (index) {
                     final service = provider.serviceList[index];
-                    return _boolChoiceChip(
+                    return boolChoiceChip(
                       service,
                       provider.isSelectedService(service),
                       () {
@@ -206,14 +192,16 @@ class _PgPriceState extends State<PgPrice> {
                   spacing: 10,
                   runSpacing: 10,
                   children: [
-                    _choiceChip("Yes", mealsAvailable, (v) {
-                      setState(() => mealsAvailable = v);
+                    _choiceChip("Yes", provider.mealsAvailable, (v) {
+                      provider.setMealsAvailable(v);
                     }),
-                    _choiceChip("No", mealsAvailable, (v) {
-                      setState(() => mealsAvailable = v);
+                    _choiceChip("No", provider.mealsAvailable, (v) {
+                      provider.setMealsAvailable(v);
                     }),
-                    _choiceChip("Extra fees apply", mealsAvailable, (v) {
-                      setState(() => mealsAvailable = v);
+                    _choiceChip("Extra fees apply", provider.mealsAvailable, (
+                      v,
+                    ) {
+                      provider.setMealsAvailable(v);
                     }),
                   ],
                 ),
@@ -221,52 +209,54 @@ class _PgPriceState extends State<PgPrice> {
                 const SizedBox(height: 24),
 
                 /// Meal Type
-                _sectionTitle("Meals Type"),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: [
-                    _choiceChip("Only Veg", mealType, (v) {
-                      setState(() => mealType = v);
-                    }),
-                    _choiceChip("Veg & Non Veg", mealType, (v) {
-                      setState(() => mealType = v);
-                    }),
-                  ],
-                ),
+                if (provider.showMealDetails) ...[
+                  _sectionTitle("Meals Type"),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: [
+                      _choiceChip("Only Veg", provider.mealType, (v) {
+                        provider.setMealType(v);
+                      }),
+                      _choiceChip("Veg & Non Veg", provider.mealType, (v) {
+                        provider.setMealType(v);
+                      }),
+                    ],
+                  ),
 
-                const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-                /// Meal Time
-                _sectionTitle("Meals Availability on Weekdays? *"),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: [
-                    _choiceChip("Breakfast", mealTime, (v) {
-                      setState(() => mealTime = v);
-                    }),
-                    _choiceChip("Lunch", mealTime, (v) {
-                      setState(() => mealTime = v);
-                    }),
-                    _choiceChip("Dinner", mealTime, (v) {
-                      setState(() => mealTime = v);
-                    }),
-                  ],
-                ),
+                  /// Meal Time
+                  _sectionTitle("Meals Availability on Weekdays? *"),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: provider.mealTimeList.map((type) {
+                      return boolChoiceChip(
+                        type,
+                        provider.isSelectedMealTime(type),
+                        () {
+                          provider.setMealTime(type);
+                        },
+                      );
+                    }).toList(),
+                  ),
 
-                const SizedBox(height: 24),
+                  const SizedBox(height: 24),
+                ],
 
                 /// Meal Amount
-                _sectionTitle("Meal Amount *"),
-                AppTextField(
-                  controller: mealAmountCtr,
-                  hintText: "Enter meal amount",
-                  keyboardType: TextInputType.number,
-                  prefixIcon: const Icon(FontAwesomeIcons.rupeeSign),
-                ),
+                if (provider.mealsAvailable == "Extra fees apply") ...[
+                  _sectionTitle("Meal Amount *"),
+                  AppTextField(
+                    controller: provider.mealAmountCtr,
+                    hintText: "Enter meal amount",
+                    keyboardType: TextInputType.number,
+                    prefixIcon: const Icon(Icons.currency_rupee_sharp),
+                  ),
 
-                const SizedBox(height: 24),
+                  const SizedBox(height: 24),
+                ],
 
                 /// Notice Period
                 _sectionTitle("Notice Period (in months)"),
@@ -274,7 +264,9 @@ class _PgPriceState extends State<PgPrice> {
                   spacing: 10,
                   children: List.generate(6, (index) {
                     final value = index + 1;
-                    return _numberChip(value);
+                    return _numberChip(value, provider.noticePeriod ?? 0, () {
+                      provider.togglePeriod(value);
+                    });
                   }),
                 ),
 
@@ -285,15 +277,29 @@ class _PgPriceState extends State<PgPrice> {
                 Wrap(
                   spacing: 10,
                   children: [
-                    _choiceChip("None", "", (_) {}),
-                    _choiceChip("Custom", "", (_) {}),
+                    _choiceChip("None", provider.LockPerdiod, (_) {
+                      provider.toggleLockPeriod("None");
+                    }),
+                    _choiceChip("Custom", provider.LockPerdiod, (_) {
+                      provider.toggleLockPeriod("Custom");
+                    }),
                   ],
                 ),
 
                 const SizedBox(height: 32),
 
                 /// Buttons
-                AppButton(text: "Save & Next", onTap: () {}),
+                AppButton(
+                  text: "Save & Next",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => AddressDetailsPage(path: "PG"),
+                      ),
+                    );
+                  },
+                ),
 
                 const SizedBox(height: 12),
 
@@ -348,31 +354,6 @@ class _PgPriceState extends State<PgPrice> {
     );
   }
 
-  Widget _boolChoiceChip(String label, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(25),
-          border: Border.all(
-            color: isSelected ? AppColors.mainColors : Colors.grey.shade300,
-          ),
-          color: isSelected
-              ? AppColors.mainColors.withOpacity(.1)
-              : Colors.white,
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? AppColors.mainColors : Colors.grey.shade700,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _checkTile(String title, bool value, Function(bool) onChanged) {
     return Row(
       children: [
@@ -382,10 +363,10 @@ class _PgPriceState extends State<PgPrice> {
     );
   }
 
-  Widget _numberChip(int value) {
-    final bool selected = noticePeriod == value;
+  Widget _numberChip(int value, int isSelected, VoidCallback onTap) {
+    final bool selected = isSelected == value;
     return GestureDetector(
-      onTap: () => setState(() => noticePeriod = value),
+      onTap: onTap,
       child: Container(
         width: 42,
         height: 42,
@@ -407,4 +388,27 @@ class _PgPriceState extends State<PgPrice> {
       ),
     );
   }
+}
+
+Widget boolChoiceChip(String label, bool isSelected, VoidCallback onTap) {
+  return GestureDetector(
+    onTap: onTap,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(
+          color: isSelected ? AppColors.mainColors : Colors.grey.shade300,
+        ),
+        color: isSelected ? AppColors.mainColors.withOpacity(.1) : Colors.white,
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: isSelected ? AppColors.mainColors : Colors.grey.shade700,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    ),
+  );
 }

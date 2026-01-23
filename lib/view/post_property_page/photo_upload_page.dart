@@ -5,10 +5,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
+import 'package:token_app/view/post_property_page/co_living_pages/other_details_page.dart';
 import 'package:token_app/view/post_property_page/summary_page.dart';
 
 class PhotosPage extends StatefulWidget {
-  const PhotosPage({super.key});
+  final bool? isSharing;
+  const PhotosPage({super.key, this.isSharing = false});
 
   @override
   State<PhotosPage> createState() => _PhotosPageState();
@@ -183,14 +185,21 @@ class _PhotosPageState extends State<PhotosPage> {
                 //   return;
                 // }
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => SummaryPage(
-                      // images: _images.map((e) => e.path).toList(),
+                if (widget.isSharing ?? true) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => OtherDetailsPage()),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => SummaryPage(
+                        // images: _images.map((e) => e.path).toList(),
+                      ),
                     ),
-                  ),
-                );
+                  );
+                }
               },
             ),
 
