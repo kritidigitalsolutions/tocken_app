@@ -4,7 +4,10 @@ import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
 import 'package:token_app/utils/textfield.dart';
+import 'package:token_app/view/post_property_page/co_living_pages/profile_details_page.dart';
 import 'package:token_app/view/post_property_page/pg_pages/pg_details.dart';
+import 'package:token_app/view/post_property_page/pg_pages/pg_price.dart';
+import 'package:token_app/view/post_property_page/pricing_page.dart';
 import 'package:token_app/view/post_property_page/rent_&_sale/commercial/office_layout_page.dart';
 import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provider.dart';
 
@@ -19,6 +22,13 @@ class OfficeSpaceDetailsPage extends StatefulWidget {
     required this.propertyType,
   });
 
+  bool get isSale =>
+      "$type-$propertyType" == "Sale-Office" ||
+      "$type-$propertyType" == "Sale-Builder Floor" ||
+      "$type-$propertyType" == "Sale-Independent House" ||
+      "$type-$propertyType" == "Sale-Villa" ||
+      "$type-$propertyType" == "Sale-Others";
+
   @override
   State<OfficeSpaceDetailsPage> createState() => _OfficeSpaceDetailsPageState();
 }
@@ -27,33 +37,6 @@ class _OfficeSpaceDetailsPageState extends State<OfficeSpaceDetailsPage> {
   String constructionStatus = "Ready to Move";
   String propertyCondition = "Ready to Use";
 
-  String? propertyAge;
-  String? locationHub;
-  String? zoneType;
-  String? facing;
-  String? flooring;
-  String? owner;
-
-  final List<String> flooringTypeList = [
-    "Vitrified Tiles",
-    "Marble",
-    "Granite",
-    "Wooden",
-    "Laminated",
-    "Ceramic Tiles",
-    "Mosaic",
-    "Italian Marble",
-    "Cement",
-    "Stone",
-    "Other",
-  ];
-  final List<String> selectedFire = [];
-  final List<String> fire = [
-    "Fire Extinguisher",
-    "Fire Sensors",
-    "Sprinkles",
-    "Firehose",
-  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,95 +75,180 @@ class _OfficeSpaceDetailsPageState extends State<OfficeSpaceDetailsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (widget.propertyType == "Others") ...[
+                  _title("Property Type *"),
+                  AppTextField(
+                    controller: p.propertyTypeCtr,
+                    hintText: "Enter the property type",
+                  ),
+                ],
                 _title("Construction Status *"),
-                _chipRow(
-                  ["Ready to Move", "Under Construction"],
-                  constructionStatus,
-                  (v) => setState(() => constructionStatus = v),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: p.constructionStatusList
+                      .map(
+                        (status) =>
+                            choiceChip(status, p.constructionStatus ?? '', (_) {
+                              p.setConstructionStatus(status);
+                            }),
+                      )
+                      .toList(),
                 ),
 
-                _title("Age of the property *"),
-                _dropdown(
-                  value: propertyAge,
-                  hint: "Age of the property",
-                  items: [
-                    "Less than 1 year",
-                    "1 - 5 years",
-                    "5 - 10 years",
-                    "10+ years",
-                  ],
-                  onChanged: (v) => setState(() => propertyAge = v),
-                ),
-
-                _title("Location Hub"),
-                _dropdown(
-                  value: locationHub,
-                  hint: "Select the location hub",
-                  items: [
-                    "IT Park",
-                    "Business Park",
-                    "Commercial Complex",
-                    "Industrial Area",
-                  ],
-                  onChanged: (v) => setState(() => locationHub = v),
-                ),
-
-                _title("Zone Type *"),
-                _dropdown(
-                  value: zoneType,
-                  hint: "Select the zone type",
-                  items: ["Commercial", "Industrial", "Residential", "SEZ"],
-                  onChanged: (v) => setState(() => zoneType = v),
-                ),
-
-                if (widget.propertyType != "Warehouse") ...[
-                  _title("Property Condition *"),
-                  _chipRow(
-                    ["Ready to Use", "Bare Shell"],
-                    propertyCondition,
-                    (v) => setState(() => propertyCondition = v),
+                if (p.constructionStatus == "Ready to Move") ...[
+                  _title("Age of the property *"),
+                  _dropdown(
+                    hint: "Select the age of the Property",
+                    value: p.propertyAge,
+                    items: p.ageOfProperty,
+                    onChanged: (v) => p.setAgeProperty(v ?? ''),
                   ),
                 ],
 
-                _title("Facing"),
-                _dropdown(
-                  value: facing,
-                  hint: "Select the Facing",
-                  items: [
-                    "North",
-                    "South",
-                    "East",
-                    "West",
-                    "North-East",
-                    "North-West",
-                    "South-East",
-                    "South-West",
+                if (widget.propertyType == "Retail Shop" ||
+                    widget.propertyType == "Showroom" ||
+                    widget.propertyType == "Warehouse") ...[
+                  _title("No.of Whasrooms"),
+                  _dropdown(
+                    hint: "Select the No. of washrooms",
+                    value: p.washroom,
+                    items: p.washroomList,
+                    onChanged: (v) => p.setWashroom(v ?? ''),
+                  ),
+                  if (widget.propertyType != "Warehouse") ...[
+                    _title("Suitable For"),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        spacing: 10,
+                        children: p.retailSuitableForList
+                            .map(
+                              (retail) => boolChoiceChip(
+                                retail,
+                                p.isSelectedSuitable(retail),
+                                () {
+                                  p.setRetailSuitable(retail);
+                                },
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    ),
                   ],
-                  onChanged: (v) => setState(() => facing = v),
+                ],
+
+                if (p.constructionStatus == "Under Construction") ...[
+                  _title("Expected Time of Possession *"),
+                  _dropdown(
+                    hint: "Select the expected time",
+                    value: p.expectedTime,
+                    items: p.expectedTimeList,
+                    onChanged: (v) => p.setExpectedTime(v ?? ''),
+                  ),
+                ],
+
+                _title("Location Hub"),
+                _dropdown(
+                  value: p.locationHub,
+                  hint: "Select the location hub",
+                  items: p.locationHubList,
+                  onChanged: (v) => p.setLocationHub(v ?? ''),
                 ),
 
-                /// Flooring Type
-                _title("Flooring Type"),
-                _dropdown(
-                  hint: "Select the flooring type",
-                  value: flooring,
-                  items: flooringTypeList,
-                  onChanged: (v) => setState(() => flooring = v),
-                ),
+                if (widget.propertyType != "Retail Shop" &&
+                    widget.propertyType != "Showroom") ...[
+                  _title("Zone Type *"),
+                  _dropdown(
+                    value: p.zoneType,
+                    hint: "Select the zone type",
+                    items: p.zoneList,
+                    onChanged: (v) => p.setZone(v ?? ''),
+                  ),
+                  if (widget.propertyType != "Others") ...[
+                    if (widget.propertyType != "Warehouse") ...[
+                      _title("Property Condition *"),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: p.propertyConditionList
+                            .map(
+                              (status) => choiceChip(
+                                status,
+                                p.propertyCondition ?? '',
+                                (_) {
+                                  p.setPropertyCondition(status);
+                                },
+                              ),
+                            )
+                            .toList(),
+                      ),
+                      if (p.propertyCondition == "Ready to Use" ||
+                          p.propertyCondition == "Bare Shell") ...[
+                        _title("Available Date *"),
 
-                _title("Ownership *"),
-                _dropdown(
-                  value: owner,
-                  hint: "Select the Ownership",
-                  items: [
-                    "Freehold",
-                    "Power of attorney",
-                    "Lease Holder",
-                    "Cooperative Society",
+                        TextField(
+                          controller: p.dateCtr,
+                          readOnly: true,
+                          decoration: InputDecoration(
+                            suffixIcon: const Icon(Icons.calendar_month),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onTap: () async {
+                            final picked = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate:
+                                  DateTime.now(), // 🚫 disables all past dates
+                              lastDate: DateTime(2100),
+                            );
+                            if (picked != null) {
+                              p.dateCtr.text =
+                                  "${picked.day}/${picked.month}/${picked.year}";
+                            }
+                          },
+                        ),
+                      ],
+
+                      if (p.propertyCondition == "Bare Shell") ...[
+                        _title("Construction Status of walls *"),
+                        _dropdown(
+                          hint: "Select Construction status of walls",
+                          value: p.wall,
+                          items: p.wallStatusList,
+                          onChanged: (v) => p.setWall(v ?? ''),
+                        ),
+                      ],
+                    ],
                   ],
-                  onChanged: (v) => setState(() => owner = v),
-                ),
-                const SizedBox(height: 20),
+                  _title("Facing"),
+                  _dropdown(
+                    hint: "Select the Facing",
+                    value: p.facing,
+                    items: p.facingList,
+                    onChanged: (v) => p.setFacing(v ?? ''),
+                  ),
+
+                  /// Flooring Type
+                  _title("Flooring Type"),
+                  _dropdown(
+                    hint: "Select the flooring type",
+                    value: p.flooring,
+                    items: p.facingList,
+                    onChanged: (v) => p.setFlooring(v ?? ''),
+                  ),
+
+                  _title("Ownership *"),
+                  _dropdown(
+                    value: p.owner,
+                    hint: "Select the Ownership",
+                    items: p.ownerTypeList,
+                    onChanged: (v) => p.setOwner(v ?? ''),
+                  ),
+                  const SizedBox(height: 20),
+                ],
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -256,96 +324,116 @@ class _OfficeSpaceDetailsPageState extends State<OfficeSpaceDetailsPage> {
                         ),
                       ],
                     ),
+                    if (widget.propertyType != "Retail Shop" &&
+                        widget.propertyType != "Showroom" &&
+                        widget.propertyType != "Warehouse" &&
+                        !widget.isSale) ...[
+                      if (widget.propertyType != "Others") ...[
+                        const SizedBox(height: 15),
 
-                    if (widget.propertyType != "Others") ...[
-                      const SizedBox(height: 15),
+                        /// 🔹 Reserved Parking
+                        Text(
+                          "Reserved Parking",
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 12),
 
-                      /// 🔹 Reserved Parking
-                      Text(
-                        "Reserved Parking",
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(height: 12),
+                        CounterField(
+                          label: "No. of Covered Parking",
+                          value: p.coveredParking,
+                          onAdd: p.incCovered,
+                          onRemove: p.decCovered,
+                        ),
+                        const SizedBox(height: 12),
+                        CounterField(
+                          label: "No. of Open Parking",
+                          value: p.openParking,
+                          onAdd: p.incOpen,
+                          onRemove: p.decOpen,
+                        ),
 
-                      CounterField(
-                        label: "No. of Covered Parking",
-                        value: p.coveredParking,
-                        onAdd: p.incCovered,
-                        onRemove: p.decCovered,
-                      ),
-                      const SizedBox(height: 12),
-                      CounterField(
-                        label: "No. of Open Parking",
-                        value: p.openParking,
-                        onAdd: p.incOpen,
-                        onRemove: p.decOpen,
-                      ),
-                    ],
-                    const SizedBox(height: 15),
+                        const SizedBox(height: 15),
 
-                    /// 🔹 Floors
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Total Floors *"),
-                              const SizedBox(height: 6),
-                              AppNumberField(
-                                controller: p.floorsController,
-                                hintText: "Enter total floors",
-                                maxLength: 2,
-                                min: 1,
-                                max: 50,
+                        /// 🔹 Floors
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Total Floors *"),
+                                  const SizedBox(height: 6),
+                                  AppNumberField(
+                                    controller: p.floorsController,
+                                    hintText: "Enter total floors",
+                                    maxLength: 2,
+                                    min: 1,
+                                    max: 50,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (widget.propertyType != "Villa" &&
+                                widget.propertyType != "Independent House") ...[
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text("Your Floor *"),
+                                    const SizedBox(height: 6),
+                                    AppNumberField(
+                                      controller: p.floorsController,
+                                      hintText: "Enter your floors",
+                                      maxLength: 2,
+                                      min: 1,
+                                      max: 50,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
-                          ),
+                          ],
                         ),
-                        if (widget.propertyType != "Villa" &&
-                            widget.propertyType != "Independent House") ...[
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Your Floor *"),
-                                const SizedBox(height: 6),
-                                AppNumberField(
-                                  controller: p.floorsController,
-                                  hintText: "Enter your floors",
-                                  maxLength: 2,
-                                  min: 1,
-                                  max: 50,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
                       ],
-                    ),
+                    ],
                   ],
                 ),
-
-                _title("Fire Safety Measures"),
-                const SizedBox(height: 10),
-                Wrap(
-                  spacing: 12,
-                  children: fire.map((e) => _tenantChip(e)).toList(),
-                ),
-
-                const SizedBox(height: 24),
-                CheckboxListTile(
-                  value: false,
-                  onChanged: (v) {},
-                  title: Text("Occupancy Certificate"),
-                ),
-                CheckboxListTile(
-                  value: false,
-                  onChanged: (v) {},
-                  title: Text("Is your Office NOC certified?"),
-                ),
-                const SizedBox(height: 24),
+                if (widget.propertyType != "Others") ...[
+                  _title("Fire Safety Measures"),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: p.fire
+                        .map(
+                          (e) => boolChoiceChip(e, p.isSelectedFireM(e), () {
+                            p.setFireMeas(e);
+                          }),
+                        )
+                        .toList(),
+                  ),
+                  if (widget.propertyType != "Retail Shop" &&
+                      widget.propertyType != "Showroom" &&
+                      widget.propertyType != "Warehouse") ...[
+                    const SizedBox(height: 15),
+                    CheckboxListTile(
+                      value: p.isOccCerti,
+                      onChanged: (v) {
+                        p.toggleOccCerti(v ?? false);
+                      },
+                      title: Text("Occupancy Certificate"),
+                    ),
+                    CheckboxListTile(
+                      value: p.isNOCCerti,
+                      onChanged: (v) {
+                        p.toggleNocCerti(v ?? false);
+                      },
+                      title: Text("Is your Office NOC certified?"),
+                    ),
+                  ],
+                ],
+                const SizedBox(height: 15),
 
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -365,7 +453,12 @@ class _OfficeSpaceDetailsPageState extends State<OfficeSpaceDetailsPage> {
                         ],
                       ),
                       Spacer(),
-                      Switch(value: true, onChanged: (v) {}),
+                      Switch(
+                        value: p.isBrokerAllow,
+                        onChanged: (v) {
+                          p.toggleBroker(v);
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -376,10 +469,23 @@ class _OfficeSpaceDetailsPageState extends State<OfficeSpaceDetailsPage> {
                 AppButton(
                   text: "Save & Next",
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => OfficeLayoutPage()),
-                    );
+                    if (widget.propertyType == "Office") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              OfficeLayoutPage(isSell: widget.isSale),
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              PricingPage(propertyType: widget.propertyType),
+                        ),
+                      );
+                    }
                   },
                 ),
                 SizedBox(height: 15),
@@ -400,20 +506,6 @@ class _OfficeSpaceDetailsPageState extends State<OfficeSpaceDetailsPage> {
 
   /// ---------- Widgets ----------
 
-  Widget _tenantChip(String value) {
-    final bool selected = selectedFire.contains(value);
-    return ChoiceChip(
-      label: Text(value),
-      selected: selected,
-      onSelected: (_) {
-        setState(() {
-          selected ? selectedFire.remove(value) : selectedFire.add(value);
-        });
-      },
-      selectedColor: Colors.blue.shade100,
-    );
-  }
-
   Widget _title(String text) {
     return Padding(
       padding: const EdgeInsets.only(top: 20, bottom: 8),
@@ -433,6 +525,7 @@ class _OfficeSpaceDetailsPageState extends State<OfficeSpaceDetailsPage> {
     return DropdownButtonFormField<String>(
       initialValue: value,
       hint: Text(hint),
+      menuMaxHeight: 400,
       items: items
           .map((e) => DropdownMenuItem(value: e, child: Text(e)))
           .toList(),
@@ -444,30 +537,6 @@ class _OfficeSpaceDetailsPageState extends State<OfficeSpaceDetailsPage> {
           vertical: 14,
         ),
       ),
-    );
-  }
-
-  Widget _chipRow(
-    List<String> options,
-    String selected,
-    ValueChanged<String> onTap,
-  ) {
-    return Wrap(
-      spacing: 12,
-      children: options.map((e) {
-        final isSelected = e == selected;
-        return ChoiceChip(
-          label: Text(e),
-          selected: isSelected,
-          onSelected: (_) => onTap(e),
-          selectedColor: Colors.blue.shade50,
-          shape: StadiumBorder(
-            side: BorderSide(
-              color: isSelected ? Colors.blue : Colors.grey.shade400,
-            ),
-          ),
-        );
-      }).toList(),
     );
   }
 

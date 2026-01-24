@@ -11,7 +11,13 @@ import 'package:token_app/viewModel/afterLogin/post_property_provider/post_prope
 class AddressDetailsPage extends StatelessWidget {
   final String path;
   final bool? isSharing;
-  const AddressDetailsPage({super.key, required this.path, this.isSharing});
+  final bool? isSell;
+  const AddressDetailsPage({
+    super.key,
+    required this.path,
+    this.isSharing,
+    this.isSell,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -115,14 +121,19 @@ class AddressDetailsPage extends StatelessWidget {
                   } else if (path == "COM") {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => ContactAmenitiesPage()),
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            ContactAmenitiesPage(propertyType: path),
+                      ),
                     );
                   } else {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            ContactAmenitiesPage(propertyType: path),
+                        builder: (_) => ContactAmenitiesPage(
+                          propertyType: path,
+                          isSell: isSell,
+                        ),
                       ),
                     );
                   }

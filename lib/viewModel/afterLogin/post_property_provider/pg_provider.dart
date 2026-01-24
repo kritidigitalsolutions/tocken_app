@@ -540,6 +540,8 @@ class PgDetailsProvider extends ChangeNotifier {
     "Home Gym",
     "Study Room",
     "Servant Room",
+    "Game Room",
+    "Others",
   ];
 
   Set<String> selectedRoom = {};
@@ -579,6 +581,405 @@ class PgDetailsProvider extends ChangeNotifier {
 
   void toggleBroker(bool value) {
     isBrokerAllow = value;
+    notifyListeners();
+  }
+
+  // Rent and sale
+
+  // Construction status
+  final List<String> constructionStatusList = [
+    "Ready to Move",
+    "Under Construction",
+  ];
+
+  String? constructionStatus;
+
+  void setConstructionStatus(String value) {
+    constructionStatus = value;
+    notifyListeners();
+  }
+
+  // under construction - expected time
+
+  String? expectedTime;
+
+  void setExpectedTime(String value) {
+    expectedTime = value;
+    notifyListeners();
+  }
+
+  final List<String> expectedTimeList = [
+    "Within 15 days",
+    "Within 1 month",
+    "Within 2 month",
+    "Within 3 month",
+    "Within 6 month",
+    "By 2025",
+    "By 2026",
+    "By 2027",
+    "By 2027",
+    "By 2029",
+    "By 2030",
+  ];
+
+  // property condition
+  final List<String> propertyConditionList = ["Ready to Use", "Bare Shell"];
+
+  String? propertyCondition;
+
+  void setPropertyCondition(String value) {
+    propertyCondition = value;
+    notifyListeners();
+  }
+
+  //Location Hub
+
+  String? locationHub;
+
+  void setLocationHub(String value) {
+    locationHub = value;
+    notifyListeners();
+  }
+
+  final List<String> locationHubList = [
+    "Shopping Malls",
+    "Commercial Project",
+    "Market/High Street",
+    "Retail Complex/Building",
+    "Industrail Areas",
+    "Healthcare Center",
+    "Commercial Streets",
+    "Downtown or City Center",
+    "Tourist Areas",
+    "Transport Hubs",
+    "Business Districts",
+    "Entertainment Complexes",
+    "Other",
+  ];
+
+  // Zone type
+
+  String? zoneType;
+
+  void setZone(String value) {
+    zoneType = value;
+    notifyListeners();
+  }
+
+  final List<String> zoneList = [
+    "Industrail Complex",
+    "Commercial Complex",
+    "Residential Complex",
+    "Agriculture Zone",
+    "Special Economic Zone",
+    "Natural Conservation Zone",
+    "Transport and Communication",
+    "Public Utilities",
+    "Public and Semi Public use",
+    "Open Space",
+    "IT Park",
+    "Business Park",
+    "Corporate Campus",
+    "Government Use"
+        "Other",
+  ];
+
+  // owner
+
+  String? owner;
+
+  void setOwner(String value) {
+    owner = value;
+    notifyListeners();
+  }
+
+  final List<String> ownerTypeList = [
+    "Freehold",
+    "Power of attorney",
+    "Lease Holder",
+    "Cooperative Society",
+  ];
+
+  // fire safty measurment
+
+  final Set<String> selectedFire = {};
+
+  bool isSelectedFireM(value) => selectedFire.contains(value);
+
+  void setFireMeas(String value) {
+    if (selectedFire.contains(value)) {
+      selectedFire.remove(value);
+    } else {
+      selectedFire.add(value);
+    }
+    notifyListeners();
+  }
+
+  final List<String> fire = [
+    "Fire Extinguisher",
+    "Fire Sensors",
+    "Sprinkles",
+    "Firehose",
+  ];
+
+  // other infor
+
+  bool isOccCerti = false;
+
+  void toggleOccCerti(bool value) {
+    isOccCerti = value;
+    notifyListeners();
+  }
+
+  bool isNOCCerti = false;
+
+  void toggleNocCerti(bool value) {
+    isNOCCerti = value;
+    notifyListeners();
+  }
+
+  // wall Status
+
+  String? wall;
+
+  void setWall(String value) {
+    wall = value;
+    notifyListeners();
+  }
+
+  final List<String> wallStatusList = [
+    "No Walls",
+    "Brick Walls",
+    "Cemented Walls",
+    "Plastered Walls",
+    "Other",
+  ];
+
+  // ============================ Retail Shop section========================
+  //
+  //
+
+  // Washroom ===
+
+  String? washroom;
+
+  void setWashroom(String value) {
+    washroom = value;
+    notifyListeners();
+  }
+
+  final List<String> washroomList = [
+    "Shared",
+    "1 Washroom",
+    "2 Washroom",
+    "3 Washroom",
+    "4 Washroom",
+    "4+ Washroom",
+  ];
+
+  // Suitable for ratil shop
+
+  final List<String> retailSuitableForList = [
+    "Jewellery",
+    "Gym",
+    "Medical/Clinic",
+    "Footwear Shop",
+    "Clothing Store",
+    "Supermarket/Grocery Store",
+    "Electronic Store",
+    "Home Furnishings Store",
+    "Beauty & Cosmetics Store",
+    "Toy Store",
+    "Book Store",
+    "Stationary Store",
+    "Pet Store",
+    "General Store",
+    "Other",
+  ];
+
+  final Set<String> retailsSuitable = {};
+
+  bool isSelectedSuitable(value) => retailsSuitable.contains(value);
+
+  void setRetailSuitable(String value) {
+    if (retailsSuitable.contains(value)) {
+      retailsSuitable.remove(value);
+    } else {
+      retailsSuitable.add(value);
+    }
+    notifyListeners();
+  }
+
+  /// Rent - resident - pricing page
+
+  // ================
+
+  final rentCtr = TextEditingController();
+  final leaseCtr = TextEditingController();
+  final maintenanceCtrl = TextEditingController();
+  final bookingCtrl = TextEditingController();
+  final otherCtrl = TextEditingController();
+
+  // you'r going to =============
+
+  final List<String> rentTypeList = ["Only Rent", "Only Lease"];
+
+  String rentType = "Only Rent";
+  void setRentType(String value) {
+    rentType = value;
+    notifyListeners();
+  }
+
+  String? leaseYear;
+  void setLeaseYear(String value) {
+    leaseYear = value;
+    notifyListeners();
+  }
+
+  // secutiry deposit
+
+  final fixedCtr = TextEditingController();
+  final MultiRentCtr = TextEditingController();
+
+  void setSecurityDep(String value) {
+    securityDep = value;
+    notifyListeners();
+  }
+
+  // ============ Office layout =================
+
+  final cabinCtr = TextEditingController();
+  final meetingRoomCtr = TextEditingController();
+  final seatsCtr = TextEditingController();
+
+  bool conferenceRoom = false;
+  bool washrooms = false;
+  bool furnished = false;
+  bool receptionArea = false;
+  bool pantry = false;
+  bool centralAc = false;
+  bool ups = false;
+  bool oxygenDuct = false;
+
+  void setConferenceRoom(bool value) {
+    conferenceRoom = value;
+    notifyListeners();
+  }
+
+  void setWashrooms(bool value) {
+    washrooms = value;
+    notifyListeners();
+  }
+
+  void setFurnished(bool value) {
+    furnished = value;
+    notifyListeners();
+  }
+
+  void setReceptionArea(bool value) {
+    receptionArea = value;
+    notifyListeners();
+  }
+
+  void setPantry(bool value) {
+    pantry = value;
+    notifyListeners();
+  }
+
+  void setCentralAc(bool value) {
+    centralAc = value;
+    notifyListeners();
+  }
+
+  void setUps(bool value) {
+    ups = value;
+    notifyListeners();
+  }
+
+  void setOxygenDuct(bool value) {
+    oxygenDuct = value;
+    notifyListeners();
+  }
+
+  // Private washroom
+
+  String? privateWashroom;
+  void setPrivateWashroomr(String value) {
+    privateWashroom = value;
+    notifyListeners();
+  }
+
+  // Public washroom
+
+  String? pubWashroom;
+  void setPubWashroom(String value) {
+    pubWashroom = value;
+    notifyListeners();
+  }
+
+  // pantry list
+
+  final List<String> pantryList = ["Private", "Shared"];
+  String? selectedPantry;
+  void togglePantry(String value) {
+    selectedPantry = value;
+    notifyListeners();
+  }
+
+  // Lift section =========================
+
+  String? pLifts;
+  void setPLift(String value) {
+    pLifts = value;
+    notifyListeners();
+  }
+
+  String? sLift;
+  void setSLift(String value) {
+    sLift = value;
+    notifyListeners();
+  }
+
+  // Parking type
+
+  final parkingCtr = TextEditingController();
+  final List<String> parkingOption = ["Available", "Not Available"];
+
+  final List<String> parkingTypeList = [
+    "Private parking in basement",
+    "Private parking outside",
+    "Public Parking",
+  ];
+
+  String? selectedParkingOption;
+  List<String> selectedParkingTypes = [];
+
+  void setParkingOption(String value) {
+    selectedParkingOption = value;
+
+    // clear types if Not Available
+    if (value == "Not Available") {
+      selectedParkingTypes.clear();
+    }
+
+    notifyListeners();
+  }
+
+  void toggleParkingType(String type) {
+    if (selectedParkingTypes.contains(type)) {
+      selectedParkingTypes.remove(type);
+    } else {
+      selectedParkingTypes.add(type);
+    }
+    notifyListeners();
+  }
+
+  // sell section -resident --Apartment
+
+  bool isHotDeal = false;
+
+  void toggleHotDeal(bool value) {
+    isHotDeal = value;
     notifyListeners();
   }
 }

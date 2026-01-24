@@ -81,7 +81,7 @@ class TypePropertySheet extends StatelessWidget {
                 ),
                 PropertyTile(
                   image: "assets/images/sale.svg",
-                  label: 'Sale',
+                  label: 'Sell',
                   onTap: () {
                     final parentContext = context; // ✅ save valid context
 
@@ -98,7 +98,7 @@ class TypePropertySheet extends StatelessWidget {
                           ),
                         ),
                         builder: (ctx) {
-                          return propertyTypeBottomSheet(ctx, "Sale");
+                          return propertyTypeBottomSheet(ctx, "Sell");
                         },
                       );
                     });
@@ -295,7 +295,7 @@ Widget propertyResidentList(
   String type,
   String propertyCategory,
 ) {
-  final typeList = [
+  final typeList1 = [
     "Apartment",
     "Builder Floor",
     "Independent House",
@@ -303,6 +303,17 @@ Widget propertyResidentList(
     "1RK/Studio House",
     "Others",
   ];
+
+  final typeList2 = [
+    "Apartment",
+    "Builder Floor",
+    "Independent House",
+    "Villa",
+    "Plot/Land",
+    "Others",
+  ];
+
+  final typeList = type == "Rent" ? typeList1 : typeList2;
   return Container(
     padding: EdgeInsets.all(15),
     child: Column(
@@ -355,7 +366,15 @@ Widget propertyCommercialList(
   String type,
   String propertyCategory,
 ) {
-  final typeList = [
+  final typeList1 = [
+    "Office",
+    "Retail Shop",
+    "Showroom",
+    "Warehouse",
+    "Others",
+  ];
+
+  final typeList2 = [
     "Office",
     "Retail Shop",
     "Showroom",
@@ -363,6 +382,8 @@ Widget propertyCommercialList(
     "Plot/Land",
     "Others",
   ];
+
+  final typeList = type == "Rent" ? typeList1 : typeList2;
   return Container(
     padding: EdgeInsets.all(15),
     child: Column(

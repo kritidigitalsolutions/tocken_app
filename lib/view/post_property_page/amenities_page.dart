@@ -9,7 +9,8 @@ import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provide
 
 class ContactAmenitiesPage extends StatefulWidget {
   final String? propertyType;
-  const ContactAmenitiesPage({super.key, this.propertyType});
+  final bool? isSell;
+  const ContactAmenitiesPage({super.key, this.propertyType, this.isSell});
 
   @override
   State<ContactAmenitiesPage> createState() => _ContactAmenitiesPageState();
@@ -141,20 +142,26 @@ class _ContactAmenitiesPageState extends State<ContactAmenitiesPage> {
                       const SizedBox(height: 16),
 
                       /// Preferences
-                      selectTile(
-                        title: widget.propertyType != "PG"
-                            ? "Preferences"
-                            : "PG Rules",
-                        subtitle: "Please choose your Preferences",
-                        list: provider.selectedAmenityModel(preferencesList),
-                        onTap: () {
-                          _openAmenitiesBottomSheet(
-                            context,
-                            "Select the Preferences",
-                            preferencesList,
-                          );
-                        },
-                      ),
+                      if (widget.propertyType != "COM" &&
+                          widget.propertyType != "Retail Shop" &&
+                          widget.propertyType != "Showroom" &&
+                          widget.propertyType != "Warehouse" &&
+                          widget.propertyType != "Others" &&
+                          !(widget.isSell ?? true))
+                        selectTile(
+                          title: widget.propertyType != "PG"
+                              ? "Preferences"
+                              : "PG Rules",
+                          subtitle: "Please choose your Preferences",
+                          list: provider.selectedAmenityModel(preferencesList),
+                          onTap: () {
+                            _openAmenitiesBottomSheet(
+                              context,
+                              "Select the Preferences",
+                              preferencesList,
+                            );
+                          },
+                        ),
 
                       if (widget.propertyType == "PG") ...[
                         _sectionTitle("Last Entry Time"),
