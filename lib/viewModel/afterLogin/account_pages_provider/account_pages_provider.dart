@@ -2,8 +2,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:token_app/model/request_model/account/feedback_req_model.dart';
+import 'package:token_app/model/response_model/auth/auth_response_model.dart';
 import 'package:token_app/repository/account_repo.dart';
+import 'package:token_app/resources/app_url.dart';
 import 'package:token_app/utils/app_snackbar.dart';
+import 'package:token_app/utils/local_storage.dart';
 
 class ProfilePagesProvider extends ChangeNotifier {
   final ImagePicker _picker = ImagePicker();
@@ -33,6 +36,72 @@ class ProfilePagesProvider extends ChangeNotifier {
   /// Optional: remove image
   void removeImage() {
     _profileImage = null;
+    notifyListeners();
+  }
+}
+
+class ProfileEditProvider extends ChangeNotifier {
+  final _repo = AccountRepo();
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
+  final emailController = TextEditingController();
+  final gstCtr = TextEditingController();
+  String name = '';
+  String userName = '';
+  String phone = '';
+  String profileImage = "";
+  String role = '';
+
+  Future<void> getUserData() async {
+    final User? userData = await LocalStorageService.getUser();
+
+    firstNameController.text = userData?.firstName ?? '';
+    lastNameController.text = userData?.lastName ?? '';
+    emailController.text = userData?.email ?? '';
+
+    name = userData?.name ?? '';
+    userName = userData?.username ?? '';
+    role = userData?.userType ?? '';
+
+    String phone = userData?.phone ?? '';
+
+    if (phone.startsWith('+91')) {
+      phone = phone.substring(3); // remove +91
+    }
+
+    this.phone = phone;
+
+    profileImage = "${AppUrl.baseUrl}${userData?.profileImage ?? ''}";
+    print(profileImage);
+    notifyListeners();
+  }
+
+  bool isLoading = false;
+  Future<void> editProfile(BuildContext context) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      await _repo.editProfile(
+        firstNameController.text.trim(),
+        lastNameController.text.trim(),
+        gstCtr.text.trim(),
+      );
+
+      await LocalStorageService.updateUserData(
+        firstName: firstNameController.text.trim(),
+        lastName: lastNameController.text.trim(),
+        gstNumber: gstCtr.text.trim(),
+      );
+
+      await getUserData(); // refresh provider data
+
+      AppSnackBar.success(context, "Profile updated successfully");
+      Navigator.pop(context);
+    } catch (e) {
+      AppSnackBar.error(context, "Failed to update profile");
+    } finally {
+      isLoading = false;
+    }
     notifyListeners();
   }
 }
@@ -98,11 +167,8 @@ class FeedbackProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  String selectedType = "Report a problem";
+  String selectedType = "";
   final TextEditingController feedbackController = TextEditingController();
-  final TextEditingController nameController = TextEditingController(
-    text: "Amit Kumar",
-  );
   final TextEditingController emailController = TextEditingController();
 
   final List<String> feedbackTypes = [
@@ -122,25 +188,45 @@ class FeedbackProvider extends ChangeNotifier {
 
   final AccountRepo _repo = AccountRepo();
 
-  Future<void> postFeedback(BuildContext context) async {
+  bool isLoading = false;
+
+  Future<void> postFeedback(
+    BuildContext context,
+    String name,
+    String phone,
+  ) async {
+    isLoading = true;
+    notifyListeners();
     try {
       final model = FeedbackReqModel(
         type: selectedType,
         description: feedbackController.text.trim(),
-        name: nameController.text.trim(),
-        phone: '9999999999',
+        name: name,
+        phone: phone,
       );
+      print(model.toJson());
       await _repo.postFeedback(model);
       AppSnackBar.success(
         context,
         "Thank you! Your feedback has been submitted.",
       );
+      cleanAll();
+      Navigator.pop(context);
     } catch (e) {
       AppSnackBar.error(
         context,
         "Failed to submit feedback. Please try again.",
       );
+      isLoading = false;
+    } finally {
+      isLoading = false;
     }
+    notifyListeners();
+  }
+
+  void cleanAll() {
+    selectedType = '';
+    feedbackController.clear();
   }
 }
 
@@ -164,6 +250,44 @@ class BookmarkProvider extends ChangeNotifier {
   void toggle(String type) {
     _isSelected = type;
     notifyListeners();
+  }
+}
+
+class PhonePrivacyProvider extends ChangeNotifier {
+  bool _isEnable = false;
+  bool _isLoading = false;
+
+  final _phonePrivacy = AccountRepo();
+
+  bool get isEnable => _isEnable;
+  bool get isLoading => _isLoading;
+
+  Future<void> toggle(BuildContext context, bool value) async {
+    if (_isLoading) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _phonePrivacy.phonePrivacy(value);
+
+      _isEnable = value;
+
+      AppSnackBar.success(
+        context,
+        value
+            ? "Your phone number has been hidden successfully."
+            : "Your phone number is now visible.",
+      );
+    } catch (e) {
+      AppSnackBar.error(
+        context,
+        "Unable to update phone privacy. Please try again later.",
+      );
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }
 

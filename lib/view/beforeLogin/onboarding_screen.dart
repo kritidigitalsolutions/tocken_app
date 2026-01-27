@@ -15,14 +15,6 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     context.read<OnboardingProvider>().getOnBoarding();
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<OnboardingProvider>();

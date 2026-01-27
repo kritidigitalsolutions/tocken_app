@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:token_app/main.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
-import 'package:token_app/view/beforeLogin/otp_verification_page.dart';
 import 'package:token_app/viewModel/beforeLogin/auth_provider.dart';
 
 class PhoneNumberScreen extends StatefulWidget {
@@ -156,31 +155,23 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
 
                 /// 🔹 SEND OTP BUTTON
                 ///
-                Selector<PhoneNumberProvider, bool>(
-                  selector: (_, p) => p.isValid,
-                  builder: (context, isLoading, child) {
+                Selector<PhoneNumberProvider, ({bool isValid, bool isLoading})>(
+                  selector: (_, p) =>
+                      (isValid: p.isValid, isLoading: p.isLoading),
+                  builder: (context, state, child) {
                     return AppButton(
                       text: "Send OTP",
-                      // isLoading: isLoading,
                       height: 54,
-                      onTap: !isLoading
-                          ? null
-                          : () {
+                      isLoading: state.isLoading,
+                      onTap: state.isValid && !state.isLoading
+                          ? () {
                               if (_formKey.currentState!.validate()) {
-                                // context.read<PhoneNumberProvider>().login(
-                                //   context,
-                                // );
-                                Navigator.push(
+                                context.read<PhoneNumberProvider>().login(
                                   context,
-                                  MaterialPageRoute(
-                                    builder: (_) => OtpVerificationScreen(
-                                      phone: provider.phoneController.text
-                                          .trim(),
-                                    ),
-                                  ),
                                 );
                               }
-                            },
+                            }
+                          : null,
                     );
                   },
                 ),

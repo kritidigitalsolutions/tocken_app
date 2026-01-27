@@ -1,6 +1,8 @@
 class AppUrl {
-  static const String baseUrl =
-      'https://backend-tocken-admin-panel.vercel.app/api';
+  static const String baseUrl = 'http://192.168.29.185:5000/api';
+
+  // static const String baseUrl =
+  //    "https://backend-tocken-admin-panel.vercel.app/api";
 
   // Login
 
@@ -8,6 +10,7 @@ class AppUrl {
 
   static const String sendOtp = "$baseUrl/auth/send-otp";
   static const String verifyOtp = "$baseUrl/auth/verify-otp";
+  static const String registerUser = "$baseUrl/user/profile-info";
 
   // Policy
 
@@ -29,4 +32,16 @@ class AppUrl {
   // acount page
 
   static const String personalDetails = "$baseUrl/wallpapers";
+
+  // phone number privacy
+
+  static const String phonePrivacy = "$baseUrl/user/phone-privacy";
+
+  // profile update
+
+  static const String profileEdit = "$baseUrl/user/profile-update";
+
+  // city search
+
+  static const String city = "$baseUrl/city";
 }

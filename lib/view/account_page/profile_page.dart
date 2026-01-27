@@ -7,6 +7,7 @@ import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/custom_dialogBox.dart';
 import 'package:token_app/utils/helper/helper_method.dart';
+import 'package:token_app/utils/local_storage.dart';
 import 'package:token_app/utils/text_style.dart';
 import 'package:token_app/view/account_page/account_privacy_page.dart';
 import 'package:token_app/view/account_page/add_gst_number.dart';
@@ -17,6 +18,7 @@ import 'package:token_app/view/account_page/help_support/help_And_Support_page.d
 import 'package:token_app/view/account_page/my_listin_page.dart';
 import 'package:token_app/view/account_page/offline_Notification.dart';
 import 'package:token_app/view/account_page/phone_privacy.dart';
+import 'package:token_app/view/beforeLogin/login_screen.dart';
 import 'package:token_app/viewModel/afterLogin/account_pages_provider/account_pages_provider.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -36,7 +38,8 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ProfilePagesProvider>();
-
+    final provider1 = context.read<ProfileEditProvider>();
+    provider1.getUserData();
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -53,7 +56,7 @@ class ProfilePage extends StatelessWidget {
               child: IconButton(
                 icon: const Icon(Icons.help_outline, color: AppColors.grey),
                 onPressed: () async {
-                  await makePhoneCall("9999999999");
+                  await makePhoneCall(provider1.phone);
                 },
               ),
             ),
@@ -87,17 +90,30 @@ class ProfilePage extends StatelessWidget {
                         CircleAvatar(
                           radius: 32,
                           backgroundColor: Colors.grey.shade300,
-                          backgroundImage: provider.profileImage != null
-                              ? FileImage(provider.profileImage!)
-                              : null,
-                          child: provider.profileImage == null
-                              ? const Icon(
-                                  Icons.person,
-                                  color: AppColors.grey,
-                                  size: 30,
-                                )
-                              : null,
+                          child: ClipOval(
+                            child: provider.profileImage != null
+                                ? Image.file(
+                                    provider.profileImage!,
+                                    width: 64,
+                                    height: 64,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.network(
+                                    provider1.profileImage,
+                                    width: 64,
+                                    height: 64,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(
+                                        Icons.person,
+                                        size: 30,
+                                        color: Colors.grey,
+                                      );
+                                    },
+                                  ),
+                          ),
                         ),
+
                         Positioned(
                           bottom: 0,
                           right: 0,
@@ -115,30 +131,34 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          "Amit Kumar",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Row(
+                  Consumer<ProfileEditProvider>(
+                    builder: (context, p, child) {
+                      return Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(Icons.lock, size: 14, color: Colors.grey),
-                            SizedBox(width: 6),
                             Text(
-                              "+91 6397892585",
-                              style: TextStyle(color: Colors.grey),
+                              p.name,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(Icons.lock, size: 14, color: Colors.grey),
+                                SizedBox(width: 6),
+                                Text(
+                                  p.phone,
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                   iconButton(
                     onTap: () {
@@ -232,6 +252,14 @@ class ProfilePage extends StatelessWidget {
                 title: "Tocken",
                 confirmText: "Log out",
                 message: "Are you sure you want to log out?",
+                onConfirm: () async {
+                  await LocalStorageService.clearData();
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => LoginScreen()),
+                    (route) => false,
+                  );
+                },
               );
             }, isLogout: true),
 

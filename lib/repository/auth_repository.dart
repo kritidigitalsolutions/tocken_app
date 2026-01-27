@@ -1,4 +1,5 @@
 import 'package:token_app/data/network/network_api_service.dart';
+import 'package:token_app/model/request_model/auth_request_model/user_req_model.dart';
 import 'package:token_app/model/response_model/auth/auth_response_model.dart';
 import 'package:token_app/resources/app_url.dart';
 
@@ -30,11 +31,29 @@ class AuthRepository {
 
   // verify otp
 
-  Future<dynamic> verifyOtp(String mobile, String otp) async {
+  Future<UserResModel> verifyOtp(String mobile, String otp) async {
     try {
-      final response = await _api.postApi(AppUrl.verifyOtp, {"phone": mobile});
-      return response;
+      final response = await _api.postApi(AppUrl.verifyOtp, {
+        "phone": mobile,
+        "otp": otp,
+      });
+      print(response);
+      return UserResModel.fromJson(response);
     } catch (e) {
+      print(e.toString());
+      rethrow;
+    }
+  }
+
+  // register page
+
+  Future<UserResModel> registerUser(UserReqModel model) async {
+    try {
+      final res = await _api.postApi(AppUrl.registerUser, model.toJson());
+      print("respo -- -- - - -- - -  $res");
+      return UserResModel.fromJson(res);
+    } catch (e) {
+      print(e.toString());
       rethrow;
     }
   }

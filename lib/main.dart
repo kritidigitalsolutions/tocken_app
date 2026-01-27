@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:token_app/utils/bottom_navigationbar.dart';
-import 'package:token_app/view/beforeLogin/onboarding_screen.dart';
+import 'package:token_app/view/beforeLogin/splash_screen.dart';
 import 'package:token_app/view/post_property_page/type_property_page.dart';
 import 'package:token_app/viewModel/afterLogin/account_pages_provider/account_pages_provider.dart';
 import 'package:token_app/viewModel/afterLogin/account_pages_provider/my_listing_provider.dart';
@@ -56,6 +56,8 @@ void main() {
 
         ChangeNotifierProvider(create: (_) => PolicyProvider()),
         ChangeNotifierProvider(create: (_) => CoLivingProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileEditProvider()),
+        ChangeNotifierProvider(create: (_) => PhonePrivacyProvider()),
       ],
       child: const MyApp(),
     ),
@@ -78,7 +80,7 @@ class MyApp extends StatelessWidget {
           elevation: 0,
         ),
       ),
-      home: OnboardingScreen(),
+      home: SplashScreen(),
     );
   }
 }

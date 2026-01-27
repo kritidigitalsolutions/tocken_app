@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:token_app/main.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
@@ -16,7 +15,7 @@ class UserDetails extends StatelessWidget {
     final provider = Provider.of<UserDetailsProvider>(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Column(
@@ -200,17 +199,18 @@ class UserDetails extends StatelessWidget {
 
             /// BUTTON
             ///
-            AppButton(
-              text: "Confirm details",
-              onTap: provider.isValid
-                  ? () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(builder: (_) => MyHomePage()),
-                        (route) => route.isFirst,
-                      );
-                    }
-                  : null,
+            Consumer<UserDetailsProvider>(
+              builder: (context, provider, child) {
+                return AppButton(
+                  text: "Confirm details",
+                  isLoading: provider.isLoading,
+                  onTap: provider.isValid && !provider.isLoading
+                      ? () {
+                          provider.registerUser(context, phone);
+                        }
+                      : null,
+                );
+              },
             ),
 
             const SizedBox(height: 20),

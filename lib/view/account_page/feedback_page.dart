@@ -18,6 +18,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
   @override
   Widget build(BuildContext context) {
     final provider = context.read<FeedbackProvider>();
+    final profilePage = context.read<ProfileEditProvider>();
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
@@ -109,11 +110,15 @@ class _FeedbackPageState extends State<FeedbackPage> {
             /// Name
             const Text("Name", style: TextStyle(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
-            AppTextField(
-              controller: provider.nameController,
-              hintText: "name",
-              fillColor: AppColors.white,
-              filled: true,
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: AppColors.grey.shade300,
+                border: Border.all(color: AppColors.grey.shade400),
+              ),
+              child: Text(profilePage.name),
             ),
 
             const SizedBox(height: 20),
@@ -141,7 +146,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                 children: [
                   Image.asset("assets/auth/india_flag.png", height: 20),
                   const SizedBox(width: 6),
-                  Text("(+91) 9999999999"),
+                  Text("(+91) ${profilePage.phone}"),
                   const Spacer(),
                   Row(
                     children: [
@@ -163,7 +168,22 @@ class _FeedbackPageState extends State<FeedbackPage> {
             const SizedBox(height: 30),
 
             /// Submit Button
-            AppButton(text: "Submit", onTap: () {}),
+            Selector<FeedbackProvider, bool>(
+              selector: (_, p) => p.isLoading,
+              builder: (context, isLoading, child) {
+                return AppButton(
+                  isLoading: isLoading,
+                  text: "Submit",
+                  onTap: () {
+                    provider.postFeedback(
+                      context,
+                      profilePage.name,
+                      profilePage.phone,
+                    );
+                  },
+                );
+              },
+            ),
           ],
         ),
       ),

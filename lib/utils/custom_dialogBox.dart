@@ -8,7 +8,7 @@ void showCustomDialog({
   required String message,
   String cancelText = "Cancel",
   String confirmText = "Confirm",
-  VoidCallback? onConfirm,
+  required VoidCallback onConfirm,
 }) {
   showDialog(
     context: context,
@@ -60,10 +60,7 @@ void showCustomDialog({
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: AppButton(
-                      text: confirmText,
-                      onTap: () => Navigator.pop(context),
-                    ),
+                    child: AppButton(text: confirmText, onTap: onConfirm),
                   ),
                 ],
               ),

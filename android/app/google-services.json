@@ -1,0 +1,86 @@
+{
+  "project_info": {
+    "project_number": "681332319946",
+    "project_id": "tocken-57cce",
+    "storage_bucket": "tocken-57cce.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:681332319946:android:8a4f4062a83c8320733633",
+        "android_client_info": {
+          "package_name": "com.tocken.portal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "681332319946-48pj2oa5b48ts95jrpgadnihnbp19n5c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tocken.portal",
+            "certificate_hash": "9f626b7d10440caafcc886d1ec07e3b6d2cf8ae7"
+          }
+        },
+        {
+          "client_id": "681332319946-c1nj9s51j4qbngdrg25lhrjqk9klc4lg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tocken.portal",
+            "certificate_hash": "d2b5108b97f1e726c1b8c72892d6022293650cc0"
+          }
+        },
+        {
+          "client_id": "681332319946-i18m8hhou4p5qvqmid2p5lg8jucv8v7g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tocken.portal",
+            "certificate_hash": "b2dbff81f5269329ffac959c853298a126339a85"
+          }
+        },
+        {
+          "client_id": "681332319946-qpq8sjl43n2ir1kp0cogljutk3jnfmh7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tocken.portal",
+            "certificate_hash": "bb22535c8e6300a1d9a96d3b2fb7fb4bdb82165b"
+          }
+        },
+        {
+          "client_id": "681332319946-vtv7ot0grfdoqm86vc1q9jh4crb0o0th.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tocken.portal",
+            "certificate_hash": "ba3291d6c7612d1ffe5ae1f89a609d90ab47d23b"
+          }
+        },
+        {
+          "client_id": "681332319946-b8i1l09spgf627lmuhakdue6sb7mjvli.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOS0_L3XZLN3Mga2d5SRqnfqA7N401pOE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "681332319946-b8i1l09spgf627lmuhakdue6sb7mjvli.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "681332319946-v873hbe0a32qaaqp80eocrss6isvsebf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tocken.portal"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

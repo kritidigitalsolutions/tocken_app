@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:token_app/data/app_exception.dart';
+import 'package:token_app/utils/local_storage.dart';
 import 'base_api_service.dart';
 
 class NetworkApiService extends BaseApiService {
@@ -34,6 +35,57 @@ class NetworkApiService extends BaseApiService {
       final response = await _dio.post(url, data: data);
       return returnResponse(response);
     } on DioException catch (e) {
+      print("Error ${e.toString()}");
+      throw _handleDioError(e);
+    } on SocketException {
+      throw NoInternetException();
+    }
+  }
+
+  Future<dynamic> postHeaderApi(String url, dynamic data) async {
+    try {
+      final token = await LocalStorageService.getToken(); // if needed
+
+      final response = await _dio.post(
+        url,
+        data: data,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            if (token != null) "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      return returnResponse(response);
+    } on DioException catch (e) {
+      print("Dio Error: ${e.response?.data}");
+      throw _handleDioError(e);
+    } on SocketException {
+      throw NoInternetException();
+    }
+  }
+
+  Future<dynamic> patchHeaderApi(String url, dynamic data) async {
+    try {
+      final token = await LocalStorageService.getToken(); // if needed
+
+      final response = await _dio.patch(
+        url,
+        data: data,
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            if (token != null) "Authorization": "Bearer $token",
+          },
+        ),
+      );
+
+      return returnResponse(response);
+    } on DioException catch (e) {
+      print("Dio Error: ${e.response?.data}");
       throw _handleDioError(e);
     } on SocketException {
       throw NoInternetException();
