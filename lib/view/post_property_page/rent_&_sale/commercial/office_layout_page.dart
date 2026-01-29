@@ -8,8 +8,15 @@ import 'package:token_app/view/post_property_page/pricing_page.dart';
 import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provider.dart';
 
 class OfficeLayoutPage extends StatefulWidget {
+  final String? type;
+  final String? propertyType;
   final bool? isSell;
-  const OfficeLayoutPage({super.key, this.isSell});
+  const OfficeLayoutPage({
+    super.key,
+    this.isSell,
+    this.type,
+    this.propertyType,
+  });
 
   @override
   State<OfficeLayoutPage> createState() => _OfficeLayoutPageState();
@@ -333,7 +340,8 @@ class _OfficeLayoutPageState extends State<OfficeLayoutPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => PricingPage(propertyType: "COM"),
+                        builder: (_) =>
+                            PricingPage(propertyType: "COM", type: widget.type),
                       ),
                     );
                   },

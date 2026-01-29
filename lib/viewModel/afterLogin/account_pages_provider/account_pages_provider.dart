@@ -4,41 +4,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:token_app/model/request_model/account/feedback_req_model.dart';
 import 'package:token_app/model/response_model/auth/auth_response_model.dart';
 import 'package:token_app/repository/account_repo.dart';
-import 'package:token_app/resources/app_url.dart';
 import 'package:token_app/utils/app_snackbar.dart';
 import 'package:token_app/utils/local_storage.dart';
 
-class ProfilePagesProvider extends ChangeNotifier {
-  final ImagePicker _picker = ImagePicker();
-
-  File? _profileImage;
-
-  /// Getter
-  File? get profileImage => _profileImage;
-
-  /// Pick image from camera or gallery
-  Future<void> pickImage(ImageSource source) async {
-    try {
-      final XFile? pickedFile = await _picker.pickImage(
-        source: source,
-        imageQuality: 70, // reduce size
-      );
-
-      if (pickedFile != null) {
-        _profileImage = File(pickedFile.path);
-        notifyListeners();
-      }
-    } catch (e) {
-      debugPrint("Image pick error: $e");
-    }
-  }
-
-  /// Optional: remove image
-  void removeImage() {
-    _profileImage = null;
-    notifyListeners();
-  }
-}
+class ProfilePagesProvider extends ChangeNotifier {}
 
 class ProfileEditProvider extends ChangeNotifier {
   final _repo = AccountRepo();
@@ -49,7 +18,7 @@ class ProfileEditProvider extends ChangeNotifier {
   String name = '';
   String userName = '';
   String phone = '';
-  String profileImage = "";
+  String profileImageUrl = "";
   String role = '';
 
   Future<void> getUserData() async {
@@ -71,10 +40,11 @@ class ProfileEditProvider extends ChangeNotifier {
 
     this.phone = phone;
 
-    profileImage = "${AppUrl.baseUrl}${userData?.profileImage ?? ''}";
-    print(profileImage);
+    profileImageUrl = userData?.profileImage ?? '';
+    print(profileImageUrl);
     notifyListeners();
   }
+  // update user data
 
   bool isLoading = false;
   Future<void> editProfile(BuildContext context) async {
@@ -102,6 +72,55 @@ class ProfileEditProvider extends ChangeNotifier {
     } finally {
       isLoading = false;
     }
+    notifyListeners();
+  }
+
+  // user image
+
+  final ImagePicker _picker = ImagePicker();
+
+  File? pickedImage;
+
+  /// Pick image from camera or gallery
+  ///
+  Future<void> pickImage(ImageSource source) async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: source,
+        imageQuality: 70, // reduce size
+      );
+
+      if (pickedFile != null) {
+        pickedImage = File(pickedFile.path);
+        updateImage();
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Image pick error: $e");
+    }
+  }
+
+  // update image ====================
+
+  Future<void> updateImage() async {
+    if (pickedImage == null) return;
+    try {
+      final imageUrl = await _repo.updateProfileImage(pickedImage!);
+
+      await LocalStorageService.updateUserImage(
+        image: imageUrl.user?.profileImage ?? '',
+      );
+      await getUserData();
+      notifyListeners();
+    } catch (e) {
+      notifyListeners();
+      debugPrint("Update image error: $e");
+    }
+  }
+
+  /// Optional: remove image
+  void removeImage() {
+    pickedImage = null;
     notifyListeners();
   }
 }

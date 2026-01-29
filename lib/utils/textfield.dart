@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:token_app/resources/app_colors.dart';
+import 'package:token_app/utils/text_style.dart';
 
 class AppTextField extends StatefulWidget {
   final TextEditingController controller;
@@ -105,6 +106,7 @@ class AppNumberField extends StatelessWidget {
   final Color focusedBorderColor;
   final Color errorBorderColor;
   final Widget? icon;
+  final String? textWidget;
   final ValueChanged<String>? onChanged;
 
   const AppNumberField({
@@ -116,6 +118,7 @@ class AppNumberField extends StatelessWidget {
     this.min,
     this.max,
     this.icon,
+    this.textWidget,
     this.borderColor = AppColors.grey,
     this.focusedBorderColor = AppColors.mainColors,
     this.errorBorderColor = AppColors.mainColors,
@@ -175,6 +178,8 @@ class AppNumberField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hintText,
         prefixIcon: icon,
+        suffixText: textWidget,
+        suffixStyle: textStyle14(FontWeight.bold),
         counterText: "",
         enabledBorder: _border(borderColor),
         focusedBorder: _border(focusedBorderColor),

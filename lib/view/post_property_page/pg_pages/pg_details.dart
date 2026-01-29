@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:token_app/resources/App_string.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
@@ -433,7 +434,7 @@ class FurnishingBottomSheet extends StatelessWidget {
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
-                  children: provider.amenityList.map((item) {
+                  children: AppString.amenityList.map((item) {
                     return _item(
                       context,
                       "No. of ${item['name']}",

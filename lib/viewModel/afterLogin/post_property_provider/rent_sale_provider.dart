@@ -7,30 +7,30 @@ class RentSaleProvider extends ChangeNotifier {
 
   // Furniture type
 
-  String? furnishType;
+  // String? furnishType;
 
-  final List<String> furnishTypeList = [
-    "Fully Furnished",
-    "Semi Furnished",
-    "Unfurnished",
-  ];
+  // final List<String> furnishTypeList = [
+  //   "Fully Furnished",
+  //   "Semi Furnished",
+  //   "Unfurnished",
+  // ];
 
-  void setFurnishType(String value) {
-    furnishType = value;
-    notifyListeners();
-  }
+  // void setFurnishType(String value) {
+  //   furnishType = value;
+  //   notifyListeners();
+  // }
 
-  int get minRequiredAmenities {
-    if (furnishType == "Fully Furnished") return 6;
-    if (furnishType == "Semi Furnished") return 3;
-    return 0;
-  }
+  // int get minRequiredAmenities {
+  //   if (furnishType == "Fully Furnished") return 6;
+  //   if (furnishType == "Semi Furnished") return 3;
+  //   return 0;
+  // }
 
-  bool get canOpenFurnishing =>
-      furnishType == "Fully Furnished" || furnishType == "Semi Furnished";
+  // bool get canOpenFurnishing =>
+  //     furnishType == "Fully Furnished" || furnishType == "Semi Furnished";
 
-  bool get isAmenitiesValid => totalAmenities() >= minRequiredAmenities;
-  int totalAmenities() {
-    return amenities.values.fold(0, (sum, val) => sum + val);
-  }
+  // bool get isAmenitiesValid => totalAmenities() >= minRequiredAmenities;
+  // int totalAmenities() {
+  //   return amenities.values.fold(0, (sum, val) => sum + val);
+  // }
 }

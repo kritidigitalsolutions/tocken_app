@@ -5,10 +5,11 @@ import 'package:token_app/resources/app_url.dart';
 class LocationRepo {
   final _api = NetworkApiService();
 
-  Future<List<LocationModel>> searchCity(String city) async {
+  Future<LocationModel> searchCity(String city) async {
     try {
-      final res = await _api.postHeaderApi(AppUrl.city, {"city": city});
-      return res.map((e) => LocationModel.fromJson(e)).toList();
+      final uri = "${AppUrl.city}?query=$city";
+      final res = await _api.getApi(uri);
+      return LocationModel.fromJson(res);
     } catch (e) {
       rethrow;
     }

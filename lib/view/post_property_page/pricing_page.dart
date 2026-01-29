@@ -10,8 +10,9 @@ import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provide
 
 class PricingPage extends StatefulWidget {
   final String? propertyType;
+  final String? type;
   final bool? isSell;
-  const PricingPage({super.key, this.propertyType, this.isSell});
+  const PricingPage({super.key, this.propertyType, this.isSell, this.type});
 
   @override
   State<PricingPage> createState() => _PricingPageState();
@@ -39,7 +40,7 @@ class _PricingPageState extends State<PricingPage> {
               style: TextStyle(fontWeight: FontWeight.w600),
             ),
             Text(
-              "Rent > Residential > Apartment",
+              "${widget.type} > ${widget.propertyType}",
               style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
             ),
           ],
@@ -162,19 +163,19 @@ class _PricingPageState extends State<PricingPage> {
                   p.utilitiesIncluded,
                   (v) => p.toggleutilitiesIncludede(v),
                 ),
-                if (!(widget.isSell ?? false)) ...[
-                  const SizedBox(height: 20),
-                  if (widget.propertyType == "COM") ...[
-                    _sectionTitle("Yearly rent is expected to increase by *"),
-                    AppNumberField(
-                      controller: p.leaseCtr,
-                      hintText: "% increase by",
-                    ),
-                    const SizedBox(height: 10),
-                  ],
+                if (p.rentType != "Only Lease") ...[
+                  if (!(widget.isSell ?? false)) ...[
+                    const SizedBox(height: 20),
+                    if (widget.propertyType == "COM") ...[
+                      _sectionTitle("Yearly rent is expected to increase by *"),
+                      AppNumberField(
+                        controller: p.leaseCtr,
+                        hintText: "% increase by",
+                      ),
+                      const SizedBox(height: 10),
+                    ],
 
-                  /// 🔹 Security Deposit
-                  if (p.rentType != "Only Lease") ...[
+                    /// 🔹 Security Deposit
                     _sectionTitle("Security Deposit"),
                     Wrap(
                       spacing: 10,
@@ -244,7 +245,7 @@ class _PricingPageState extends State<PricingPage> {
                   ],
                 ],
 
-                if ((widget.isSell ?? true))
+                if (widget.type != "Rent")
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(

@@ -43,5 +43,9 @@ class AppUrl {
 
   // city search
 
-  static const String city = "$baseUrl/city";
+  static const String city = "$baseUrl/location/search";
+
+  // post properties
+
+  static const String postProperty = "$baseUrl/properties";
 }

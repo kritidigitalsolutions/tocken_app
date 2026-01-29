@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:token_app/data/api_response.dart';
 import 'package:token_app/model/response_model/home/location_res_model.dart';
 import 'package:token_app/repository/location_repo.dart';
 
@@ -6,11 +7,11 @@ class LocationProvider extends ChangeNotifier {
   final LocationRepo _repo = LocationRepo();
 
   bool isLoading = false;
-  List<LocationModel> locations = [];
+  ApiResponse<LocationModel> locations = ApiResponse.completed(null);
 
   Future<void> searchCity(String query) async {
     if (query.isEmpty) {
-      locations = [];
+      locations = ApiResponse.completed(null);
       notifyListeners();
       return;
     }
@@ -19,9 +20,10 @@ class LocationProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      locations = await _repo.searchCity(query);
+      final res = await _repo.searchCity(query);
+      locations = ApiResponse.completed(res);
     } catch (e) {
-      locations = [];
+      locations = ApiResponse.error("Something went wrong");
     }
 
     isLoading = false;

@@ -49,6 +49,34 @@ class LocalStorageService {
     await prefs.setString(_userKey, jsonEncode(updatedUser.toJson()));
   }
 
+  // update image
+
+  static Future<void> updateUserImage({required String image}) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final userString = prefs.getString(_userKey);
+    if (userString == null) return;
+
+    final Map<String, dynamic> userMap = jsonDecode(userString);
+
+    User oldUser = User.fromJson(userMap);
+
+    final updatedUser = User(
+      id: oldUser.id,
+      name: oldUser.name,
+      username: oldUser.username,
+      firstName: oldUser.firstName,
+      lastName: oldUser.lastName,
+      email: oldUser.email,
+      phone: oldUser.phone,
+      profileImage: image,
+      userType: oldUser.userType,
+      gstNumber: oldUser.gstNumber,
+    );
+
+    await prefs.setString(_userKey, jsonEncode(updatedUser.toJson()));
+  }
+
   /// Get token
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();

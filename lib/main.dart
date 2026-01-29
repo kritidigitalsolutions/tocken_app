@@ -10,6 +10,7 @@ import 'package:token_app/viewModel/afterLogin/account_pages_provider/my_listing
 import 'package:token_app/viewModel/afterLogin/filter_pages_provider/filter_provider.dart';
 import 'package:token_app/viewModel/afterLogin/home_screen_controller.dart';
 import 'package:token_app/viewModel/afterLogin/leadScreenProvider/leads_screen_controller.dart';
+import 'package:token_app/viewModel/afterLogin/location_provider.dart';
 import 'package:token_app/viewModel/afterLogin/plans_provider/plan_provider.dart';
 import 'package:token_app/viewModel/afterLogin/post_property_provider/co_living_provider.dart';
 import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provider.dart';
@@ -58,6 +59,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => CoLivingProvider()),
         ChangeNotifierProvider(create: (_) => ProfileEditProvider()),
         ChangeNotifierProvider(create: (_) => PhonePrivacyProvider()),
+        ChangeNotifierProvider(create: (_) => LocationProvider()),
       ],
       child: const MyApp(),
     ),

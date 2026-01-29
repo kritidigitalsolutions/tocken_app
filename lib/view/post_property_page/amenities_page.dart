@@ -163,7 +163,25 @@ class _ContactAmenitiesPageState extends State<ContactAmenitiesPage> {
                           },
                         ),
 
+                      // pg
+                      if (widget.propertyType == "PG")
+                        selectTile(
+                          title: widget.propertyType != "PG"
+                              ? "Preferences"
+                              : "PG Rules",
+                          subtitle: "Please choose your Preferences",
+                          list: provider.selectedAmenityModel(preferencesList),
+                          onTap: () {
+                            _openAmenitiesBottomSheet(
+                              context,
+                              "Select the Preferences",
+                              preferencesList,
+                            );
+                          },
+                        ),
+
                       if (widget.propertyType == "PG") ...[
+                        SizedBox(height: 10),
                         _sectionTitle("Last Entry Time"),
                         _dropdown(
                           provider.lastEntryTime,

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:token_app/data/network/network_api_service.dart';
 import 'package:token_app/model/request_model/auth_request_model/user_req_model.dart';
 import 'package:token_app/model/response_model/auth/auth_response_model.dart';
@@ -48,12 +49,34 @@ class AuthRepository {
   // register page
 
   Future<UserResModel> registerUser(UserReqModel model) async {
+    final dio = Dio();
+
     try {
-      final res = await _api.postApi(AppUrl.registerUser, model.toJson());
-      print("respo -- -- - - -- - -  $res");
-      return UserResModel.fromJson(res);
+      FormData formData = FormData.fromMap({
+        "userType": model.userType,
+        "firstName": model.firstName,
+        "lastName": model.lastName,
+        if (model.email != null && model.email!.isNotEmpty)
+          "email": model.email,
+        "phone": model.phone,
+
+        // 👇 THIS IS IMPORTANT
+        if (model.profileImage != null)
+          "profileImage": await MultipartFile.fromFile(
+            model.profileImage!,
+            filename: model.profileImage!.split('/').last,
+          ),
+      });
+
+      final res = await dio.post(
+        AppUrl.registerUser,
+        data: formData,
+        options: Options(headers: {"Content-Type": "multipart/form-data"}),
+      );
+
+      return UserResModel.fromJson(res.data);
     } catch (e) {
-      print(e.toString());
+      print("Error: $e");
       rethrow;
     }
   }

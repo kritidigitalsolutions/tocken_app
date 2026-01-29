@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:token_app/model/response_model/post_property_model/rent_sell_res_model.dart';
+import 'package:token_app/repository/post_property_repo.dart';
+import 'package:token_app/resources/App_string.dart';
 
 enum SecurityDepositType { fixed, multiple, none }
 
@@ -9,22 +12,13 @@ class PgDetailsProvider extends ChangeNotifier {
   final dataCtr = TextEditingController();
 
   // ---------------- STATIC LISTS ----------------
-  final List<String> pgForList = ["Male", "Female", "All"];
-  final List<String> bestSuitedList = [
-    "Working",
-    "Student",
-    "Business",
-    "Other",
-  ];
-  final List<String> furnishTypeList = [
-    "Fully Furnished",
-    "Semi Furnished",
-    "Unfurnished",
-  ];
-  final List<String> propertyManagedByList = ["Owner", "Agent", "Company"];
-  final List<String> yesNoList = ["Yes", "No"];
+  final List<String> pgForList = AppString.pgForList;
+  final List<String> bestSuitedList = AppString.bestSuitedList;
+  final List<String> furnishTypeList = AppString.furnishTypeList;
+  final List<String> propertyManagedByList = AppString.propertyManagedByList;
+  final List<String> yesNoList = AppString.yesNoList;
 
-  final List<String> securityDeposit = ["Fixed", "Multiple of Rent", "None"];
+  final List<String> securityDeposit = AppString.securityDeposit;
 
   // ---------------- SELECTIONS ----------------
   String? pgFor;
@@ -51,7 +45,7 @@ class PgDetailsProvider extends ChangeNotifier {
 
   bool isSelected(String value) => _bestSuitedFor.contains(value);
 
-  final List<String> roomSharingList = ["Private", "Twin", "Triple", "Quad"];
+  final List<String> roomSharingList = AppString.roomSharingList;
 
   final Set<String> _roomSharing = {};
   Set<String> get roomSharing => _roomSharing;
@@ -184,11 +178,11 @@ class PgDetailsProvider extends ChangeNotifier {
 
   // ----- TOTAL SELECTED AMENITIES -----
   int totalAmenities() {
-    return amenities.values.fold(0, (sum, val) => sum + val);
+    return AppString.amenities.values.fold(0, (sum, val) => sum + val);
   }
 
   int getAmenityCount(String key) {
-    return amenities[key] ?? 0;
+    return AppString.amenities[key] ?? 0;
   }
 
   // ----- MIN REQUIRED BASED ON TYPE -----
@@ -213,66 +207,17 @@ class PgDetailsProvider extends ChangeNotifier {
   }
 
   void updateAmenity(String key, int delta) {
-    if (amenities.containsKey(key)) {
-      amenities[key] = (amenities[key]! + delta).clamp(0, 99);
+    if (AppString.amenities.containsKey(key)) {
+      AppString.amenities[key] = (AppString.amenities[key]! + delta).clamp(
+        0,
+        99,
+      );
       notifyListeners();
     }
   }
-
-  Map<String, int> amenities = {
-    "fan": 0,
-    "ac": 0,
-    "tv": 0,
-    "bed": 0,
-    "wardrobe": 0,
-    "geyser": 0,
-    "sofa": 0,
-    "washingMachine": 0,
-    "stove": 0,
-    "fridge": 0,
-    "waterPurifier": 0,
-    "microwave": 0,
-    "modularKitchen": 0,
-    "chimney": 0,
-    "diningTable": 0,
-    "curtains": 0,
-    "exhaustFan": 0,
-    "lights": 0,
-  };
-
-  final amenityList = [
-    {"name": "Fans", "key": "fan"},
-    {"name": "AC", "key": "ac"},
-    {"name": "TV", "key": "tv"},
-    {"name": "Beds", "key": "bed"},
-    {"name": "Wardrobe", "key": "wardrobe"},
-    {"name": "Geysers", "key": "geyser"},
-    {"name": "Sofa", "key": "sofa"},
-    {"name": "Washing Machine", "key": "washingMachine"},
-    {"name": "Stove", "key": "stove"},
-    {"name": "Fridge", "key": "fridge"},
-    {"name": "Water Purifier", "key": "waterPurifier"},
-    {"name": "Microwave", "key": "microwave"},
-    {"name": "Modular Kitchen", "key": "modularKitchen"},
-    {"name": "Chimney", "key": "chimney"},
-    {"name": "Dining Table", "key": "diningTable"},
-    {"name": "Curtains", "key": "curtains"},
-    {"name": "Exhaust Fan", "key": "exhaustFan"},
-    {"name": "Lights", "key": "lights"},
-  ];
-
   // pricing
 
-  final List<String> serviceList = [
-    "Water Charges",
-    "Laundry",
-    "Wifi",
-    "House Keeping",
-    "Maintenance",
-    "Cooking Gas",
-    "Trash Removal",
-    "DTH",
-  ];
+  final List<String> serviceList = AppString.serviceList;
 
   final Set<String> _selectedService = {};
 
@@ -292,7 +237,7 @@ class PgDetailsProvider extends ChangeNotifier {
 
   Set<String> mealTime = {};
 
-  List<String> mealTimeList = ["Breakfast", "Lunch", "Dinner"];
+  List<String> mealTimeList = AppString.mealTimeList;
 
   bool isSelectedMealTime(value) => mealTime.contains(value);
 
@@ -365,27 +310,9 @@ class PgDetailsProvider extends ChangeNotifier {
 
   // Contact & Amenties For Pg
 
-  List<String> entryTimeList = [
-    "7 PM",
-    "7:30 PM",
-    "8 PM",
-    "8:30 PM",
-    "9 PM",
-    "9:30 PM",
-    "10 PM",
-    "10:30 PM",
-    "11 PM",
-    "11:30 PM",
-    "12 PM",
-  ];
+  final List<String> entryTimeList = AppString.entryTimeList;
 
-  List<String> commonAreaList = [
-    "Living Room",
-    "Kitchen",
-    "Dining Hall",
-    "Pooja Room",
-    "Study Room",
-  ];
+  final List<String> commonAreaList = AppString.commonAreaList;
 
   Set<String> selectedArea = {};
 
@@ -444,23 +371,13 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  final prefeTenant = ["Family", "Male", "Female", "Others"];
+  final List<String> prefeTenant = AppString.prefeTenant;
 
   // === facing -======
 
   String? facing;
 
-  final List<String> facingList = [
-    "East",
-    "West",
-    "North",
-    "South",
-    "North-East",
-    "North-West",
-    "South-East",
-    "South-West",
-  ];
-
+  final List<String> facingList = AppString.facingList;
   void setFacing(String value) {
     facing = value;
     notifyListeners();
@@ -474,29 +391,12 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  final List<String> flooringTypeList = [
-    "Vitrified Tiles",
-    "Marble",
-    "Granite",
-    "Wooden",
-    "Laminated",
-    "Ceramic Tiles",
-    "Mosaic",
-    "Italian Marble",
-    "Cement",
-    "Stone",
-    "Other",
-  ];
+  final List<String> flooringTypeList = AppString.flooringTypeList;
 
   // age of property
 
   String? propertyAge;
-  final List<String> ageOfProperty = [
-    "0-1 years",
-    "1-5 years",
-    "5-10 years",
-    "10+ years",
-  ];
+  final List<String> ageOfProperty = AppString.ageOfProperty;
 
   void setAgeProperty(String value) {
     propertyAge = value;
@@ -505,7 +405,7 @@ class PgDetailsProvider extends ChangeNotifier {
 
   // BHK type
 
-  final List<String> bhkList = ["1BHK", "2BHK", "3BHK", "4BHK", "5BHK"];
+  final List<String> bhkList = AppString.bhkList;
 
   String selectedBhk = "";
   void setBHKType(String value) {
@@ -516,7 +416,7 @@ class PgDetailsProvider extends ChangeNotifier {
   // Bathrooms
 
   String? bathrooms;
-  final List<String> noOfBathroom = ["1", "2", "3", "4+"];
+  final List<String> noOfBathroom = AppString.noOfBathroom;
 
   void setBathrooms(String value) {
     bathrooms = value;
@@ -526,7 +426,7 @@ class PgDetailsProvider extends ChangeNotifier {
   // Balconies
 
   String? balconies;
-  final List<String> noOfBalcony = ["0", "1", "2", "3+"];
+  final List<String> noOfBalcony = AppString.noOfBalcony;
 
   void setBalcony(String value) {
     balconies = value;
@@ -535,16 +435,9 @@ class PgDetailsProvider extends ChangeNotifier {
 
   // Additional Room
 
-  final List<String> roomList = [
-    "Pooja Room",
-    "Home Gym",
-    "Study Room",
-    "Servant Room",
-    "Game Room",
-    "Others",
-  ];
+  final List<String> roomList = AppString.roomList;
 
-  Set<String> selectedRoom = {};
+  List<String> selectedRoom = [];
 
   bool isSelectedRoom(value) => selectedRoom.contains(value);
 
@@ -562,7 +455,7 @@ class PgDetailsProvider extends ChangeNotifier {
   final carpetAreaCtr = TextEditingController();
   final buildAreaCtr = TextEditingController();
 
-  final List<String> measurmentList = ["Sq ft", "Sq m", "Sq yd", "Sq guz"];
+  final List<String> measurmentList = AppString.measurmentList;
 
   String builtMeasuType = "Sq ft";
   String carpetMeasuType = "Sq ft";
@@ -608,19 +501,7 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  final List<String> expectedTimeList = [
-    "Within 15 days",
-    "Within 1 month",
-    "Within 2 month",
-    "Within 3 month",
-    "Within 6 month",
-    "By 2025",
-    "By 2026",
-    "By 2027",
-    "By 2027",
-    "By 2029",
-    "By 2030",
-  ];
+  final List<String> expectedTimeList = AppString.expectedTimeList;
 
   // property condition
   final List<String> propertyConditionList = ["Ready to Use", "Bare Shell"];
@@ -641,21 +522,7 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  final List<String> locationHubList = [
-    "Shopping Malls",
-    "Commercial Project",
-    "Market/High Street",
-    "Retail Complex/Building",
-    "Industrail Areas",
-    "Healthcare Center",
-    "Commercial Streets",
-    "Downtown or City Center",
-    "Tourist Areas",
-    "Transport Hubs",
-    "Business Districts",
-    "Entertainment Complexes",
-    "Other",
-  ];
+  final List<String> locationHubList = AppString.locationHubList;
 
   // Zone type
 
@@ -666,24 +533,7 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  final List<String> zoneList = [
-    "Industrail Complex",
-    "Commercial Complex",
-    "Residential Complex",
-    "Agriculture Zone",
-    "Special Economic Zone",
-    "Natural Conservation Zone",
-    "Transport and Communication",
-    "Public Utilities",
-    "Public and Semi Public use",
-    "Open Space",
-    "IT Park",
-    "Business Park",
-    "Corporate Campus",
-    "Government Use"
-        "Other",
-  ];
-
+  final List<String> zoneList = AppString.zoneList;
   // owner
 
   String? owner;
@@ -693,12 +543,7 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  final List<String> ownerTypeList = [
-    "Freehold",
-    "Power of attorney",
-    "Lease Holder",
-    "Cooperative Society",
-  ];
+  final List<String> ownerTypeList = AppString.ownerTypeList;
 
   // fire safty measurment
 
@@ -715,12 +560,7 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  final List<String> fire = [
-    "Fire Extinguisher",
-    "Fire Sensors",
-    "Sprinkles",
-    "Firehose",
-  ];
+  final List<String> fire = AppString.fire;
 
   // other infor
 
@@ -747,13 +587,7 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  final List<String> wallStatusList = [
-    "No Walls",
-    "Brick Walls",
-    "Cemented Walls",
-    "Plastered Walls",
-    "Other",
-  ];
+  final List<String> wallStatusList = AppString.wallStatusList;
 
   // ============================ Retail Shop section========================
   //
@@ -768,34 +602,11 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  final List<String> washroomList = [
-    "Shared",
-    "1 Washroom",
-    "2 Washroom",
-    "3 Washroom",
-    "4 Washroom",
-    "4+ Washroom",
-  ];
+  final List<String> washroomList = AppString.washroomList;
 
   // Suitable for ratil shop
 
-  final List<String> retailSuitableForList = [
-    "Jewellery",
-    "Gym",
-    "Medical/Clinic",
-    "Footwear Shop",
-    "Clothing Store",
-    "Supermarket/Grocery Store",
-    "Electronic Store",
-    "Home Furnishings Store",
-    "Beauty & Cosmetics Store",
-    "Toy Store",
-    "Book Store",
-    "Stationary Store",
-    "Pet Store",
-    "General Store",
-    "Other",
-  ];
+  final List<String> retailSuitableForList = AppString.retailSuitableForList;
 
   final Set<String> retailsSuitable = {};
 
@@ -940,17 +751,50 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // plot and land
+
+  String? openSide;
+  void setOpenSide(String value) {
+    openSide = value;
+    notifyListeners();
+  }
+
+  String? yesOrNo;
+
+  void setYesOrNo(String value) {
+    yesOrNo = value;
+    notifyListeners();
+  }
+
+  String? plotContr;
+
+  final List<String> platLandConstructionList =
+      AppString.plotLandConstructionList;
+
+  void setPlotCon(String value) {
+    plotContr = value;
+    notifyListeners();
+  }
+
+  bool boundaryWall = false;
+  bool cornerPlot = false;
+
+  void setBoundaryWall(bool value) {
+    ups = value;
+    notifyListeners();
+  }
+
+  void setCornerPlot(bool value) {
+    ups = value;
+    notifyListeners();
+  }
+
   // Parking type
 
   final parkingCtr = TextEditingController();
   final List<String> parkingOption = ["Available", "Not Available"];
 
-  final List<String> parkingTypeList = [
-    "Private parking in basement",
-    "Private parking outside",
-    "Public Parking",
-  ];
-
+  final List<String> parkingTypeList = AppString.parkingTypeList;
   String? selectedParkingOption;
   List<String> selectedParkingTypes = [];
 
@@ -981,6 +825,111 @@ class PgDetailsProvider extends ChangeNotifier {
   void toggleHotDeal(bool value) {
     isHotDeal = value;
     notifyListeners();
+  }
+
+  // ==================Api implemented rent and sell residentional===============
+
+  final _repo = PostPropertyRepo();
+
+  Future<void> postProperty() async {
+    try {
+      final model = RentSellResModel(
+        listingType: "Rent",
+        propertyType: "Residential",
+        propertyCategory: "Apartment",
+
+        residentialDetails: ResidentialDetails(
+          ageOfProperty: propertyAge,
+          bhkType: selectedBhk,
+          bathrooms: bathrooms,
+          balconies: balconies,
+          additionalRooms: selectedRoom,
+
+          furnishing: Furnishing(
+            type: furnishType,
+            amenities: AppString.amenities.entries.map((e) {
+              return Amenity(name: e.key, quantity: e.value);
+            }).toList(),
+          ),
+
+          facing: facing,
+          flooring: flooring,
+
+          area: Area(
+            builtUp: BuiltUp(
+              value: int.tryParse(buildAreaCtr.text),
+              unit: builtMeasuType,
+            ),
+            carpet: BuiltUp(
+              value: int.tryParse(carpetAreaCtr.text),
+              unit: carpetMeasuType,
+            ),
+          ),
+
+          parking: Parking(
+            parkingDetails: [
+              ParkingDetail(label: "Covered", value: coveredParking),
+              ParkingDetail(label: "Open", value: openParking),
+            ],
+          ),
+
+          totalFloors: int.tryParse(floorsController.text),
+          yourFloor: int.tryParse(dataCtr.text),
+
+          preferredTenants: selectedTenant.toList(),
+          availableFrom: DateTime.tryParse(dateCtr.text),
+
+          isBroker: isBrokerAllow,
+        ),
+
+        pricing: Pricing(
+          rent: Rent(
+            label: rentType,
+            rantAmount: int.tryParse(rentCtr.text),
+            isElectricity: utilitiesIncluded,
+            isNegotiable: negotiable,
+          ),
+
+          amenities: _selectedService.map((e) {
+            return SecurityDeposit(label: e, amount: 0);
+          }).toList(),
+
+          securityDeposit: SecurityDeposit(
+            label: securityDep,
+            amount: int.tryParse(fixedCtr.text),
+          ),
+
+          noticePeriod: noticePeriod,
+
+          lockInPeriod: LockInPeriod(
+            label: LockPerdiod,
+            month: int.tryParse(leaseYear ?? "0"),
+          ),
+        ),
+
+        location: Location(
+          city: "Delhi", // replace with your controller
+          locality: "Noida",
+          society: "My Society",
+        ),
+
+        contact: Contact(phone: "6397892585", phonePrivate: hideNumber),
+
+        amenities: selectedArea.toList(),
+
+        preferences: selectedTenant.toList(),
+
+        images: [],
+
+        description: dataCtr.text,
+      );
+
+      await _repo.postProperty(model);
+
+      //  print("Success ====> $");
+    } catch (e) {
+      print("Post property error: $e");
+    }
   }
 }
 
@@ -1026,46 +975,4 @@ List<AmenityModel> preferencesList = [
   AmenityModel(title: "Only Veg", icon: "assets/icons/gated.png"),
   AmenityModel(title: "Gender Restrictions", icon: "assets/icons/water.png"),
   AmenityModel(title: "No Alcohol", icon: "assets/icons/parking.png"),
-];
-
-Map<String, int> amenities = {
-  "fan": 0,
-  "ac": 0,
-  "tv": 0,
-  "bed": 0,
-  "wardrobe": 0,
-  "geyser": 0,
-  "sofa": 0,
-  "washingMachine": 0,
-  "stove": 0,
-  "fridge": 0,
-  "waterPurifier": 0,
-  "microwave": 0,
-  "modularKitchen": 0,
-  "chimney": 0,
-  "diningTable": 0,
-  "curtains": 0,
-  "exhaustFan": 0,
-  "lights": 0,
-};
-
-final amenityList = [
-  {"name": "Fans", "key": "fan"},
-  {"name": "AC", "key": "ac"},
-  {"name": "TV", "key": "tv"},
-  {"name": "Beds", "key": "bed"},
-  {"name": "Wardrobe", "key": "wardrobe"},
-  {"name": "Geysers", "key": "geyser"},
-  {"name": "Sofa", "key": "sofa"},
-  {"name": "Washing Machine", "key": "washingMachine"},
-  {"name": "Stove", "key": "stove"},
-  {"name": "Fridge", "key": "fridge"},
-  {"name": "Water Purifier", "key": "waterPurifier"},
-  {"name": "Microwave", "key": "microwave"},
-  {"name": "Modular Kitchen", "key": "modularKitchen"},
-  {"name": "Chimney", "key": "chimney"},
-  {"name": "Dining Table", "key": "diningTable"},
-  {"name": "Curtains", "key": "curtains"},
-  {"name": "Exhaust Fan", "key": "exhaustFan"},
-  {"name": "Lights", "key": "lights"},
 ];

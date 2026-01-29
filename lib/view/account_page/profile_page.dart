@@ -21,8 +21,14 @@ import 'package:token_app/view/account_page/phone_privacy.dart';
 import 'package:token_app/view/beforeLogin/login_screen.dart';
 import 'package:token_app/viewModel/afterLogin/account_pages_provider/account_pages_provider.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
   void _shareApp(BuildContext context) {
     const String appLink =
         "https://play.google.com/store/apps/details?id=com.tocken.app"; // replace with real link
@@ -36,10 +42,17 @@ class ProfilePage extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      context.read<ProfileEditProvider>().getUserData();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final provider = context.watch<ProfilePagesProvider>();
     final provider1 = context.read<ProfileEditProvider>();
-    provider1.getUserData();
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -87,31 +100,42 @@ class ProfilePage extends StatelessWidget {
                     onTap: () => _showImagePicker(context),
                     child: Stack(
                       children: [
-                        CircleAvatar(
-                          radius: 32,
-                          backgroundColor: Colors.grey.shade300,
-                          child: ClipOval(
-                            child: provider.profileImage != null
-                                ? Image.file(
-                                    provider.profileImage!,
-                                    width: 64,
-                                    height: 64,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Image.network(
-                                    provider1.profileImage,
-                                    width: 64,
-                                    height: 64,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return const Icon(
+                        Consumer<ProfileEditProvider>(
+                          builder: (context, p, child) {
+                            return CircleAvatar(
+                              radius: 32,
+                              backgroundColor: Colors.grey.shade300,
+                              child: ClipOval(
+                                child: p.pickedImage != null
+                                    ? Image.file(
+                                        p.pickedImage!,
+                                        width: 64,
+                                        height: 64,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : p.profileImageUrl.isNotEmpty
+                                    ? Image.network(
+                                        p.profileImageUrl,
+                                        width: 64,
+                                        height: 64,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                              return const Icon(
+                                                Icons.person,
+                                                size: 30,
+                                                color: Colors.grey,
+                                              );
+                                            },
+                                      )
+                                    : const Icon(
                                         Icons.person,
                                         size: 30,
                                         color: Colors.grey,
-                                      );
-                                    },
-                                  ),
-                          ),
+                                      ),
+                              ),
+                            );
+                          },
                         ),
 
                         Positioned(
@@ -307,7 +331,7 @@ class ProfilePage extends StatelessWidget {
 
   /// IMAGE PICKER
   void _showImagePicker(BuildContext context) {
-    final provider = context.read<ProfilePagesProvider>();
+    final provider = context.read<ProfileEditProvider>();
 
     showModalBottomSheet(
       context: context,
