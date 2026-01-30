@@ -73,11 +73,13 @@ Future<Map<String, dynamic>> getCurrentLocationAndAddress(
       '${place.street}, ${place.subLocality}, ${place.locality}, '
       '${place.administrativeArea}, ${place.postalCode}, ${place.country}';
   String city = place.locality ?? '';
+  String locality = '${place.street}, ${place.subLocality}';
 
   return {
     'latitude': position.latitude,
     'longitude': position.longitude,
     'address': address,
+    "locality": locality,
     'city': city,
   };
 }

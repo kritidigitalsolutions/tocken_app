@@ -340,8 +340,11 @@ class _OfficeLayoutPageState extends State<OfficeLayoutPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            PricingPage(propertyType: "COM", type: widget.type),
+                        builder: (_) => PricingPage(
+                          propertyType: "COM",
+                          type: widget.type,
+                          isSell: widget.isSell,
+                        ),
                       ),
                     );
                   },

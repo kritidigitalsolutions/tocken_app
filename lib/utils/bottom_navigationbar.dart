@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/text_style.dart';
-import 'package:token_app/viewModel/afterLogin/home_screen_controller.dart';
+import 'package:token_app/viewModel/afterLogin/home_screen_provider.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   const CustomBottomNavBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ctr = Provider.of<HomeScreenController>(context);
+    final ctr = Provider.of<HomeScreenProvicer>(context);
 
     return BottomAppBar(
       shape: const CircularNotchedRectangle(),
@@ -67,7 +67,7 @@ class CustomBottomNavBar extends StatelessWidget {
     required bool isSelected,
     required String title,
   }) {
-    final ctr = Provider.of<HomeScreenController>(context, listen: false);
+    final ctr = Provider.of<HomeScreenProvicer>(context, listen: false);
 
     return SizedBox(
       child: GestureDetector(

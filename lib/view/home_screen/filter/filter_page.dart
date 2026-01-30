@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/view/home_screen/filter/buy_filter_page.dart';
 import 'package:token_app/view/home_screen/filter/coliving_filter_page.dart';
 import 'package:token_app/view/home_screen/filter/pg_filter.dart';
 import 'package:token_app/view/home_screen/filter/plot_land_page.dart';
 import 'package:token_app/view/home_screen/filter/rent_fliter_page.dart';
+import 'package:token_app/viewModel/afterLogin/filter_pages_provider/filter_provider.dart';
 
 class FilterPage extends StatefulWidget {
   const FilterPage({super.key});
@@ -27,10 +29,14 @@ class _FilterPageState extends State<FilterPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
+    Future.microtask(() {
+      context.read<FilterProvider>().getCity();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final pro = context.read<FilterProvider>();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -62,11 +68,11 @@ class _FilterPageState extends State<FilterPage>
       body: TabBarView(
         controller: _tabController,
         children: [
-          RentFliterPage(),
-          ColivingFilterPage(),
-          PgFilter(),
-          BuyFilterPage(),
-          PlotLandPage(),
+          RentFliterPage(city: pro.city),
+          ColivingFilterPage(city: pro.city),
+          PgFilter(city: pro.city),
+          BuyFilterPage(city: pro.city),
+          PlotLandPage(city: pro.city),
         ],
       ),
     );

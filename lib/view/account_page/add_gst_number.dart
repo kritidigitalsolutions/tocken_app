@@ -82,19 +82,19 @@ class AddGstNumber extends StatelessWidget {
             _inputItem("Email", ctr, "email"),
             SizedBox(height: 15),
             _inputItem("GST Number", ctr, "GST Number"),
-            SizedBox(height: 15),
+            // SizedBox(height: 15),
 
-            Text("Role", style: textStyle15(FontWeight.w900)),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: AppColors.grey.shade300,
-                border: Border.all(color: AppColors.grey.shade400),
-              ),
-              child: Text(provider.role),
-            ),
+            // Text("Role", style: textStyle15(FontWeight.w900)),
+            // Container(
+            //   width: double.infinity,
+            //   padding: const EdgeInsets.all(14),
+            //   decoration: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(12),
+            //     color: AppColors.grey.shade300,
+            //     border: Border.all(color: AppColors.grey.shade400),
+            //   ),
+            //   child: Text(provider.role),
+            // ),
             SizedBox(height: 20),
             Consumer<ProfileEditProvider>(
               builder: (context, p, child) {

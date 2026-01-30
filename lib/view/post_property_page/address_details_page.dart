@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:token_app/resources/app_colors.dart';
+import 'package:token_app/utils/app_snackbar.dart';
 import 'package:token_app/utils/buttons.dart';
+import 'package:token_app/utils/helper/helper_method.dart';
+import 'package:token_app/utils/text_style.dart';
 import 'package:token_app/utils/textfield.dart';
 import 'package:token_app/view/home_screen/location_screen.dart';
 import 'package:token_app/view/post_property_page/amenities_page.dart';
 import 'package:token_app/view/post_property_page/co_living_pages/pricing_details_page.dart';
-import 'package:token_app/viewModel/afterLogin/post_property_provider/post_propert_providers.dart';
+import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provider.dart';
 
 class AddressDetailsPage extends StatelessWidget {
   final String path;
@@ -21,16 +24,13 @@ class AddressDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<AddressDetailsProvider>();
+    final provider = context.watch<PgDetailsProvider>();
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         leading: const BackButton(),
-        title: const Text(
-          'Location Details',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text('Address Details', style: textStyle17(FontWeight.w900)),
         actions: [TextButton(onPressed: () {}, child: const Text("Help"))],
       ),
       body: SafeArea(
@@ -98,7 +98,45 @@ class AddressDetailsPage extends StatelessWidget {
 
                     /// USE CURRENT LOCATION
                     // if (!provider.isCitySelected)
-                    _useLocationButton(),
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        showLoadingOverlay(
+                          context,
+                          message: "Fetching your location...",
+                        );
+
+                        try {
+                          final locationData =
+                              await getCurrentLocationAndAddress(context);
+
+                          // Success - you can now use the data
+                          print(locationData['address']);
+                          print(locationData['city']);
+                          provider.cityCtr.text = locationData['city'];
+                          provider.localityCtr.text = locationData['locality'];
+
+                          // Optional: show success message or set location in provider
+                          AppSnackBar.success(
+                            context,
+                            "Your current location has been set.",
+                          );
+                        } catch (e) {
+                          // Handle error
+                          AppSnackBar.error(
+                            context,
+                            "Failed to get location: $e",
+                          );
+                        } finally {
+                          // Always hide loader
+                          hideLoadingOverlay(context);
+                        }
+                      },
+                      icon: const Icon(Icons.my_location),
+                      label: const Text("Use My Current Location"),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 48),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -175,17 +213,6 @@ class AddressDetailsPage extends StatelessWidget {
         ),
         Expanded(child: Divider()),
       ],
-    );
-  }
-
-  Widget _useLocationButton() {
-    return OutlinedButton.icon(
-      onPressed: () {},
-      icon: const Icon(Icons.my_location),
-      label: const Text("Use My Current Location"),
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size(double.infinity, 48),
-      ),
     );
   }
 }

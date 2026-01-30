@@ -14,6 +14,8 @@ class PricingPage extends StatefulWidget {
   final bool? isSell;
   const PricingPage({super.key, this.propertyType, this.isSell, this.type});
 
+  bool get plotLand => "$type-$propertyType" == "Sell-Plot/Land";
+
   @override
   State<PricingPage> createState() => _PricingPageState();
 }
@@ -61,7 +63,7 @@ class _PricingPageState extends State<PricingPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 /// 🔹 Rent / Lease
-                if (!(widget.isSell ?? false)) ...[
+                if (widget.type != "Sell") ...[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -126,11 +128,23 @@ class _PricingPageState extends State<PricingPage> {
                 ],
 
                 /// sell apartment
-                if ((widget.isSell ?? false)) ...[
-                  _sectionTitle("Expected Price (All inclusive price) *"),
+                if (!widget.plotLand)
+                  if (widget.type == "Sell") ...[
+                    _sectionTitle("Expected Price (All inclusive price) *"),
+                    AppNumberField(
+                      controller: p.rentCtr,
+                      hintText: "Enter expected price",
+                      icon: Icon(Icons.currency_rupee_sharp),
+                    ),
+
+                    const SizedBox(height: 12),
+                  ],
+
+                if (widget.plotLand) ...[
+                  _sectionTitle("Price per Square feet (Sq ft) *"),
                   AppNumberField(
                     controller: p.rentCtr,
-                    hintText: "Enter expected price",
+                    hintText: "Enter the price per Sq ft",
                     icon: Icon(Icons.currency_rupee_sharp),
                   ),
 
@@ -157,12 +171,19 @@ class _PricingPageState extends State<PricingPage> {
                   p.negotiable,
                   (v) => p.toggleNegotiable(v),
                 ),
+                if (widget.type != "Sell")
+                  _checkTile(
+                    "Is electricity charges included?",
+                    p.utilitiesIncluded,
+                    (v) => p.toggleutilitiesIncludede(v),
+                  ),
 
-                _checkTile(
-                  "Is electricity charges included?",
-                  p.utilitiesIncluded,
-                  (v) => p.toggleutilitiesIncludede(v),
-                ),
+                if (widget.type == "Sell")
+                  _checkTile(
+                    "Tax & Govt. Charges excluded?",
+                    p.utilitiesIncluded,
+                    (v) => p.toggleutilitiesIncludede(v),
+                  ),
                 if (p.rentType != "Only Lease") ...[
                   if (!(widget.isSell ?? false)) ...[
                     const SizedBox(height: 20),
@@ -211,10 +232,7 @@ class _PricingPageState extends State<PricingPage> {
                     const SizedBox(height: 20),
 
                     /// 🔹 Notice Period
-                    if (widget.propertyType != "Retail Shop" &&
-                        widget.propertyType != "Showroom" &&
-                        widget.propertyType != "Warehouse" &&
-                        widget.propertyType != "Others") ...[
+                    if (widget.type != "Sell") ...[
                       _sectionTitle("Notice Period (in months)"),
                       Wrap(
                         spacing: 10,
@@ -233,10 +251,10 @@ class _PricingPageState extends State<PricingPage> {
                       Wrap(
                         spacing: 10,
                         children: [
-                          _choiceChip("None", p.LockPerdiod, (_) {
+                          _choiceChip("None", p.lockPerdiod, (_) {
                             p.toggleLockPeriod("None");
                           }),
-                          _choiceChip("Custom", p.LockPerdiod, (_) {
+                          _choiceChip("Custom", p.lockPerdiod, (_) {
                             p.toggleLockPeriod("Custom");
                           }),
                         ],

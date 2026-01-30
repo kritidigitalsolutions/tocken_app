@@ -8,7 +8,7 @@ import 'package:token_app/view/post_property_page/type_property_page.dart';
 import 'package:token_app/viewModel/afterLogin/account_pages_provider/account_pages_provider.dart';
 import 'package:token_app/viewModel/afterLogin/account_pages_provider/my_listing_provider.dart';
 import 'package:token_app/viewModel/afterLogin/filter_pages_provider/filter_provider.dart';
-import 'package:token_app/viewModel/afterLogin/home_screen_controller.dart';
+import 'package:token_app/viewModel/afterLogin/home_screen_provider.dart';
 import 'package:token_app/viewModel/afterLogin/leadScreenProvider/leads_screen_controller.dart';
 import 'package:token_app/viewModel/afterLogin/location_provider.dart';
 import 'package:token_app/viewModel/afterLogin/plans_provider/plan_provider.dart';
@@ -33,7 +33,7 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => HomeScreenController()),
+        ChangeNotifierProvider(create: (_) => HomeScreenProvicer()),
         ChangeNotifierProvider(create: (_) => LeadsScreenController()),
         ChangeNotifierProvider(create: (_) => TypePropertyProvider()),
         ChangeNotifierProvider(create: (_) => PropertyDetailsProvider()),
@@ -101,14 +101,14 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final ctr = Provider.of<HomeScreenController>(context, listen: false);
+      final ctr = Provider.of<HomeScreenProvicer>(context, listen: false);
       ctr.toggelPage(widget.screenIndex ?? 0);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final ctr = Provider.of<HomeScreenController>(context);
+    final ctr = Provider.of<HomeScreenProvicer>(context);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(

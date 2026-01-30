@@ -128,31 +128,4 @@ class PropertyDetailsProvider extends ChangeNotifier {
 
 // Address details
 
-class AddressDetailsProvider extends ChangeNotifier {
-  String? city;
-
-  final localityCtr = TextEditingController();
-  final addressCtr = TextEditingController();
-  final cityCtr = TextEditingController();
-
-  /// city selected or not
-  bool get isCitySelected => cityCtr.text.trim().isNotEmpty;
-
-  /// full form validation
-  bool get isFormValid =>
-      isCitySelected &&
-      localityCtr.text.isNotEmpty &&
-      addressCtr.text.isNotEmpty;
-
-  void setCity(String value) {
-    city = value;
-    notifyListeners();
-  }
-
-  @override
-  void dispose() {
-    localityCtr.dispose();
-    addressCtr.dispose();
-    super.dispose();
-  }
-}
+class AddressDetailsProvider extends ChangeNotifier {}

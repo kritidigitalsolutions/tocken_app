@@ -8,7 +8,8 @@ import 'package:token_app/view/home_screen/location_screen.dart';
 import 'package:token_app/viewModel/afterLogin/filter_pages_provider/filter_provider.dart';
 
 class ColivingFilterPage extends StatelessWidget {
-  const ColivingFilterPage({super.key});
+  final String? city;
+  const ColivingFilterPage({super.key, this.city});
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +61,11 @@ class ColivingFilterPage extends StatelessWidget {
                                     children: [
                                       Icon(Icons.search, color: AppColors.grey),
                                       SizedBox(width: 5),
-                                      Text('Search city/Locality/Landmarks...'),
+                                      Text(
+                                        provider.city.isEmpty
+                                            ? 'Search city/Locality/Landmarks...'
+                                            : provider.city,
+                                      ),
                                     ],
                                   ),
                                   Icon(Icons.location_on_outlined),

@@ -106,6 +106,7 @@ class AppNumberField extends StatelessWidget {
   final Color focusedBorderColor;
   final Color errorBorderColor;
   final Widget? icon;
+  final String? Function(String?)? validator;
   final String? textWidget;
   final ValueChanged<String>? onChanged;
 
@@ -118,6 +119,7 @@ class AppNumberField extends StatelessWidget {
     this.min,
     this.max,
     this.icon,
+    this.validator,
     this.textWidget,
     this.borderColor = AppColors.grey,
     this.focusedBorderColor = AppColors.mainColors,
@@ -136,6 +138,7 @@ class AppNumberField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      validator: validator,
       keyboardType: TextInputType.numberWithOptions(
         decimal: allowDecimal,
         signed: false,

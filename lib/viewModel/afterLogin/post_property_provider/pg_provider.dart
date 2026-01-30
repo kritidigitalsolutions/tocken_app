@@ -1,40 +1,294 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:token_app/model/response_model/post_property_model/rent_sell_res_model.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:token_app/model/request_model/post_property/common_property_req_model.dart';
+import 'package:token_app/model/request_model/post_property/pg_req_model.dart';
+import 'package:token_app/model/request_model/post_property/rent_sell_req_model.dart';
 import 'package:token_app/repository/post_property_repo.dart';
 import 'package:token_app/resources/App_string.dart';
+import 'package:token_app/utils/app_snackbar.dart';
 
 enum SecurityDepositType { fixed, multiple, none }
 
 class PgDetailsProvider extends ChangeNotifier {
-  // ---------------- CONTROLLERS ----------------
-  final pgNameController = TextEditingController();
-  final floorsController = TextEditingController();
-  final dataCtr = TextEditingController();
+  PgDetailsProvider() {
+    lengthCtr.addListener(validateArea);
+    widthCtr.addListener(validateArea);
+  }
 
-  // ---------------- STATIC LISTS ----------------
+  // ───────────────────────────────────────────────
+  //  CONTROLLERS
+  // ───────────────────────────────────────────────
+  final pgNameController = TextEditingController();
+  final totalFloorsController = TextEditingController();
+  final yourFloorCtr = TextEditingController();
+
+  final carpetAreaCtr = TextEditingController();
+  final buildAreaCtr = TextEditingController();
+
+  final plotAreaCtr = TextEditingController();
+  final lengthCtr = TextEditingController();
+  final widthCtr = TextEditingController();
+  final widthRoadSideCtr = TextEditingController();
+
+  final rentCtr = TextEditingController();
+  final leaseCtr = TextEditingController();
+  final maintenanceCtrl = TextEditingController();
+  final bookingCtrl = TextEditingController();
+  final otherCtrl = TextEditingController();
+
+  final fixedCtr = TextEditingController();
+  final MultiRentCtr = TextEditingController();
+
+  final mealAmountCtr = TextEditingController();
+
+  final dateCtr = TextEditingController();
+  final propertyTypeCtr = TextEditingController();
+
+  final cabinCtr = TextEditingController();
+  final meetingRoomCtr = TextEditingController();
+  final seatsCtr = TextEditingController();
+  final parkingCtr = TextEditingController();
+  final TextEditingController descController = TextEditingController();
+
+  // ───────────────────────────────────────────────
+  //  STATIC LISTS FROM AppString
+  // ───────────────────────────────────────────────
   final List<String> pgForList = AppString.pgForList;
   final List<String> bestSuitedList = AppString.bestSuitedList;
   final List<String> furnishTypeList = AppString.furnishTypeList;
   final List<String> propertyManagedByList = AppString.propertyManagedByList;
   final List<String> yesNoList = AppString.yesNoList;
-
   final List<String> securityDeposit = AppString.securityDeposit;
 
-  // ---------------- SELECTIONS ----------------
+  final List<String> roomSharingList = AppString.roomSharingList;
+  final List<String> serviceList = AppString.serviceList;
+  final List<String> mealTimeList = AppString.mealTimeList;
+  final List<String> entryTimeList = AppString.entryTimeList;
+  final List<String> commonAreaList = AppString.commonAreaList;
+
+  final List<String> facingList = AppString.facingList;
+  final List<String> flooringTypeList = AppString.flooringTypeList;
+  final List<String> ageOfProperty = AppString.ageOfProperty;
+  final List<String> bhkList = AppString.bhkList;
+  final List<String> noOfBathroom = AppString.noOfBathroom;
+  final List<String> noOfBalcony = AppString.noOfBalcony;
+  final List<String> roomList = AppString.roomList;
+  final List<String> measurmentList = AppString.measurmentList;
+
+  final List<String> prefeTenant = AppString.prefeTenant;
+
+  final List<String> constructionStatusList = [
+    "Ready to Move",
+    "Under Construction",
+  ];
+  final List<String> expectedTimeList = AppString.expectedTimeList;
+  final List<String> propertyConditionList = ["Ready to Use", "Bare Shell"];
+  final List<String> locationHubList = AppString.locationHubList;
+  final List<String> zoneList = AppString.zoneList;
+  final List<String> ownerTypeList = AppString.ownerTypeList;
+  final List<String> fire = AppString.fire;
+  final List<String> wallStatusList = AppString.wallStatusList;
+
+  final List<String> washroomList = AppString.washroomList;
+  final List<String> retailSuitableForList = AppString.retailSuitableForList;
+
+  final List<String> rentTypeList = ["Only Rent", "Only Lease"];
+  final List<String> parkingOption = ["Available", "Not Available"];
+  final List<String> parkingTypeList = AppString.parkingTypeList;
+
+  final List<String> pantryList = ["Private", "Shared"];
+  final List<String> platLandConstructionList =
+      AppString.plotLandConstructionList;
+
+  // ───────────────────────────────────────────────
+  //  SINGLE VALUE SELECTIONS
+  // ───────────────────────────────────────────────
   String? pgFor;
   String? managerStay;
-
   String? propertyManagedBy;
-
   String? securityDep;
+  String? furnishType;
+  String? facing;
+  String? flooring;
+  String? propertyAge;
+  String selectedBhk = "";
+  String? bathrooms;
+  String? balconies;
+  String? constructionStatus;
+  String? expectedTime;
+  String? propertyCondition;
+  String? locationHub;
+  String? zoneType;
+  String? owner;
+  String? wall;
+  String? washroom;
+  String? privateWashroom;
+  String? pubWashroom;
+  String? selectedPantry;
+  String? pLifts;
+  String? sLift;
+  String? openSide;
+  String? yesOrNo;
+  String? plotContr;
+  String? lastEntryTime;
+  String rentType = "Only Rent";
+  String? leaseYear;
+  String builtMeasuType = "Sq ft";
+  String carpetMeasuType = "Sq ft";
+  String plotMeasuType = "Sq ft";
+  String facingRoadMeasuType = "Sq ft";
+  String mealsAvailable = ""; // Yes / No / Extra fees apply
+  String mealType = ""; // Only Veg / Veg & Non Veg
 
   int coveredParking = 0;
   int openParking = 0;
+  int? noticePeriod;
 
-  // ---------------- MULTI SELECT ----------------
+  String lockPerdiod = '';
+
+  bool negotiable = false;
+  bool utilitiesIncluded = false;
+  bool hideNumber = false;
+  bool isBrokerAllow = false;
+  bool isHotDeal = false;
+  bool isOccCerti = false;
+  bool isNOCCerti = false;
+  bool boundaryWall = false;
+  bool cornerPlot = false;
+
+  // Office specific flags
+  bool conferenceRoom = false;
+  bool washrooms = false;
+  bool furnished = false;
+  bool receptionArea = false;
+  bool pantry = false;
+  bool centralAc = false;
+  bool ups = false;
+  bool oxygenDuct = false;
+
+  // ───────────────────────────────────────────────
+  //  MULTI-SELECTION SETS
+  // ───────────────────────────────────────────────
   final Set<String> _bestSuitedFor = {};
-
   Set<String> get bestSuitedFor => _bestSuitedFor;
+
+  final Set<String> _roomSharing = {};
+  Set<String> get roomSharing => _roomSharing;
+
+  final Set<String> _selectedService = {};
+  bool isSelectedService(String value) => _selectedService.contains(value);
+
+  Set<String> mealTime = {};
+  bool isSelectedMealTime(value) => mealTime.contains(value);
+
+  Set<String> selectedArea = {};
+  bool isSelectedArea(value) => selectedArea.contains(value);
+
+  final Set<String> selectedTenant = {};
+  bool isSelectedTenant(value) => selectedTenant.contains(value);
+
+  List<String> selectedRoom = [];
+  bool isSelectedRoom(value) => selectedRoom.contains(value);
+
+  final Set<String> selectedFire = {};
+  bool isSelectedFireM(value) => selectedFire.contains(value);
+
+  final Set<String> retailsSuitable = {};
+  bool isSelectedSuitable(value) => retailsSuitable.contains(value);
+
+  List<String> selectedParkingTypes = [];
+
+  // ───────────────────────────────────────────────
+  //  ROOM TYPE RELATED MAPS
+  // ───────────────────────────────────────────────
+  final Map<String, TextEditingController> roomCountCtr = {};
+  final Map<String, TextEditingController> roomAmountCtr = {};
+  final Map<String, bool> attachedBathroom = {};
+  final Map<String, bool> attachedBalcony = {};
+
+  final Map<String, SecurityDepositType> roomSecurityType = {};
+  final Map<String, TextEditingController> fixedDepositCtr = {};
+  final Map<String, int> multipleOfRent = {};
+
+  TextEditingController getRoomController(String type) {
+    return roomCountCtr.putIfAbsent(type, () => TextEditingController());
+  }
+
+  bool getBathroom(String type) => attachedBathroom[type] ?? false;
+  bool getBalcony(String type) => attachedBalcony[type] ?? false;
+
+  SecurityDepositType getSecurityType(String room) {
+    return roomSecurityType[room] ?? SecurityDepositType.none;
+  }
+
+  // ───────────────────────────────────────────────
+  //  AMENITIES (using AppString.amenities map)
+  // ───────────────────────────────────────────────
+  int totalAmenities() {
+    return AppString.amenities.values.fold(0, (sum, val) => sum + val);
+  }
+
+  int getAmenityCount(String key) {
+    return AppString.amenities[key] ?? 0;
+  }
+
+  int get minRequiredAmenities {
+    if (furnishType == "Fully Furnished") return 6;
+    if (furnishType == "Semi Furnished") return 3;
+    return 0;
+  }
+
+  bool get canOpenFurnishing =>
+      furnishType == "Fully Furnished" || furnishType == "Semi Furnished";
+
+  bool get isAmenitiesValid => totalAmenities() >= minRequiredAmenities;
+
+  void inc(String key) {
+    updateAmenity(key, 1);
+  }
+
+  void dec(String key) {
+    updateAmenity(key, -1);
+  }
+
+  void updateAmenity(String key, int delta) {
+    if (AppString.amenities.containsKey(key)) {
+      AppString.amenities[key] = (AppString.amenities[key]! + delta).clamp(
+        0,
+        99,
+      );
+      notifyListeners();
+    }
+  }
+
+  // ───────────────────────────────────────────────
+  //  PLOT / AREA VALIDATION
+  // ───────────────────────────────────────────────
+  String? areaError;
+
+  void validateArea() {
+    double plotArea = double.tryParse(plotAreaCtr.text) ?? 0;
+    double length = double.tryParse(lengthCtr.text) ?? 0;
+    double width = double.tryParse(widthCtr.text) ?? 0;
+
+    if (plotArea == 0) return;
+
+    double enteredArea = length * width;
+
+    if (enteredArea > plotArea) {
+      areaError = "Length × Width cannot exceed Plot Area";
+    } else {
+      areaError = null;
+    }
+
+    notifyListeners();
+  }
+
+  // ───────────────────────────────────────────────
+  //  TOGGLE / SELECTION METHODS
+  // ───────────────────────────────────────────────
 
   void toggleBestSuited(String value) {
     _bestSuitedFor.contains(value)
@@ -44,13 +298,6 @@ class PgDetailsProvider extends ChangeNotifier {
   }
 
   bool isSelected(String value) => _bestSuitedFor.contains(value);
-
-  final List<String> roomSharingList = AppString.roomSharingList;
-
-  final Set<String> _roomSharing = {};
-  Set<String> get roomSharing => _roomSharing;
-
-  final Map<String, TextEditingController> roomAmountCtr = {};
 
   void toggleRoomSharing(String value) {
     if (_roomSharing.contains(value)) {
@@ -68,18 +315,6 @@ class PgDetailsProvider extends ChangeNotifier {
 
   bool isRoomSharingSelected(String value) => _roomSharing.contains(value);
 
-  // ---------------- ROOM DATA PER TYPE ----------------
-  final Map<String, TextEditingController> roomCountCtr = {};
-  final Map<String, bool> attachedBathroom = {};
-  final Map<String, bool> attachedBalcony = {};
-
-  TextEditingController getRoomController(String type) {
-    return roomCountCtr.putIfAbsent(type, () => TextEditingController());
-  }
-
-  bool getBathroom(String type) => attachedBathroom[type] ?? false;
-  bool getBalcony(String type) => attachedBalcony[type] ?? false;
-
   void toggleBathroom(String type) {
     attachedBathroom[type] = !(attachedBathroom[type] ?? false);
     notifyListeners();
@@ -90,7 +325,83 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ---------------- SINGLE SELECT ----------------
+  void toggleService(String service) {
+    if (_selectedService.contains(service)) {
+      _selectedService.remove(service);
+    } else {
+      _selectedService.add(service);
+    }
+    notifyListeners();
+  }
+
+  void setMealsAvailable(String value) {
+    mealsAvailable = value;
+
+    if (value == "No") {
+      mealType = "";
+      mealTime.clear();
+      mealAmountCtr.clear();
+    }
+
+    notifyListeners();
+  }
+
+  void setMealType(String value) {
+    mealType = value;
+    notifyListeners();
+  }
+
+  void setMealTime(String value) {
+    if (mealTime.contains(value)) {
+      mealTime.remove(value);
+    } else {
+      mealTime.add(value);
+    }
+    notifyListeners();
+  }
+
+  bool get showMealDetails =>
+      mealsAvailable == "Yes" || mealsAvailable == "Extra fees apply";
+
+  void togglePeriod(int value) {
+    noticePeriod = value;
+    notifyListeners();
+  }
+
+  void toggleLockPeriod(String value) {
+    lockPerdiod = value;
+    notifyListeners();
+  }
+
+  void toggleNegotiable(bool value) {
+    negotiable = value;
+    notifyListeners();
+  }
+
+  void toggleutilitiesIncludede(bool value) {
+    utilitiesIncluded = value;
+    notifyListeners();
+  }
+
+  void toggelArea(String value) {
+    if (selectedArea.contains(value)) {
+      selectedArea.remove(value);
+    } else {
+      selectedArea.add(value);
+    }
+    notifyListeners();
+  }
+
+  void toggleHideNumber(bool value) {
+    hideNumber = value;
+    notifyListeners();
+  }
+
+  void toggleEntryTime(String value) {
+    lastEntryTime = value;
+    notifyListeners();
+  }
+
   void selectPgFor(String value) {
     pgFor = value;
     notifyListeners();
@@ -131,25 +442,6 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  @override
-  void dispose() {
-    pgNameController.dispose();
-    floorsController.dispose();
-    dataCtr.dispose();
-
-    for (final controller in roomCountCtr.values) {
-      controller.dispose();
-    }
-
-    super.dispose();
-  }
-
-  String? furnishType;
-
-  final Map<String, SecurityDepositType> roomSecurityType = {};
-  final Map<String, TextEditingController> fixedDepositCtr = {};
-  final Map<String, int> multipleOfRent = {};
-
   void setSecurityType(String room, SecurityDepositType type) {
     roomSecurityType[room] = type;
 
@@ -166,201 +458,10 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  SecurityDepositType getSecurityType(String room) {
-    return roomSecurityType[room] ?? SecurityDepositType.none;
-  }
-
-  // ----- SET FURNISH TYPE -----
   void setFurnishType(String value) {
     furnishType = value;
     notifyListeners();
   }
-
-  // ----- TOTAL SELECTED AMENITIES -----
-  int totalAmenities() {
-    return AppString.amenities.values.fold(0, (sum, val) => sum + val);
-  }
-
-  int getAmenityCount(String key) {
-    return AppString.amenities[key] ?? 0;
-  }
-
-  // ----- MIN REQUIRED BASED ON TYPE -----
-  int get minRequiredAmenities {
-    if (furnishType == "Fully Furnished") return 6;
-    if (furnishType == "Semi Furnished") return 3;
-    return 0;
-  }
-
-  bool get canOpenFurnishing =>
-      furnishType == "Fully Furnished" || furnishType == "Semi Furnished";
-
-  bool get isAmenitiesValid => totalAmenities() >= minRequiredAmenities;
-
-  // ----- COUNTER HANDLERS -----
-  void inc(String key) {
-    updateAmenity(key, 1);
-  }
-
-  void dec(String key) {
-    updateAmenity(key, -1);
-  }
-
-  void updateAmenity(String key, int delta) {
-    if (AppString.amenities.containsKey(key)) {
-      AppString.amenities[key] = (AppString.amenities[key]! + delta).clamp(
-        0,
-        99,
-      );
-      notifyListeners();
-    }
-  }
-  // pricing
-
-  final List<String> serviceList = AppString.serviceList;
-
-  final Set<String> _selectedService = {};
-
-  bool isSelectedService(String value) => _selectedService.contains(value);
-
-  void toggleService(String service) {
-    if (_selectedService.contains(service)) {
-      _selectedService.remove(service);
-    } else {
-      _selectedService.add(service);
-    }
-    notifyListeners();
-  }
-
-  String mealsAvailable = ""; // Yes / No / Extra fees apply
-  String mealType = ""; // Only Veg / Veg & Non Veg
-
-  Set<String> mealTime = {};
-
-  List<String> mealTimeList = AppString.mealTimeList;
-
-  bool isSelectedMealTime(value) => mealTime.contains(value);
-
-  final TextEditingController mealAmountCtr = TextEditingController();
-
-  /// ---------------- SETTERS ----------------
-  void setMealsAvailable(String value) {
-    mealsAvailable = value;
-
-    // Reset dependent fields if "No"
-    if (value == "No") {
-      mealType = "";
-      mealTime.clear();
-      mealAmountCtr.clear();
-    }
-
-    notifyListeners();
-  }
-
-  void setMealType(String value) {
-    mealType = value;
-    notifyListeners();
-  }
-
-  void setMealTime(String value) {
-    if (mealTime.contains(value)) {
-      mealTime.remove(value);
-    } else {
-      mealTime.add(value);
-    }
-    notifyListeners();
-  }
-
-  /// ---------------- HELPERS ----------------
-  bool get showMealDetails =>
-      mealsAvailable == "Yes" || mealsAvailable == "Extra fees apply";
-
-  // noticed periods
-
-  int? noticePeriod;
-
-  void togglePeriod(int value) {
-    noticePeriod = value;
-    notifyListeners();
-  }
-
-  // Lock in Period
-
-  String LockPerdiod = '';
-
-  void toggleLockPeriod(String value) {
-    LockPerdiod = value;
-    notifyListeners();
-  }
-
-  // add More pricing Details
-
-  bool negotiable = false;
-  bool utilitiesIncluded = false;
-
-  void toggleNegotiable(bool value) {
-    negotiable = value;
-    notifyListeners();
-  }
-
-  void toggleutilitiesIncludede(bool value) {
-    utilitiesIncluded = value;
-    notifyListeners();
-  }
-
-  // Contact & Amenties For Pg
-
-  final List<String> entryTimeList = AppString.entryTimeList;
-
-  final List<String> commonAreaList = AppString.commonAreaList;
-
-  Set<String> selectedArea = {};
-
-  bool isSelectedArea(value) => selectedArea.contains(value);
-
-  void toggelArea(String value) {
-    if (selectedArea.contains(value)) {
-      selectedArea.remove(value);
-    } else {
-      selectedArea.add(value);
-    }
-    notifyListeners();
-  }
-
-  bool hideNumber = false;
-
-  void toggleHideNumber(bool value) {
-    hideNumber = value;
-    notifyListeners();
-  }
-
-  String? lastEntryTime;
-
-  void toggleEntryTime(String value) {
-    lastEntryTime = value;
-    notifyListeners();
-  }
-
-  /// toggle selection
-  void toggleItem(List<AmenityModel> list, int index) {
-    list[index].isSelected = !list[index].isSelected;
-    notifyListeners();
-  }
-
-  List<AmenityModel> selectedAmenityModel(List<AmenityModel> list) {
-    final selected = list.where((e) => e.isSelected).toList();
-
-    return selected;
-  }
-
-  /// Rent and sale page
-  ///
-  final TextEditingController dateCtr = TextEditingController();
-  final TextEditingController propertyTypeCtr = TextEditingController();
-
-  final Set<String> selectedTenant = {};
-
-  bool isSelectedTenant(value) => selectedTenant.contains(value);
 
   void setTenant(String value) {
     if (selectedTenant.contains(value)) {
@@ -371,75 +472,35 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  final List<String> prefeTenant = AppString.prefeTenant;
-
-  // === facing -======
-
-  String? facing;
-
-  final List<String> facingList = AppString.facingList;
   void setFacing(String value) {
     facing = value;
     notifyListeners();
   }
 
-  // Floaring type ''''''
-
-  String? flooring;
   void setFlooring(String value) {
     flooring = value;
     notifyListeners();
   }
-
-  final List<String> flooringTypeList = AppString.flooringTypeList;
-
-  // age of property
-
-  String? propertyAge;
-  final List<String> ageOfProperty = AppString.ageOfProperty;
 
   void setAgeProperty(String value) {
     propertyAge = value;
     notifyListeners();
   }
 
-  // BHK type
-
-  final List<String> bhkList = AppString.bhkList;
-
-  String selectedBhk = "";
   void setBHKType(String value) {
     selectedBhk = value;
     notifyListeners();
   }
-
-  // Bathrooms
-
-  String? bathrooms;
-  final List<String> noOfBathroom = AppString.noOfBathroom;
 
   void setBathrooms(String value) {
     bathrooms = value;
     notifyListeners();
   }
 
-  // Balconies
-
-  String? balconies;
-  final List<String> noOfBalcony = AppString.noOfBalcony;
-
   void setBalcony(String value) {
     balconies = value;
     notifyListeners();
   }
-
-  // Additional Room
-
-  final List<String> roomList = AppString.roomList;
-
-  List<String> selectedRoom = [];
-
-  bool isSelectedRoom(value) => selectedRoom.contains(value);
 
   void setAdditionalRoom(String value) {
     if (selectedRoom.contains(value)) {
@@ -449,16 +510,6 @@ class PgDetailsProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-
-  // Area detail
-
-  final carpetAreaCtr = TextEditingController();
-  final buildAreaCtr = TextEditingController();
-
-  final List<String> measurmentList = AppString.measurmentList;
-
-  String builtMeasuType = "Sq ft";
-  String carpetMeasuType = "Sq ft";
 
   void setBuildArea(String value) {
     builtMeasuType = value;
@@ -470,86 +521,40 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool isBrokerAllow = false;
-
   void toggleBroker(bool value) {
     isBrokerAllow = value;
     notifyListeners();
   }
-
-  // Rent and sale
-
-  // Construction status
-  final List<String> constructionStatusList = [
-    "Ready to Move",
-    "Under Construction",
-  ];
-
-  String? constructionStatus;
 
   void setConstructionStatus(String value) {
     constructionStatus = value;
     notifyListeners();
   }
 
-  // under construction - expected time
-
-  String? expectedTime;
-
   void setExpectedTime(String value) {
     expectedTime = value;
     notifyListeners();
   }
-
-  final List<String> expectedTimeList = AppString.expectedTimeList;
-
-  // property condition
-  final List<String> propertyConditionList = ["Ready to Use", "Bare Shell"];
-
-  String? propertyCondition;
 
   void setPropertyCondition(String value) {
     propertyCondition = value;
     notifyListeners();
   }
 
-  //Location Hub
-
-  String? locationHub;
-
   void setLocationHub(String value) {
     locationHub = value;
     notifyListeners();
   }
-
-  final List<String> locationHubList = AppString.locationHubList;
-
-  // Zone type
-
-  String? zoneType;
 
   void setZone(String value) {
     zoneType = value;
     notifyListeners();
   }
 
-  final List<String> zoneList = AppString.zoneList;
-  // owner
-
-  String? owner;
-
   void setOwner(String value) {
     owner = value;
     notifyListeners();
   }
-
-  final List<String> ownerTypeList = AppString.ownerTypeList;
-
-  // fire safty measurment
-
-  final Set<String> selectedFire = {};
-
-  bool isSelectedFireM(value) => selectedFire.contains(value);
 
   void setFireMeas(String value) {
     if (selectedFire.contains(value)) {
@@ -560,57 +565,25 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  final List<String> fire = AppString.fire;
-
-  // other infor
-
-  bool isOccCerti = false;
-
   void toggleOccCerti(bool value) {
     isOccCerti = value;
     notifyListeners();
   }
-
-  bool isNOCCerti = false;
 
   void toggleNocCerti(bool value) {
     isNOCCerti = value;
     notifyListeners();
   }
 
-  // wall Status
-
-  String? wall;
-
   void setWall(String value) {
     wall = value;
     notifyListeners();
   }
 
-  final List<String> wallStatusList = AppString.wallStatusList;
-
-  // ============================ Retail Shop section========================
-  //
-  //
-
-  // Washroom ===
-
-  String? washroom;
-
   void setWashroom(String value) {
     washroom = value;
     notifyListeners();
   }
-
-  final List<String> washroomList = AppString.washroomList;
-
-  // Suitable for ratil shop
-
-  final List<String> retailSuitableForList = AppString.retailSuitableForList;
-
-  final Set<String> retailsSuitable = {};
-
-  bool isSelectedSuitable(value) => retailsSuitable.contains(value);
 
   void setRetailSuitable(String value) {
     if (retailsSuitable.contains(value)) {
@@ -621,56 +594,20 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Rent - resident - pricing page
-
-  // ================
-
-  final rentCtr = TextEditingController();
-  final leaseCtr = TextEditingController();
-  final maintenanceCtrl = TextEditingController();
-  final bookingCtrl = TextEditingController();
-  final otherCtrl = TextEditingController();
-
-  // you'r going to =============
-
-  final List<String> rentTypeList = ["Only Rent", "Only Lease"];
-
-  String rentType = "Only Rent";
   void setRentType(String value) {
     rentType = value;
     notifyListeners();
   }
 
-  String? leaseYear;
   void setLeaseYear(String value) {
     leaseYear = value;
     notifyListeners();
   }
 
-  // secutiry deposit
-
-  final fixedCtr = TextEditingController();
-  final MultiRentCtr = TextEditingController();
-
   void setSecurityDep(String value) {
     securityDep = value;
     notifyListeners();
   }
-
-  // ============ Office layout =================
-
-  final cabinCtr = TextEditingController();
-  final meetingRoomCtr = TextEditingController();
-  final seatsCtr = TextEditingController();
-
-  bool conferenceRoom = false;
-  bool washrooms = false;
-  bool furnished = false;
-  bool receptionArea = false;
-  bool pantry = false;
-  bool centralAc = false;
-  bool ups = false;
-  bool oxygenDuct = false;
 
   void setConferenceRoom(bool value) {
     conferenceRoom = value;
@@ -712,72 +649,55 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Private washroom
-
-  String? privateWashroom;
   void setPrivateWashroomr(String value) {
     privateWashroom = value;
     notifyListeners();
   }
 
-  // Public washroom
-
-  String? pubWashroom;
   void setPubWashroom(String value) {
     pubWashroom = value;
     notifyListeners();
   }
 
-  // pantry list
-
-  final List<String> pantryList = ["Private", "Shared"];
-  String? selectedPantry;
   void togglePantry(String value) {
     selectedPantry = value;
     notifyListeners();
   }
 
-  // Lift section =========================
-
-  String? pLifts;
   void setPLift(String value) {
     pLifts = value;
     notifyListeners();
   }
 
-  String? sLift;
   void setSLift(String value) {
     sLift = value;
     notifyListeners();
   }
 
-  // plot and land
+  void setPlotArea(String value) {
+    plotMeasuType = value;
+    notifyListeners();
+  }
 
-  String? openSide;
+  void setWidthRaodSideArea(String value) {
+    facingRoadMeasuType = value;
+    notifyListeners();
+  }
+
   void setOpenSide(String value) {
     openSide = value;
     notifyListeners();
   }
-
-  String? yesOrNo;
 
   void setYesOrNo(String value) {
     yesOrNo = value;
     notifyListeners();
   }
 
-  String? plotContr;
-
-  final List<String> platLandConstructionList =
-      AppString.plotLandConstructionList;
-
   void setPlotCon(String value) {
     plotContr = value;
     notifyListeners();
   }
-
-  bool boundaryWall = false;
-  bool cornerPlot = false;
 
   void setBoundaryWall(bool value) {
     ups = value;
@@ -789,19 +709,9 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Parking type
-
-  final parkingCtr = TextEditingController();
-  final List<String> parkingOption = ["Available", "Not Available"];
-
-  final List<String> parkingTypeList = AppString.parkingTypeList;
-  String? selectedParkingOption;
-  List<String> selectedParkingTypes = [];
-
   void setParkingOption(String value) {
     selectedParkingOption = value;
 
-    // clear types if Not Available
     if (value == "Not Available") {
       selectedParkingTypes.clear();
     }
@@ -818,22 +728,282 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // sell section -resident --Apartment
-
-  bool isHotDeal = false;
+  String? selectedParkingOption;
 
   void toggleHotDeal(bool value) {
     isHotDeal = value;
     notifyListeners();
   }
 
-  // ==================Api implemented rent and sell residentional===============
+  // ───────────────────────────────────────────────
+  //  TOGGLE AMENITY MODEL (unused in provider but kept)
+  // ───────────────────────────────────────────────
+  void toggleItem(List<AmenityModel> list, int index) {
+    list[index].isSelected = !list[index].isSelected;
+    notifyListeners();
+  }
 
+  List<String> get selectedAmenityTitles {
+    return selectedAmenityModel(
+      amenitiesList,
+    ).map((amenity) => amenity.title).toList();
+  }
+
+  List<String> get selectedRulesTitles {
+    return selectedAmenityModel(
+      preferencesList,
+    ).map((amenity) => amenity.title).toList();
+  }
+
+  List<AmenityModel> selectedAmenityModel(List<AmenityModel> list) {
+    final selected = list.where((e) => e.isSelected).toList();
+
+    return selected;
+  }
+
+  // ------------------------------------------------
+  // Address details
+  // ------------------------------------------------
+
+  final localityCtr = TextEditingController();
+  final addressCtr = TextEditingController();
+  final cityCtr = TextEditingController();
+
+  /// city selected or not
+  bool get isCitySelected => cityCtr.text.trim().isNotEmpty;
+
+  /// full form validation
+  bool get isFormValid =>
+      isCitySelected &&
+      localityCtr.text.isNotEmpty &&
+      addressCtr.text.isNotEmpty;
+
+  // -------------------------------------------------
+  // Photo upload
+  //--------------------------------------------------
+
+  final ImagePicker _picker = ImagePicker();
+  final List<String> images = [];
+
+  /// Pick multiple images
+  Future<void> pickImages(BuildContext context) async {
+    final List<XFile> pickedImages = await _picker.pickMultiImage(
+      imageQuality: 80,
+    );
+
+    for (var image in pickedImages) {
+      final file = File(image.path);
+      final sizeInMB = file.lengthSync() / (1024 * 1024);
+
+      if (sizeInMB <= 2) {
+        images.add(image.path);
+      } else {
+        AppSnackBar.error(context, "Image size should be less than 2 MB");
+      }
+    }
+
+    notifyListeners();
+  }
+
+  void removeImage(int index) {
+    images.removeAt(index);
+    notifyListeners();
+  }
+
+  // ───────────────────────────────────────────────
+  //  RESET / CLEAR ALL DATA
+  // ───────────────────────────────────────────────
+
+  /// Resets all form fields, selections, counters, maps, sets, controllers' text
+  /// Use this when user wants to start a fresh property postin
+  ///
+  void clearAllData() {
+    // ── Text Controllers ───────────────────────────────────────
+    for (final controller in [
+      pgNameController,
+      totalFloorsController,
+      yourFloorCtr,
+      carpetAreaCtr,
+      buildAreaCtr,
+      plotAreaCtr,
+      lengthCtr,
+      widthCtr,
+      widthRoadSideCtr,
+      rentCtr,
+      leaseCtr,
+      maintenanceCtrl,
+      bookingCtrl,
+      otherCtrl,
+      fixedCtr,
+      MultiRentCtr,
+      mealAmountCtr,
+      dateCtr,
+      propertyTypeCtr,
+      cabinCtr,
+      meetingRoomCtr,
+      seatsCtr,
+      parkingCtr,
+    ]) {
+      controller.clear();
+    }
+
+    // Clear room-specific controllers
+    for (final controller in roomCountCtr.values) {
+      controller.clear();
+    }
+    for (final controller in roomAmountCtr.values) {
+      controller.clear();
+    }
+    for (final controller in fixedDepositCtr.values) {
+      controller.clear();
+    }
+
+    // ── Single selections ──────────────────────────────────────
+    pgFor = null;
+    managerStay = null;
+    propertyManagedBy = null;
+    securityDep = null;
+    furnishType = null;
+    facing = null;
+    flooring = null;
+    propertyAge = null;
+    selectedBhk = "";
+    bathrooms = null;
+    balconies = null;
+    constructionStatus = null;
+    expectedTime = null;
+    propertyCondition = null;
+    locationHub = null;
+    zoneType = null;
+    owner = null;
+    wall = null;
+    washroom = null;
+    privateWashroom = null;
+    pubWashroom = null;
+    selectedPantry = null;
+    pLifts = null;
+    sLift = null;
+    openSide = null;
+    yesOrNo = null;
+    plotContr = null;
+    lastEntryTime = null;
+    rentType = "Only Rent";
+    leaseYear = null;
+    builtMeasuType = "Sq ft";
+    carpetMeasuType = "Sq ft";
+    plotMeasuType = "Sq ft";
+    facingRoadMeasuType = "Sq ft";
+    mealsAvailable = "";
+    mealType = "";
+
+    // ── Counters & numbers ─────────────────────────────────────
+    coveredParking = 0;
+    openParking = 0;
+    noticePeriod = null;
+
+    // ── Booleans ───────────────────────────────────────────────
+    negotiable = false;
+    utilitiesIncluded = false;
+    hideNumber = false;
+    isBrokerAllow = false;
+    isHotDeal = false;
+    isOccCerti = false;
+    isNOCCerti = false;
+    boundaryWall = false;
+    cornerPlot = false;
+
+    conferenceRoom = false;
+    washrooms = false;
+    furnished = false;
+    receptionArea = false;
+    pantry = false;
+    centralAc = false;
+    ups = false;
+    oxygenDuct = false;
+
+    // ── Strings ────────────────────────────────────────────────
+    lockPerdiod = '';
+
+    // ── Collections ────────────────────────────────────────────
+    _bestSuitedFor.clear();
+    _roomSharing.clear();
+    _selectedService.clear();
+    mealTime.clear();
+    selectedArea.clear();
+    selectedTenant.clear();
+    selectedRoom.clear();
+    selectedFire.clear();
+    retailsSuitable.clear();
+    selectedParkingTypes.clear();
+    images.clear();
+
+    // ── Maps ───────────────────────────────────────────────────
+    roomSecurityType.clear();
+    multipleOfRent.clear();
+
+    // Clear amenity counters in AppString (if you want full reset)
+    AppString.amenities.updateAll((key, value) => 0);
+
+    // ── Error states ───────────────────────────────────────────
+    areaError = null;
+
+    // Important: notify UI
+    notifyListeners();
+  }
+
+  // ───────────────────────────────────────────────
+  //  IMPROVED DISPOSE – clear text + dispose all controllers
+  // ───────────────────────────────────────────────
+  @override
+  void dispose() {
+    // Dispose ALL controllers we have
+    final allControllers = <TextEditingController>[
+      pgNameController,
+      totalFloorsController,
+      yourFloorCtr,
+      carpetAreaCtr,
+      buildAreaCtr,
+      plotAreaCtr,
+      lengthCtr,
+      widthCtr,
+      widthRoadSideCtr,
+      rentCtr,
+      leaseCtr,
+      maintenanceCtrl,
+      bookingCtrl,
+      otherCtrl,
+      fixedCtr,
+      MultiRentCtr,
+      mealAmountCtr,
+      dateCtr,
+      propertyTypeCtr,
+      cabinCtr,
+      meetingRoomCtr,
+      seatsCtr,
+      parkingCtr,
+      ...roomCountCtr.values,
+      ...roomAmountCtr.values,
+      ...fixedDepositCtr.values,
+    ];
+
+    for (final controller in allControllers) {
+      controller.dispose();
+    }
+
+    // Optional: also clear data (but usually not needed in dispose)
+    // clearAllData();   // ← uncomment only if you want full reset on dispose
+
+    super.dispose();
+  }
+
+  // ───────────────────────────────────────────────
+  //  API CALL (kept exactly as original)
+  // ───────────────────────────────────────────────
   final _repo = PostPropertyRepo();
 
   Future<void> postProperty() async {
     try {
-      final model = RentSellResModel(
+      final model = RentSellReqModel(
         listingType: "Rent",
         propertyType: "Residential",
         propertyCategory: "Apartment",
@@ -873,8 +1043,8 @@ class PgDetailsProvider extends ChangeNotifier {
             ],
           ),
 
-          totalFloors: int.tryParse(floorsController.text),
-          yourFloor: int.tryParse(dataCtr.text),
+          totalFloors: int.tryParse(totalFloorsController.text),
+          yourFloor: int.tryParse(yourFloorCtr.text),
 
           preferredTenants: selectedTenant.toList(),
           availableFrom: DateTime.tryParse(dateCtr.text),
@@ -902,8 +1072,8 @@ class PgDetailsProvider extends ChangeNotifier {
           noticePeriod: noticePeriod,
 
           lockInPeriod: LockInPeriod(
-            label: LockPerdiod,
             month: int.tryParse(leaseYear ?? "0"),
+            lable: lockPerdiod,
           ),
         ),
 
@@ -921,7 +1091,7 @@ class PgDetailsProvider extends ChangeNotifier {
 
         images: [],
 
-        description: dataCtr.text,
+        description: descController.text,
       );
 
       await _repo.postProperty(model);
@@ -931,7 +1101,144 @@ class PgDetailsProvider extends ChangeNotifier {
       print("Post property error: $e");
     }
   }
+
+  // ------------------------------------------
+  // PG API
+  //------------------------------------------
+
+  Future<void> pgPost() async {
+    // Optional: show loading
+    // showLoadingOverlay(context, message: "Posting your PG...");
+
+    try {
+      // ── Build RoomTypes list (this was the biggest missing part) ─────────────
+      List<RoomType> roomTypesList = [];
+
+      for (String sharing in _roomSharing) {
+        final countText = roomCountCtr[sharing]?.text.trim() ?? '0';
+        final amountText = roomAmountCtr[sharing]?.text.trim() ?? '0';
+
+        final rooms = int.tryParse(countText) ?? 0;
+        final rent = int.tryParse(amountText) ?? 0;
+
+        SecurityDepositType? secDepositTypeStr = getSecurityType(sharing);
+        TextEditingController? fixedAmount = fixedDepositCtr[sharing];
+        String? type;
+        if (secDepositTypeStr == SecurityDepositType.fixed) {
+          type = "Fixed";
+        } else if (secDepositTypeStr == SecurityDepositType.multiple) {
+          type = "Multiple of rent";
+        } else {
+          type = "None";
+        }
+
+        roomTypesList.add(
+          RoomType(
+            sharingType: sharing,
+            roomsAvailable: rooms,
+            rentAmount: rent,
+            securityDepositType: type,
+            amount: int.tryParse(fixedAmount?.text.trim() ?? '0'),
+            attachedBathroom: attachedBathroom[sharing] ?? false,
+            attachedBalcony: attachedBalcony[sharing] ?? false,
+          ),
+        );
+      }
+
+      // ── Build Parking ────────────────────────────────────────────────────────
+      final parkingObj = PGParking(covered: coveredParking, open: openParking);
+
+      // ── Build Pricing (example – adjust according to your real needs) ────────
+      final pricingObj = PGPricing(
+        addMore: [], // fill if you have extra charges
+        rent: PGRent(
+          isElectricity: utilitiesIncluded,
+          isNegotiable: negotiable,
+        ),
+        mealsAvailable: mealsAvailable.isNotEmpty ? mealsAvailable : null,
+        mealsType: mealType.isNotEmpty ? mealType : null,
+        mealsAvailableOnWeekend: [], // fill from mealTime if weekend
+        mealsAvailableOnWeekDay: [], // fill from mealTime if weekday
+        mealsAmount: int.tryParse(mealAmountCtr.text) ?? 0,
+        noticePeriod: noticePeriod,
+        lockInPeriod: LockInPeriod(
+          month: int.tryParse(leaseYear ?? '0'),
+          lable: lockPerdiod,
+        ),
+      );
+
+      // ── Build Location (from your address fields) ────────────────────────────
+      final locationObj = Location(
+        society: addressCtr.text.trim(),
+        locality: localityCtr.text.trim(),
+        city: cityCtr.text.trim(),
+        // add lat/long, pincode, society if you have
+      );
+
+      // ── Build Contact ────────────────────────────────────────────────────────
+      final contactObj = PGContact(
+        phone: "1234567890", // ← replace with real phone (from auth?)
+        phonePrivate: hideNumber,
+        amenities: selectedAmenityTitles, // common areas
+        pgRules: selectedRulesTitles, // if you have pg rules set
+        lastEntryTime: lastEntryTime,
+        commonArea: selectedArea.toList(),
+      );
+
+      // ── Images (assuming List<String> urls or paths) ─────────────────────────
+      final List<String> uploadedImages =
+          images; // from your image picker/upload
+
+      // ── Create model ─────────────────────────────────────────────────────────
+      final model = PgReqModel(
+        listingType: "PG",
+        pgDetails: PgDetails(
+          pgName: pgNameController.text.trim(),
+          pgFor: pgFor,
+          bestSuitedFor: bestSuitedFor.toList(),
+          totalFloors: int.tryParse(totalFloorsController.text.trim()),
+          roomTypes: roomTypesList, // ← fixed here
+          furnishing: Furnishing(
+            type: furnishType,
+            amenities: AppString.amenities.entries
+                .where((e) => e.value > 0)
+                .map((e) => Amenity(name: e.key, quantity: e.value))
+                .toList(),
+          ),
+          parking: parkingObj,
+          managedBy: propertyManagedBy,
+          managerStaysAtPg: managerStay == "Yes", // assuming yesNoList
+          availableFrom: dateCtr.text,
+          includedServices: _selectedService.toList(),
+        ),
+        pricing: pricingObj,
+        location: locationObj,
+        contact: contactObj,
+        images: uploadedImages,
+        description: descController.text
+            .trim(), // or your description controller
+      );
+
+      print(model.toJson());
+
+      // ── Call API ─────────────────────────────────────────────────────────────
+      await _repo.pgPostProperty(model);
+
+      // Success
+      // hideLoadingOverlay(context);
+      // AppSnackBar.success(context, "PG posted successfully!");
+      // Navigator.pop(context); or clear form
+    } catch (e, stack) {
+      // hideLoadingOverlay(context);
+      // AppSnackBar.error(context, "Failed to post PG: ${e.toString()}");
+      debugPrint("Post PG error: $e\n$stack");
+    }
+  }
 }
+
+// ───────────────────────────────────────────────
+//  AmenityModel & sample lists (kept outside class)
+// ───────────────────────────────────────────────
 
 class AmenityModel {
   final String title;

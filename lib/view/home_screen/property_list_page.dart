@@ -6,7 +6,7 @@ import 'package:token_app/utils/text_style.dart';
 import 'package:token_app/view/home_screen/filter/filter_page.dart';
 import 'package:token_app/view/home_screen/location_screen.dart';
 import 'package:token_app/view/home_screen/property_review_page.dart';
-import 'package:token_app/viewModel/afterLogin/home_screen_controller.dart';
+import 'package:token_app/viewModel/afterLogin/home_screen_provider.dart';
 
 class PropertyListPage extends StatelessWidget {
   const PropertyListPage({super.key});
@@ -20,7 +20,7 @@ class PropertyListPage extends StatelessWidget {
         backgroundColor: Colors.white,
         leading: iconButton(
           onTap: () {
-            context.read<HomeScreenController>().clearAll();
+            context.read<HomeScreenProvicer>().clearAll();
             Navigator.pop(context);
           },
           icons: Icons.arrow_back,

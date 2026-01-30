@@ -43,577 +43,673 @@ class _ApartmentDetailsPageState extends State<ApartmentDetailsPage> {
     saleType = "${widget.type}-${widget.propertyType}";
   }
 
+  // ────────────────────────────────────────────────────────────────
+  //  Handle system back button / gesture + AppBar back
+  // ────────────────────────────────────────────────────────────────
+  Future<bool> _onPopInvoked(bool didPop) async {
+    if (didPop) {
+      return true; // already in the process of popping
+    }
+
+    final provider = Provider.of<PgDetailsProvider>(context, listen: false);
+
+    // →→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→
+    // Har back pe dialog dikhao — chahe kuch bhara ho ya na ho
+    // →→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→→
+
+    final bool? shouldDiscard = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        // AlertDialog ki jagah Dialog use karo → zyada control milta hai
+        insetPadding: const EdgeInsets.symmetric(horizontal: 32),
+        child: SizedBox(
+          width:
+              MediaQuery.of(context).size.width * 0.85, // 85% of screen width
+          // ya fixed value: width: 340,
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Quit this page?",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  "Are you sure you want to leave?\nAll entered information will be lost.",
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text(
+                        "Keep now",
+                        style: TextStyle(color: AppColors.black),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text(
+                        "Quit page",
+                        style: TextStyle(color: AppColors.mainColors),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (shouldDiscard == true) {
+      // User ne "Quit page" choose kiya
+      provider.clearAllData(); // ← data clear kar do
+      return true; // allow pop
+    }
+
+    // User ne "Keep now" choose kiya ya dialog dismiss kiya
+    return false; // rok do back
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        leading: const BackButton(),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "${widget.propertyType} Details",
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
-            Text(
-              "${widget.type} > ${widget.propertyClass} > ${widget.propertyType}",
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        final allowPop = await _onPopInvoked(didPop);
+        if (allowPop && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.white,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          leading: const BackButton(),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "${widget.propertyType} Details",
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              Text(
+                "${widget.type} > ${widget.propertyClass} > ${widget.propertyType}",
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+              ),
+            ],
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: TextAppButton(text: "Help", onTap: () {}),
             ),
           ],
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: TextAppButton(text: "Help", onTap: () {}),
-          ),
-        ],
-      ),
-      body: Consumer<PgDetailsProvider>(
-        builder: (context, provider, child) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: widget.propertyType == "Plot/Land"
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _label("Expected Time of Possession *"),
-                      _dropdown(
-                        hint: "Select the expected time",
-                        value: provider.expectedTime,
-                        items: provider.expectedTimeList,
-                        onChanged: (v) => provider.setExpectedTime,
-                      ),
-                      SizedBox(height: 15),
-                      _label("Ownership *"),
-                      _dropdown(
-                        value: provider.owner,
-                        hint: "Select the Ownership",
-                        items: provider.ownerTypeList,
-                        onChanged: (v) => provider.setOwner,
-                      ),
-                      SizedBox(height: 15),
-                      _label("Plot Area *"),
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: AppNumberField(
-                              controller: provider
-                                  .carpetAreaCtr, // ← probably typo → builtUpAreaCtr?
-                              hintText: "",
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            flex: 1,
-                            child: _unitDropdown(
-                              value: provider.builtMeasuType,
-                              item: provider.measurmentList,
-                              onChanged: (v) => provider.setBuildArea,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 15),
-                      Text("Dimensions", style: textStyle17(FontWeight.bold)),
-                      SizedBox(height: 10),
-                      _label("Lenght"),
-                      AppNumberField(
-                        controller: provider.cabinCtr,
-                        hintText: "Lenght of the plot",
-                        textWidget: provider.builtMeasuType,
-                      ),
-
-                      SizedBox(height: 15),
-
-                      _label("Width"),
-                      AppNumberField(
-                        controller: provider.cabinCtr,
-                        hintText: "Width of the plot",
-                        textWidget: provider.builtMeasuType,
-                      ),
-
-                      SizedBox(height: 15),
-
-                      _label("Width of facing road *"),
-                      AppNumberField(
-                        controller: provider.cabinCtr,
-                        hintText: "Enter width of the road",
-                        textWidget: provider.builtMeasuType,
-                      ),
-                      SizedBox(height: 15),
-
-                      _label("No.of open sides *"),
-                      Wrap(
-                        spacing: 10,
-                        children: List.generate(provider.noOfBathroom.length, (
-                          index,
-                        ) {
-                          final value = provider.noOfBathroom[index];
-
-                          return _stringNumberChip(
-                            value, // label
-                            // stored value
-                            provider.openSide ?? '',
-                            () {
-                              provider.setOpenSide(value);
-                            },
-                          );
-                        }),
-                      ),
-
-                      SizedBox(height: 15),
-
-                      _label("No.of open sides *"),
-                      Wrap(
-                        spacing: 10,
-                        children: provider.yesNoList
-                            .map(
-                              (y) => choiceChip(y, provider.yesOrNo ?? '', (_) {
-                                provider.setYesOrNo(y);
-                              }),
-                            )
-                            .toList(),
-                      ),
-                      if (provider.yesOrNo == "Yes") ...[
-                        SizedBox(height: 10),
-                        _label("What is the type of construction?*"),
-                        Wrap(
-                          spacing: 10,
-                          children: provider.platLandConstructionList
-                              .map(
-                                (plot) => choiceChip(
-                                  plot,
-                                  provider.plotContr ?? '',
-                                  (_) {
-                                    provider.setPlotCon(plot);
-                                  },
-                                ),
-                              )
-                              .toList(),
+        body: Consumer<PgDetailsProvider>(
+          builder: (context, provider, child) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: widget.propertyType == "Plot/Land"
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _label("Expected Time of Possession *"),
+                        _dropdown(
+                          hint: "Select the expected time",
+                          value: provider.expectedTime,
+                          items: provider.expectedTimeList,
+                          onChanged: (v) => provider.setExpectedTime(v ?? ''),
                         ),
-                      ],
-                      const SizedBox(height: 15),
-                      _label("Property Facing *"),
-                      _dropdown(
-                        hint: "Select the Property Facing",
-                        value: provider.facing,
-                        items: provider.facingList,
-                        onChanged: (v) => provider.setFacing,
-                      ),
-                      _switchTile(
-                        title: "With Boundary Wall",
-                        subtitle: "",
-                        value: provider.boundaryWall,
-                        onChanged: (v) => provider.setBoundaryWall(v),
-                      ),
-                      _switchTile(
-                        title: "Is it Corner Plot",
-                        subtitle: "",
-                        value: provider.cornerPlot,
-                        onChanged: (v) => provider.setCornerPlot(v),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
+                        SizedBox(height: 15),
+                        _label("Ownership *"),
+                        _dropdown(
+                          value: provider.owner,
+                          hint: "Select the Ownership",
+                          items: provider.ownerTypeList,
+                          onChanged: (v) => provider.setOwner(v ?? ''),
                         ),
-                        decoration: BoxDecoration(
-                          border: Border.all(width: 1, color: AppColors.grey),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Row(
+                        SizedBox(height: 15),
+                        _label("Plot Area *"),
+                        Row(
                           children: [
-                            Row(
-                              children: [
-                                Text(
-                                  "Allow brokers to reach out",
-                                  style: textStyle14(FontWeight.bold),
-                                ),
-                                const Icon(Icons.help_outline),
-                              ],
+                            Expanded(
+                              flex: 2,
+                              child: AppNumberField(
+                                controller: provider
+                                    .plotAreaCtr, // ← probably typo → builtUpAreaCtr?
+                                hintText: "",
+                              ),
                             ),
-                            const Spacer(),
-                            Switch(
-                              value: provider.isBrokerAllow,
-                              onChanged: provider.toggleBroker,
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 1,
+                              child: _unitDropdown(
+                                value: provider.plotMeasuType,
+                                item: provider.measurmentList,
+                                onChanged: (v) => provider.setPlotArea(v ?? ''),
+                              ),
                             ),
                           ],
                         ),
-                      ),
+                        SizedBox(height: 15),
+                        Text("Dimensions", style: textStyle17(FontWeight.bold)),
+                        SizedBox(height: 10),
+                        _label("Lenght"),
+                        AppNumberField(
+                          controller: provider.lengthCtr,
+                          hintText: "Lenght of the plot",
+                          textWidget: provider.plotMeasuType,
+                        ),
+                        if (provider.areaError != null)
+                          Text(
+                            provider.areaError!,
+                            style: TextStyle(color: Colors.red, fontSize: 12),
+                          ),
+                        SizedBox(height: 15),
 
-                      const SizedBox(height: 32),
+                        _label("Width"),
+                        AppNumberField(
+                          controller: provider.widthCtr,
+                          hintText: "Width of the plot",
+                          textWidget: provider.plotMeasuType,
+                        ),
+                        if (provider.areaError != null)
+                          Text(
+                            provider.areaError!,
+                            style: TextStyle(color: Colors.red, fontSize: 12),
+                          ),
+                        SizedBox(height: 15),
 
-                      // ─────────────────────────────────────────────
-                      // Action Buttons
-                      // ─────────────────────────────────────────────
-                      AppButton(
-                        text: "Save & Next",
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => PricingPage(
-                                propertyType: widget.propertyType,
-                                type: widget.type,
-                                isSell: widget.isSale,
+                        _label("Width of facing road *"),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: AppNumberField(
+                                controller: provider
+                                    .widthRoadSideCtr, // ← probably typo → builtUpAreaCtr?
+                                hintText: "Enter width of the road",
                               ),
                             ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 15),
-                      AppButton(
-                        text: "Cancel",
-                        onTap: () {},
-                        textColor: AppColors.black,
-                        backgroundColor: AppColors.red.shade100,
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ─────────────────────────────────────────────
-                      // Property Type (only for Others)
-                      // ─────────────────────────────────────────────
-                      if (widget.propertyType == "Others" ||
-                          saleType == "Sell-Others") ...[
-                        _label("Property Type *"),
-                        AppTextField(
-                          controller: provider.propertyTypeCtr,
-                          hintText: "Enter the property type",
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 1,
+                              child: _unitDropdown(
+                                value: provider.facingRoadMeasuType,
+                                item: provider.measurmentList,
+                                onChanged: (v) =>
+                                    provider.setWidthRaodSideArea(v ?? ''),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 15),
-                      ],
+                        SizedBox(height: 15),
 
-                      // ─────────────────────────────────────────────
-                      // Age / Construction Status
-                      // ─────────────────────────────────────────────
-                      if (!widget.isSale) ...[
-                        _label("Age of the property *"),
-                        _dropdown(
-                          hint: "Select the age of the Property",
-                          value: provider.propertyAge,
-                          items: provider.ageOfProperty,
-                          onChanged: (v) => provider.setAgeProperty,
-                        ),
-                      ] else ...[
-                        _label("Construction Status *"),
+                        _label("No.of open sides *"),
                         Wrap(
                           spacing: 10,
-                          runSpacing: 10,
-                          children: provider.constructionStatusList
+                          children: List.generate(
+                            provider.noOfBathroom.length,
+                            (index) {
+                              final value = provider.noOfBathroom[index];
+
+                              return _stringNumberChip(
+                                value, // label
+                                // stored value
+                                provider.openSide ?? '',
+                                () {
+                                  provider.setOpenSide(value);
+                                },
+                              );
+                            },
+                          ),
+                        ),
+
+                        SizedBox(height: 15),
+
+                        _label("No.of open sides *"),
+                        Wrap(
+                          spacing: 10,
+                          children: provider.yesNoList
                               .map(
-                                (status) => choiceChip(
-                                  status,
-                                  provider.constructionStatus ?? '',
-                                  (_) => provider.setConstructionStatus(status),
-                                ),
+                                (y) =>
+                                    choiceChip(y, provider.yesOrNo ?? '', (_) {
+                                      provider.setYesOrNo(y);
+                                    }),
                               )
                               .toList(),
                         ),
+                        if (provider.yesOrNo == "Yes") ...[
+                          SizedBox(height: 10),
+                          _label("What is the type of construction?*"),
+                          Wrap(
+                            spacing: 10,
+                            children: provider.platLandConstructionList
+                                .map(
+                                  (plot) => choiceChip(
+                                    plot,
+                                    provider.plotContr ?? '',
+                                    (_) {
+                                      provider.setPlotCon(plot);
+                                    },
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        ],
                         const SizedBox(height: 15),
+                        _label("Property Facing *"),
+                        _dropdown(
+                          hint: "Select the Property Facing",
+                          value: provider.facing,
+                          items: provider.facingList,
+                          onChanged: (v) => provider.setFacing(v ?? ''),
+                        ),
+                        _switchTile(
+                          title: "With Boundary Wall",
+                          subtitle: "",
+                          value: provider.boundaryWall,
+                          onChanged: (v) => provider.setBoundaryWall(v),
+                        ),
+                        _switchTile(
+                          title: "Is it Corner Plot",
+                          subtitle: "",
+                          value: provider.cornerPlot,
+                          onChanged: (v) => provider.setCornerPlot(v),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(width: 1, color: AppColors.grey),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Row(
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    "Allow brokers to reach out",
+                                    style: textStyle14(FontWeight.bold),
+                                  ),
+                                  const Icon(Icons.help_outline),
+                                ],
+                              ),
+                              const Spacer(),
+                              Switch(
+                                value: provider.isBrokerAllow,
+                                onChanged: provider.toggleBroker,
+                              ),
+                            ],
+                          ),
+                        ),
 
-                        if (provider.constructionStatus == "Ready to Move") ...[
+                        const SizedBox(height: 32),
+
+                        // ─────────────────────────────────────────────
+                        // Action Buttons
+                        // ─────────────────────────────────────────────
+                        AppButton(
+                          text: "Save & Next",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PricingPage(
+                                  propertyType: widget.propertyType,
+                                  type: widget.type,
+                                  isSell: widget.isSale,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 15),
+                        AppButton(
+                          text: "Cancel",
+                          onTap: () {
+                            provider.clearAllData();
+                          },
+                          textColor: AppColors.black,
+                          backgroundColor: AppColors.red.shade100,
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // ─────────────────────────────────────────────
+                        // Property Type (only for Others)
+                        // ─────────────────────────────────────────────
+                        if (widget.propertyType == "Others" ||
+                            saleType == "Sell-Others") ...[
+                          _label("Property Type *"),
+                          AppTextField(
+                            controller: provider.propertyTypeCtr,
+                            hintText: "Enter the property type",
+                          ),
+                          const SizedBox(height: 15),
+                        ],
+
+                        // ─────────────────────────────────────────────
+                        // Age / Construction Status
+                        // ─────────────────────────────────────────────
+                        if (!widget.isSale) ...[
                           _label("Age of the property *"),
                           _dropdown(
                             hint: "Select the age of the Property",
                             value: provider.propertyAge,
                             items: provider.ageOfProperty,
-                            onChanged: (v) => provider.setAgeProperty,
+                            onChanged: (v) => provider.setAgeProperty(v ?? ''),
+                          ),
+                        ] else ...[
+                          _label("Construction Status *"),
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: provider.constructionStatusList
+                                .map(
+                                  (status) => choiceChip(
+                                    status,
+                                    provider.constructionStatus ?? '',
+                                    (_) =>
+                                        provider.setConstructionStatus(status),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                          const SizedBox(height: 15),
+
+                          if (provider.constructionStatus ==
+                              "Ready to Move") ...[
+                            _label("Age of the property *"),
+                            _dropdown(
+                              hint: "Select the age of the Property",
+                              value: provider.propertyAge,
+                              items: provider.ageOfProperty,
+                              onChanged: (v) =>
+                                  provider.setAgeProperty(v ?? ''),
+                            ),
+                          ],
+
+                          if (provider.constructionStatus ==
+                              "Under Construction") ...[
+                            _label("Expected Time of Possession *"),
+                            _dropdown(
+                              hint: "Select the expected time",
+                              value: provider.expectedTime,
+                              items: provider.expectedTimeList,
+                              onChanged: (v) =>
+                                  provider.setExpectedTime(v ?? ''),
+                            ),
+                          ],
+                        ],
+
+                        // ─────────────────────────────────────────────
+                        // BHK Type
+                        // ─────────────────────────────────────────────
+                        if (widget.propertyType != "1RK/Studio House" &&
+                            widget.propertyType != "Others" &&
+                            saleType != "Sell-Others") ...[
+                          const SizedBox(height: 15),
+                          _label("BHK Type *"),
+                          const SizedBox(height: 10),
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: provider.bhkList
+                                .map(
+                                  (e) => choiceChip(
+                                    e,
+                                    provider.selectedBhk,
+                                    (_) => provider.setBHKType(e),
+                                  ),
+                                )
+                                .toList(),
                           ),
                         ],
 
-                        if (provider.constructionStatus ==
-                            "Under Construction") ...[
-                          _label("Expected Time of Possession *"),
+                        // ─────────────────────────────────────────────
+                        // Bathrooms + Balconies (non-Others)
+                        // ─────────────────────────────────────────────
+                        if (widget.propertyType != "Others") ...[
+                          const SizedBox(height: 15),
+                          _label("No. of Bathrooms"),
                           _dropdown(
-                            hint: "Select the expected time",
-                            value: provider.expectedTime,
-                            items: provider.expectedTimeList,
-                            onChanged: (v) => provider.setExpectedTime,
+                            hint: "Select the No. of bathrooms",
+                            value: provider.bathrooms,
+                            items: provider
+                                .noOfBalcony, // ← probably typo → should be noOfBathrooms?
+                            onChanged: (v) => provider.setBathrooms(v ?? ''),
+                          ),
+                          const SizedBox(height: 15),
+                          _label("No. of Balconies"),
+                          _dropdown(
+                            hint: "Select the No. of balconies",
+                            value: provider.balconies,
+                            items: provider.noOfBalcony,
+                            onChanged: (v) => provider.setBalcony(v ?? ''),
                           ),
                         ],
-                      ],
 
-                      // ─────────────────────────────────────────────
-                      // BHK Type
-                      // ─────────────────────────────────────────────
-                      if (widget.propertyType != "1RK/Studio House" &&
-                          widget.propertyType != "Others" &&
-                          saleType != "Sell-Others") ...[
                         const SizedBox(height: 15),
-                        _label("BHK Type *"),
+
+                        // ─────────────────────────────────────────────
+                        // Additional Rooms
+                        // ─────────────────────────────────────────────
+                        _label("Any additional rooms?"),
                         const SizedBox(height: 10),
                         Wrap(
                           spacing: 10,
                           runSpacing: 10,
-                          children: provider.bhkList
+                          children: provider.roomList
                               .map(
-                                (e) => choiceChip(
+                                (e) => boolChoiceChip(
                                   e,
-                                  provider.selectedBhk,
-                                  (_) => provider.setBHKType(e),
+                                  provider.isSelectedRoom(e),
+                                  () => provider.setAdditionalRoom(e),
                                 ),
                               )
                               .toList(),
                         ),
-                      ],
 
-                      // ─────────────────────────────────────────────
-                      // Bathrooms + Balconies (non-Others)
-                      // ─────────────────────────────────────────────
-                      if (widget.propertyType != "Others") ...[
                         const SizedBox(height: 15),
-                        _label("No. of Bathrooms"),
-                        _dropdown(
-                          hint: "Select the No. of bathrooms",
-                          value: provider.bathrooms,
-                          items: provider
-                              .noOfBalcony, // ← probably typo → should be noOfBathrooms?
-                          onChanged: (v) => provider.setBathrooms,
-                        ),
-                        const SizedBox(height: 15),
-                        _label("No. of Balconies"),
-                        _dropdown(
-                          hint: "Select the No. of balconies",
-                          value: provider.balconies,
-                          items: provider.noOfBalcony,
-                          onChanged: (v) => provider.setBalcony,
-                        ),
-                      ],
 
-                      const SizedBox(height: 15),
+                        // ─────────────────────────────────────────────
+                        // Furnish Type + Amenities (non Sale-Others)
+                        // ─────────────────────────────────────────────
+                        if (saleType != "Sell-Others") ...[
+                          _label("Furnish Type *"),
+                          _dropdown(
+                            hint: "Select the Furnish Type",
+                            value: provider.furnishType,
+                            items: provider.furnishTypeList,
+                            onChanged: (value) {
+                              provider.setFurnishType(value ?? '');
+                              if (provider.canOpenFurnishing) {
+                                _showFurnishingBottomSheet(context);
+                              }
+                            },
+                          ),
 
-                      // ─────────────────────────────────────────────
-                      // Additional Rooms
-                      // ─────────────────────────────────────────────
-                      _label("Any additional rooms?"),
-                      const SizedBox(height: 10),
-                      Wrap(
-                        spacing: 10,
-                        runSpacing: 10,
-                        children: provider.roomList
-                            .map(
-                              (e) => boolChoiceChip(
-                                e,
-                                provider.isSelectedRoom(e),
-                                () => provider.setAdditionalRoom(e),
+                          if (provider.furnishType == "Fully Furnished") ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              'Please select 6 amenities',
+                              style: textStyle14(
+                                FontWeight.w500,
+                                color: AppColors.mainColors,
                               ),
-                            )
-                            .toList(),
-                      ),
+                            ),
+                            const SizedBox(height: 8),
+                            AppButton(
+                              text: "Select Amenities",
+                              onTap: () => _showFurnishingBottomSheet(context),
+                            ),
+                          ],
 
-                      const SizedBox(height: 15),
+                          if (provider.furnishType == "Semi Furnished") ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              'Please select 3 amenities',
+                              style: textStyle14(
+                                FontWeight.w500,
+                                color: AppColors.mainColors,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            AppButton(
+                              text: "Select Amenities",
+                              onTap: () => _showFurnishingBottomSheet(context),
+                            ),
+                          ],
 
-                      // ─────────────────────────────────────────────
-                      // Furnish Type + Amenities (non Sale-Others)
-                      // ─────────────────────────────────────────────
-                      if (saleType != "Sell-Others") ...[
-                        _label("Furnish Type *"),
-                        _dropdown(
-                          hint: "Select the Furnish Type",
-                          value: provider.furnishType,
-                          items: provider.furnishTypeList,
-                          onChanged: (value) {
-                            provider.setFurnishType(value ?? '');
-                            if (provider.canOpenFurnishing) {
-                              _showFurnishingBottomSheet(context);
-                            }
-                          },
+                          if (widget.propertyType != "Others") ...[
+                            const SizedBox(height: 15),
+                            _label("Facing"),
+                            _dropdown(
+                              hint: "Select the Facing",
+                              value: provider.facing,
+                              items: provider.facingList,
+                              onChanged: (v) => provider.setFacing(v ?? ''),
+                            ),
+                            const SizedBox(height: 15),
+                            _label("Flooring Type"),
+                            _dropdown(
+                              hint: "Select the flooring type",
+                              value: provider.flooring,
+                              items: provider
+                                  .facingList, // ← probably typo → should be flooringList?
+                              onChanged: (v) => provider.setFlooring(v ?? ''),
+                            ),
+                          ],
+
+                          const SizedBox(height: 15),
+
+                          if (saleType == "Sell-Apartment" ||
+                              saleType == "Sell-Builder Floor") ...[
+                            _label("Ownership *"),
+                            _dropdown(
+                              value: provider.owner,
+                              hint: "Select the Ownership",
+                              items: provider.ownerTypeList,
+                              onChanged: (v) => provider.setOwner(v ?? ''),
+                            ),
+                            const SizedBox(height: 15),
+                          ],
+                        ],
+
+                        // ─────────────────────────────────────────────
+                        // Area Details Section
+                        // ─────────────────────────────────────────────
+                        _sectionTitle("Area Details"),
+
+                        const SizedBox(height: 15),
+
+                        Text("Built Up Area *"),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: AppNumberField(
+                                controller: provider
+                                    .carpetAreaCtr, // ← probably typo → builtUpAreaCtr?
+                                hintText: "Enter Built up area",
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 1,
+                              child: _unitDropdown(
+                                value: provider.builtMeasuType,
+                                item: provider.measurmentList,
+                                onChanged: (v) =>
+                                    provider.setBuildArea(v ?? ''),
+                              ),
+                            ),
+                          ],
                         ),
 
-                        if (provider.furnishType == "Fully Furnished") ...[
-                          const SizedBox(height: 8),
-                          Text(
-                            'Please select 6 amenities',
-                            style: textStyle14(
-                              FontWeight.w500,
-                              color: AppColors.mainColors,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          AppButton(
-                            text: "Select Amenities",
-                            onTap: () => _showFurnishingBottomSheet(context),
-                          ),
-                        ],
+                        const SizedBox(height: 15),
 
-                        if (provider.furnishType == "Semi Furnished") ...[
-                          const SizedBox(height: 8),
-                          Text(
-                            'Please select 3 amenities',
-                            style: textStyle14(
-                              FontWeight.w500,
-                              color: AppColors.mainColors,
+                        Text("Carpet Area"),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Expanded(
+                              flex: 2,
+                              child: AppNumberField(
+                                controller: provider.carpetAreaCtr,
+                                hintText: "Enter carpet area",
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          AppButton(
-                            text: "Select Amenities",
-                            onTap: () => _showFurnishingBottomSheet(context),
-                          ),
-                        ],
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 1,
+                              child: _unitDropdown(
+                                value: provider.carpetMeasuType,
+                                item: provider.measurmentList,
+                                onChanged: (v) =>
+                                    provider.setCarpetArea(v ?? ''),
+                              ),
+                            ),
+                          ],
+                        ),
 
-                        if (widget.propertyType != "Others") ...[
+                        if (widget.propertyType != "Others" &&
+                            saleType != "Sell-Others") ...[
                           const SizedBox(height: 15),
-                          _label("Facing"),
-                          _dropdown(
-                            hint: "Select the Facing",
-                            value: provider.facing,
-                            items: provider.facingList,
-                            onChanged: (v) => provider.setFacing,
+                          Text(
+                            "Reserved Parking",
+                            style: const TextStyle(fontWeight: FontWeight.w600),
                           ),
-                          const SizedBox(height: 15),
-                          _label("Flooring Type"),
-                          _dropdown(
-                            hint: "Select the flooring type",
-                            value: provider.flooring,
-                            items: provider
-                                .facingList, // ← probably typo → should be flooringList?
-                            onChanged: (v) => provider.setFlooring,
+                          const SizedBox(height: 12),
+                          CounterField(
+                            label: "No. of Covered Parking",
+                            value: provider.coveredParking,
+                            onAdd: provider.incCovered,
+                            onRemove: provider.decCovered,
+                          ),
+                          const SizedBox(height: 12),
+                          CounterField(
+                            label: "No. of Open Parking",
+                            value: provider.openParking,
+                            onAdd: provider.incOpen,
+                            onRemove: provider.decOpen,
                           ),
                         ],
 
                         const SizedBox(height: 15),
 
-                        if (saleType == "Sell-Apartment" ||
-                            saleType == "Sell-Builder Floor") ...[
-                          _label("Ownership *"),
-                          _dropdown(
-                            value: provider.owner,
-                            hint: "Select the Ownership",
-                            items: provider.ownerTypeList,
-                            onChanged: (v) => provider.setOwner,
-                          ),
-                          const SizedBox(height: 15),
-                        ],
-                      ],
-
-                      // ─────────────────────────────────────────────
-                      // Area Details Section
-                      // ─────────────────────────────────────────────
-                      _sectionTitle("Area Details"),
-
-                      const SizedBox(height: 15),
-
-                      Text("Built Up Area *"),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: AppNumberField(
-                              controller: provider
-                                  .carpetAreaCtr, // ← probably typo → builtUpAreaCtr?
-                              hintText: "Enter Built up area",
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            flex: 1,
-                            child: _unitDropdown(
-                              value: provider.builtMeasuType,
-                              item: provider.measurmentList,
-                              onChanged: (v) => provider.setBuildArea,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 15),
-
-                      Text("Carpet Area"),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: AppNumberField(
-                              controller: provider.carpetAreaCtr,
-                              hintText: "Enter carpet area",
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            flex: 1,
-                            child: _unitDropdown(
-                              value: provider.carpetMeasuType,
-                              item: provider.measurmentList,
-                              onChanged: (v) => provider.setCarpetArea,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      if (widget.propertyType != "Others" &&
-                          saleType != "Sell-Others") ...[
-                        const SizedBox(height: 15),
-                        Text(
-                          "Reserved Parking",
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(height: 12),
-                        CounterField(
-                          label: "No. of Covered Parking",
-                          value: provider.coveredParking,
-                          onAdd: provider.incCovered,
-                          onRemove: provider.decCovered,
-                        ),
-                        const SizedBox(height: 12),
-                        CounterField(
-                          label: "No. of Open Parking",
-                          value: provider.openParking,
-                          onAdd: provider.incOpen,
-                          onRemove: provider.decOpen,
-                        ),
-                      ],
-
-                      const SizedBox(height: 15),
-
-                      // ─────────────────────────────────────────────
-                      // Floors
-                      // ─────────────────────────────────────────────
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text("Total Floors *"),
-                                const SizedBox(height: 6),
-                                AppNumberField(
-                                  controller: provider.floorsController,
-                                  hintText: "Enter total floors",
-                                  maxLength: 2,
-                                  min: 1,
-                                  max: 50,
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (widget.propertyType != "Villa" &&
-                              widget.propertyType != "Independent House" &&
-                              saleType != "Sell-Independent House" &&
-                              saleType != "Sell-Villa") ...[
-                            const SizedBox(width: 12),
+                        // ─────────────────────────────────────────────
+                        // Floors
+                        // ─────────────────────────────────────────────
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text("Your Floor *"),
+                                  const Text("Total Floors *"),
                                   const SizedBox(height: 6),
                                   AppNumberField(
-                                    controller: provider
-                                        .floorsController, // ← probably typo → yourFloorController?
-                                    hintText: "Enter your floor",
+                                    controller: provider.totalFloorsController,
+                                    hintText: "Enter total floors",
                                     maxLength: 2,
                                     min: 1,
                                     max: 50,
@@ -621,123 +717,148 @@ class _ApartmentDetailsPageState extends State<ApartmentDetailsPage> {
                                 ],
                               ),
                             ),
-                          ],
-                        ],
-                      ),
-
-                      const SizedBox(height: 15),
-
-                      // ─────────────────────────────────────────────
-                      // Rent-specific fields
-                      // ─────────────────────────────────────────────
-                      if (!widget.isSale) ...[
-                        _label("Preferred Tenant"),
-                        const SizedBox(height: 10),
-                        Wrap(
-                          spacing: 10,
-                          runSpacing: 10,
-                          children: provider.prefeTenant
-                              .map(
-                                (e) => boolChoiceChip(
-                                  e,
-                                  provider.isSelectedTenant(e),
-                                  () => provider.setTenant(e),
+                            if (widget.propertyType != "Villa" &&
+                                widget.propertyType != "Independent House" &&
+                                saleType != "Sell-Independent House" &&
+                                saleType != "Sell-Villa") ...[
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text("Your Floor *"),
+                                    const SizedBox(height: 6),
+                                    AppNumberField(
+                                      controller: provider
+                                          .yourFloorCtr, // ← probably typo → yourFloorController?
+                                      hintText: "Enter your floor",
+                                      maxLength: 2,
+                                      min: 1,
+                                      max: 50,
+                                    ),
+                                  ],
                                 ),
-                              )
-                              .toList(),
+                              ),
+                            ],
+                          ],
                         ),
+
                         const SizedBox(height: 15),
-                        _label("Available Date *"),
-                        TextField(
-                          controller: provider.dateCtr,
-                          readOnly: true,
-                          decoration: InputDecoration(
-                            suffixIcon: const Icon(Icons.calendar_month),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+
+                        // ─────────────────────────────────────────────
+                        // Rent-specific fields
+                        // ─────────────────────────────────────────────
+                        if (!widget.isSale) ...[
+                          _label("Preferred Tenant"),
+                          const SizedBox(height: 10),
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: provider.prefeTenant
+                                .map(
+                                  (e) => boolChoiceChip(
+                                    e,
+                                    provider.isSelectedTenant(e),
+                                    () => provider.setTenant(e),
+                                  ),
+                                )
+                                .toList(),
                           ),
-                          onTap: () async {
-                            final picked = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime.now(),
-                              lastDate: DateTime(2100),
-                            );
-                            if (picked != null && mounted) {
-                              provider.dateCtr.text =
-                                  "${picked.day}/${picked.month}/${picked.year}";
-                            }
-                          },
-                        ),
-                      ],
-
-                      const SizedBox(height: 15),
-
-                      // ─────────────────────────────────────────────
-                      // Broker Switch
-                      // ─────────────────────────────────────────────
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(width: 1, color: AppColors.grey),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Row(
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  "Allow brokers to reach out",
-                                  style: textStyle14(FontWeight.bold),
-                                ),
-                                const Icon(Icons.help_outline),
-                              ],
-                            ),
-                            const Spacer(),
-                            Switch(
-                              value: provider.isBrokerAllow,
-                              onChanged: provider.toggleBroker,
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      // ─────────────────────────────────────────────
-                      // Action Buttons
-                      // ─────────────────────────────────────────────
-                      AppButton(
-                        text: "Save & Next",
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => PricingPage(
-                                propertyType: widget.propertyType,
-                                type: widget.type,
-                                isSell: widget.isSale,
+                          const SizedBox(height: 15),
+                          _label("Available Date *"),
+                          TextField(
+                            controller: provider.dateCtr,
+                            readOnly: true,
+                            decoration: InputDecoration(
+                              suffixIcon: const Icon(Icons.calendar_month),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
                               ),
                             ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 15),
-                      AppButton(
-                        text: "Cancel",
-                        onTap: () {},
-                        textColor: AppColors.black,
-                        backgroundColor: AppColors.red.shade100,
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-          );
-        },
+                            onTap: () async {
+                              final picked = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime(2100),
+                              );
+                              if (picked != null && mounted) {
+                                provider.dateCtr.text =
+                                    "${picked.day}/${picked.month}/${picked.year}";
+                              }
+                            },
+                          ),
+                        ],
+
+                        const SizedBox(height: 15),
+
+                        // ─────────────────────────────────────────────
+                        // Broker Switch
+                        // ─────────────────────────────────────────────
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            border: Border.all(width: 1, color: AppColors.grey),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Row(
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    "Allow brokers to reach out",
+                                    style: textStyle14(FontWeight.bold),
+                                  ),
+                                  const Icon(Icons.help_outline),
+                                ],
+                              ),
+                              const Spacer(),
+                              Switch(
+                                value: provider.isBrokerAllow,
+                                onChanged: provider.toggleBroker,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        // ─────────────────────────────────────────────
+                        // Action Buttons
+                        // ─────────────────────────────────────────────
+                        AppButton(
+                          text: "Save & Next",
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PricingPage(
+                                  propertyType: widget.propertyType,
+                                  type: widget.type,
+                                  isSell: widget.isSale,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 15),
+                        AppButton(
+                          text: "Cancel",
+                          onTap: () {
+                            provider.clearAllData();
+                          },
+                          textColor: AppColors.black,
+                          backgroundColor: AppColors.red.shade100,
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+            );
+          },
+        ),
       ),
     );
   }

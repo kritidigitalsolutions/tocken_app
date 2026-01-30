@@ -116,7 +116,9 @@ class _PgPriceState extends State<PgPrice> {
                           if (securityType == SecurityDepositType.fixed) ...[
                             const SizedBox(height: 10),
                             AppTextField(
-                              controller: provider.fixedDepositCtr[room]!,
+                              controller:
+                                  provider.fixedDepositCtr[room] ??
+                                  TextEditingController(),
                               hintText: "Enter fixed deposit amount",
                               prefixIcon: const Icon(
                                 Icons.currency_rupee_sharp,
@@ -127,7 +129,9 @@ class _PgPriceState extends State<PgPrice> {
                           if (securityType == SecurityDepositType.multiple) ...[
                             const SizedBox(height: 10),
                             AppTextField(
-                              controller: provider.fixedDepositCtr[room]!,
+                              controller:
+                                  provider.fixedDepositCtr[room] ??
+                                  TextEditingController(),
                               hintText: "Enter no. of months (max 36)",
                               prefixIcon: const Icon(
                                 Icons.currency_rupee_sharp,
@@ -277,10 +281,10 @@ class _PgPriceState extends State<PgPrice> {
                 Wrap(
                   spacing: 10,
                   children: [
-                    _choiceChip("None", provider.LockPerdiod, (_) {
+                    _choiceChip("None", provider.lockPerdiod, (_) {
                       provider.toggleLockPeriod("None");
                     }),
-                    _choiceChip("Custom", provider.LockPerdiod, (_) {
+                    _choiceChip("Custom", provider.lockPerdiod, (_) {
                       provider.toggleLockPeriod("Custom");
                     }),
                   ],

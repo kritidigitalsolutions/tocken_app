@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
+import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provider.dart';
 
 class SummaryPage extends StatefulWidget {
   const SummaryPage({super.key});
@@ -10,10 +12,9 @@ class SummaryPage extends StatefulWidget {
 }
 
 class _SummaryPageState extends State<SummaryPage> {
-  final TextEditingController _descController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
+    final pro = context.read<PgDetailsProvider>();
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -53,7 +54,7 @@ class _SummaryPageState extends State<SummaryPage> {
 
             /// TextField
             TextField(
-              controller: _descController,
+              controller: pro.descController,
               maxLines: 6,
               maxLength: 1500,
               decoration: InputDecoration(
@@ -83,10 +84,7 @@ class _SummaryPageState extends State<SummaryPage> {
             AppButton(
               text: "Complete & Posting",
               onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (_) => ContactAmenitiesPage()),
-                // );
+                pro.pgPost();
               },
             ),
             SizedBox(height: 15),

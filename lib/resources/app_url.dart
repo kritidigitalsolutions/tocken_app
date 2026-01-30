@@ -2,7 +2,7 @@ class AppUrl {
   static const String baseUrl = 'http://192.168.29.185:5000/api';
 
   // static const String baseUrl =
-  //    "https://backend-tocken-admin-panel.vercel.app/api";
+  //     "https://backend-tocken-admin-panel.vercel.app/api";
 
   // Login
 

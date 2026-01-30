@@ -38,6 +38,14 @@ class PgDetailsPage extends StatelessWidget {
             AppTextField(
               controller: provider.pgNameController,
               hintText: "Enter your PG name",
+              validator: (String? value) {
+                // ← String? explicitly likh do
+                if (value == null || value.trim().isEmpty) {
+                  return "Please enter PG name";
+                }
+                // Valid hai → null return karo (no error message)
+                return null;
+              },
             ),
 
             _label("PG for *"),
@@ -71,11 +79,18 @@ class PgDetailsPage extends StatelessWidget {
 
             _label("Total Floors *"),
             AppNumberField(
-              controller: provider.floorsController,
+              controller: provider.totalFloorsController,
               hintText: "Enter total floors",
               maxLength: 2,
               min: 1,
               max: 50,
+              validator: (String? value) {
+                if (value == null || value.trim().isEmpty) {
+                  return "Please enter Total floor";
+                }
+                // Valid hai → null return karo (no error message)
+                return null;
+              },
             ),
 
             _label("Room Sharing Type *"),
@@ -245,7 +260,7 @@ class PgDetailsPage extends StatelessWidget {
             _label("Available Date *"),
 
             TextField(
-              controller: provider.dataCtr,
+              controller: provider.dateCtr,
               readOnly: true,
               decoration: InputDecoration(
                 suffixIcon: const Icon(Icons.calendar_month),
@@ -261,7 +276,7 @@ class PgDetailsPage extends StatelessWidget {
                   lastDate: DateTime(2100),
                 );
                 if (picked != null) {
-                  provider.dataCtr.text =
+                  provider.dateCtr.text =
                       "${picked.day}/${picked.month}/${picked.year}";
                 }
               },

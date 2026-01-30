@@ -9,7 +9,7 @@ import 'package:token_app/view/home_screen/notification_screen.dart';
 import 'package:token_app/view/home_screen/property_list_page.dart';
 import 'package:token_app/view/home_screen/property_review_page.dart';
 import 'package:token_app/view/post_property_page/type_property_page.dart';
-import 'package:token_app/viewModel/afterLogin/home_screen_controller.dart';
+import 'package:token_app/viewModel/afterLogin/home_screen_provider.dart';
 import 'package:token_app/viewModel/afterLogin/post_property_provider/post_propert_providers.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,8 +25,11 @@ class _HomeScreenState extends State<HomeScreen> {
   final FocusNode focusNode = FocusNode();
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+
+    Future.microtask(() {
+      context.read<HomeScreenProvicer>().getCity();
+    });
   }
 
   @override
@@ -50,11 +53,16 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           child: Column(
             children: [
-              _topBar(context),
+              Consumer<HomeScreenProvicer>(
+                builder: (context, p, child) {
+                  return _topBar(context, p.city);
+                },
+              ),
+
               const SizedBox(height: 16),
               _searchBar(context, searchCtr, focusNode),
               const SizedBox(height: 16),
-              Consumer<HomeScreenController>(
+              Consumer<HomeScreenProvicer>(
                 builder: (context, controller, child) {
                   return _categoryTabs(controller, context);
                 },
@@ -70,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 _premiumCard(),
                 const SizedBox(height: 20),
-                Consumer<HomeScreenController>(
+                Consumer<HomeScreenProvicer>(
                   builder: (context, controller, child) {
                     return _bhkChips(controller, context);
                   },
@@ -115,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // 🔴 Top Bar
-  Widget _topBar(BuildContext context) {
+  Widget _topBar(BuildContext context, String city) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -123,14 +131,16 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => LocationScreen()),
+              MaterialPageRoute(
+                builder: (_) => LocationScreen(path: "USER_CITY"),
+              ),
             );
           },
           child: Row(
             children: [
               Icon(Icons.location_on, color: AppColors.mainColors),
               SizedBox(width: 4),
-              Text("Mumbai", style: textStyle16(FontWeight.w600)),
+              Text(city, style: textStyle16(FontWeight.w600)),
               SizedBox(width: 4),
               Icon(Icons.keyboard_arrow_down, color: AppColors.black),
             ],
@@ -233,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // 🏷 Rent / Buy / PG / Plot
-  Widget _categoryTabs(HomeScreenController c, BuildContext context) {
+  Widget _categoryTabs(HomeScreenProvicer c, BuildContext context) {
     final tabs = ["Rent", "Buy", "PG", "Plot", "Commercial", "Projects"];
 
     return SingleChildScrollView(
@@ -326,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // 🛏 BHK Buttons
-  Widget _bhkChips(HomeScreenController c, BuildContext context) {
+  Widget _bhkChips(HomeScreenProvicer c, BuildContext context) {
     final items = ["1 BHK", "2 BHK", "3 BHK", "4 BHK", "5 +BHK"];
 
     return SingleChildScrollView(

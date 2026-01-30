@@ -7,7 +7,8 @@ import 'package:token_app/view/home_screen/location_screen.dart';
 import 'package:token_app/viewModel/afterLogin/filter_pages_provider/filter_provider.dart';
 
 class RentFliterPage extends StatelessWidget {
-  const RentFliterPage({super.key});
+  final String? city;
+  const RentFliterPage({super.key, this.city});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +35,7 @@ class RentFliterPage extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => LocationScreen(),
+                                builder: (_) => LocationScreen(path: "FILTER"),
                               ),
                             );
                           },
@@ -59,7 +60,11 @@ class RentFliterPage extends StatelessWidget {
                                     children: [
                                       Icon(Icons.search, color: AppColors.grey),
                                       SizedBox(width: 5),
-                                      Text('Search city/Locality/Landmarks...'),
+                                      Text(
+                                        provider.city.isEmpty
+                                            ? 'Search city/Locality/Landmarks...'
+                                            : provider.city,
+                                      ),
                                     ],
                                   ),
                                   Icon(Icons.location_on_outlined),

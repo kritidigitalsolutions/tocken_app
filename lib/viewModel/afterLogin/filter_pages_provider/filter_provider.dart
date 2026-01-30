@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FilterProvider extends ChangeNotifier {
+  String city = '';
+  Future<void> getCity() async {
+    final pref = await SharedPreferences.getInstance();
+    city = pref.getString("city") ?? '';
+  }
+
   List<String> propertyType = [
     "Apartment",
     "Builder Floor",
@@ -130,16 +137,5 @@ class FilterProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  //  String selectedCoLivingMinArea = "100 sq ft";
-  // String selectedMaxArea = "4000+ sq ft";
-
-  // void setMinArea(String value) {
-  //   selectedMinArea = value;
-  //   notifyListeners();
-  // }
-
-  // void setMaxArea(String value) {
-  //   selectedMaxArea = value;
-  //   notifyListeners();
-  // }
+  // ========================================================
 }

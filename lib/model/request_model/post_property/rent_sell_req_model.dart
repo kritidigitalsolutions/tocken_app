@@ -1,5 +1,7 @@
-class RentSellResModel {
-  RentSellResModel({
+import 'package:token_app/model/request_model/post_property/common_property_req_model.dart';
+
+class RentSellReqModel {
+  RentSellReqModel({
     required this.listingType,
     required this.propertyType,
     required this.propertyCategory,
@@ -40,32 +42,6 @@ class RentSellResModel {
   };
 }
 
-class Contact {
-  Contact({required this.phone, required this.phonePrivate});
-
-  final String? phone;
-  final bool? phonePrivate;
-
-  Map<String, dynamic> toJson() => {
-    "phone": phone,
-    "phonePrivate": phonePrivate,
-  };
-}
-
-class Location {
-  Location({required this.city, required this.locality, required this.society});
-
-  final String? city;
-  final String? locality;
-  final String? society;
-
-  Map<String, dynamic> toJson() => {
-    "city": city,
-    "locality": locality,
-    "society": society,
-  };
-}
-
 class Pricing {
   Pricing({
     required this.rent,
@@ -97,14 +73,6 @@ class SecurityDeposit {
   final int? amount;
 
   Map<String, dynamic> toJson() => {"label": label, "amount": amount};
-}
-
-class LockInPeriod {
-  LockInPeriod({required this.label, required this.month});
-
-  final String? label;
-  final int? month;
-  Map<String, dynamic> toJson() => {"label": label, "month": month};
 }
 
 class Rent {
@@ -201,27 +169,6 @@ class BuiltUp {
   final String? unit;
 
   Map<String, dynamic> toJson() => {"value": value, "unit": unit};
-}
-
-class Furnishing {
-  Furnishing({required this.type, required this.amenities});
-
-  final String? type;
-  final List<Amenity> amenities;
-
-  Map<String, dynamic> toJson() => {
-    "type": type,
-    "amenities": amenities.map((x) => x.toJson()).toList(),
-  };
-}
-
-class Amenity {
-  Amenity({required this.name, required this.quantity});
-
-  final String? name;
-  final int? quantity;
-
-  Map<String, dynamic> toJson() => {"name": name, "quantity": quantity};
 }
 
 class Parking {
