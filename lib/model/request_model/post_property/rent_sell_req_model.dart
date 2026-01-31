@@ -9,8 +9,6 @@ class RentSellReqModel {
     required this.pricing,
     required this.location,
     required this.contact,
-    required this.amenities,
-    required this.preferences,
     required this.images,
     required this.description,
   });
@@ -22,8 +20,7 @@ class RentSellReqModel {
   final Pricing? pricing;
   final Location? location;
   final Contact? contact;
-  final List<String> amenities;
-  final List<String> preferences;
+
   final List<String> images;
   final String? description;
 
@@ -35,8 +32,6 @@ class RentSellReqModel {
     "pricing": pricing?.toJson(),
     "location": location?.toJson(),
     "contact": contact?.toJson(),
-    "amenities": amenities.map((x) => x).toList(),
-    "preferences": preferences.map((x) => x).toList(),
     "images": images.map((x) => x).toList(),
     "description": description,
   };
@@ -45,21 +40,18 @@ class RentSellReqModel {
 class Pricing {
   Pricing({
     required this.rent,
-    required this.amenities,
     required this.securityDeposit,
     required this.noticePeriod,
     required this.lockInPeriod,
   });
 
   final Rent? rent;
-  final List<SecurityDeposit> amenities;
   final SecurityDeposit? securityDeposit;
   final int? noticePeriod;
   final LockInPeriod? lockInPeriod;
 
   Map<String, dynamic> toJson() => {
     "rent": rent?.toJson(),
-    "amenities": amenities.map((x) => x.toJson()).toList(),
     "securityDeposit": securityDeposit?.toJson(),
     "noticePeriod": noticePeriod,
     "lockInPeriod": lockInPeriod?.toJson(),
@@ -72,27 +64,39 @@ class SecurityDeposit {
   final String? label;
   final int? amount;
 
-  Map<String, dynamic> toJson() => {"label": label, "amount": amount};
+  Map<String, dynamic> toJson() => {"depositType": label, "amount": amount};
 }
 
 class Rent {
   Rent({
-    required this.label,
-    required this.rantAmount,
-    required this.isElectricity,
-    required this.isNegotiable,
+    this.pricingRoomtype,
+    this.rentAmount,
+    this.leaseAmount,
+    this.numberOfYearLease,
+    this.isElectricity,
+    this.isNegotiable,
+    this.istaxAndGov,
+    this.yearlyRentIncreaseByPercent,
   });
 
-  final String? label;
-  final int? rantAmount;
+  final String? pricingRoomtype;
+  final int? rentAmount;
+  final int? leaseAmount;
+  final String? numberOfYearLease;
   final bool? isElectricity;
   final bool? isNegotiable;
+  final bool? istaxAndGov;
+  final int? yearlyRentIncreaseByPercent;
 
   Map<String, dynamic> toJson() => {
-    "label": label,
-    "rantAmount": rantAmount,
+    "pricingRoomtype": pricingRoomtype, // exactly same as backend
+    "rentAmount": rentAmount,
+    "leaseAmount": leaseAmount,
+    "numberOfYearLease": numberOfYearLease,
     "isElectricity": isElectricity,
     "isNegotiable": isNegotiable,
+    "istaxAndGov": istaxAndGov,
+    "YearlyRentIncreaseByPercent": yearlyRentIncreaseByPercent,
   };
 }
 

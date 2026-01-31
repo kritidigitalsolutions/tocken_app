@@ -7,7 +7,7 @@ class PgReqModel {
     required this.pricing,
     required this.location,
     required this.contact,
-    required this.images,
+    this.images,
     required this.description,
   });
 
@@ -16,7 +16,7 @@ class PgReqModel {
   final PGPricing? pricing;
   final Location? location;
   final PGContact? contact;
-  final List<String> images;
+  final List<String>? images;
   final String? description;
 
   Map<String, dynamic> toJson() => {
@@ -25,7 +25,8 @@ class PgReqModel {
     "pricing": pricing?.toJson(),
     "location": location?.toJson(),
     "contact": contact?.toJson(),
-    "images": images.map((x) => x).toList(),
+    if (images != null && images!.isNotEmpty)
+      "images": images!.map((x) => x).toList(),
     "description": description,
   };
 }
@@ -144,30 +145,27 @@ class PGPricing {
     required this.rent,
     required this.mealsAvailable,
     required this.mealsType,
-    required this.mealsAvailableOnWeekend,
-    required this.mealsAvailableOnWeekDay,
+    required this.mealsAvailableOnWeekdays,
     required this.mealsAmount,
     required this.noticePeriod,
     required this.lockInPeriod,
   });
 
-  final List<AddMore> addMore;
+  final AddMore addMore;
   final PGRent? rent;
   final String? mealsAvailable;
   final String? mealsType;
-  final List<String> mealsAvailableOnWeekend;
-  final List<String> mealsAvailableOnWeekDay;
+  final List<String> mealsAvailableOnWeekdays;
   final int? mealsAmount;
   final int? noticePeriod;
   final LockInPeriod? lockInPeriod;
 
   Map<String, dynamic> toJson() => {
-    "addMore": addMore.map((x) => x.toJson()).toList(),
+    "addMore": addMore.toJson(),
     "rent": rent?.toJson(),
     "mealsAvailable": mealsAvailable,
     "mealsType": mealsType,
-    "mealsAvailableOnWeekend": mealsAvailableOnWeekend.map((x) => x).toList(),
-    "mealsAvailableOnWeekDay": mealsAvailableOnWeekDay.map((x) => x).toList(),
+    "mealsAvailableOnWeekdays": mealsAvailableOnWeekdays.map((x) => x).toList(),
     "mealsAmount": mealsAmount,
     "noticePeriod": noticePeriod,
     "lockInPeriod": lockInPeriod?.toJson(),
@@ -175,12 +173,21 @@ class PGPricing {
 }
 
 class AddMore {
-  AddMore({required this.label, required this.amount});
+  AddMore({
+    required this.maintenanceCharge,
+    required this.bookingAmount,
+    required this.otherCharge,
+  });
 
-  final String? label;
-  final int? amount;
+  final int? maintenanceCharge;
+  final int? bookingAmount;
+  final int? otherCharge;
 
-  Map<String, dynamic> toJson() => {"label": label, "amount": amount};
+  Map<String, dynamic> toJson() => {
+    "maintenanceCharge": maintenanceCharge,
+    "bookingAmount": bookingAmount,
+    "otherCharge": otherCharge,
+  };
 }
 
 class PGRent {

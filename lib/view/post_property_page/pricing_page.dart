@@ -10,9 +10,16 @@ import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provide
 
 class PricingPage extends StatefulWidget {
   final String? propertyType;
+  final String? propertyClasses;
   final String? type;
   final bool? isSell;
-  const PricingPage({super.key, this.propertyType, this.isSell, this.type});
+  const PricingPage({
+    super.key,
+    this.propertyType,
+    this.isSell,
+    this.type,
+    this.propertyClasses,
+  });
 
   bool get plotLand => "$type-$propertyType" == "Sell-Plot/Land";
 
@@ -181,7 +188,7 @@ class _PricingPageState extends State<PricingPage> {
                 if (widget.type == "Sell")
                   _checkTile(
                     "Tax & Govt. Charges excluded?",
-                    p.utilitiesIncluded,
+                    p.tax$Free,
                     (v) => p.toggleutilitiesIncludede(v),
                   ),
                 if (p.rentType != "Only Lease") ...[
@@ -190,7 +197,7 @@ class _PricingPageState extends State<PricingPage> {
                     if (widget.propertyType == "COM") ...[
                       _sectionTitle("Yearly rent is expected to increase by *"),
                       AppNumberField(
-                        controller: p.leaseCtr,
+                        controller: p.rentIncrease,
                         hintText: "% increase by",
                       ),
                       const SizedBox(height: 10),
@@ -223,7 +230,7 @@ class _PricingPageState extends State<PricingPage> {
                     if (p.securityDep == "Multiple of Rent") ...[
                       const SizedBox(height: 10),
                       AppTextField(
-                        controller: p.MultiRentCtr,
+                        controller: p.fixedCtr,
                         hintText: "Enter no. of months (max 36)",
                         prefixIcon: const Icon(Icons.currency_rupee_sharp),
                       ),
@@ -259,6 +266,13 @@ class _PricingPageState extends State<PricingPage> {
                           }),
                         ],
                       ),
+                      if (p.lockPerdiod == "Custom") ...[
+                        SizedBox(height: 15),
+                        AppNumberField(
+                          controller: p.customMonthCtr,
+                          hintText: "Enter custom month",
+                        ),
+                      ],
                     ],
                   ],
                 ],
@@ -303,6 +317,8 @@ class _PricingPageState extends State<PricingPage> {
                       MaterialPageRoute(
                         builder: (_) => AddressDetailsPage(
                           path: widget.propertyType ?? '',
+                          type: widget.type,
+                          proClasses: widget.propertyClasses,
                           isSell: widget.isSell,
                         ),
                       ),

@@ -259,7 +259,7 @@ class PgDetailsPage extends StatelessWidget {
             // Available date
             _label("Available Date *"),
 
-            TextField(
+            TextFormField(
               controller: provider.dateCtr,
               readOnly: true,
               decoration: InputDecoration(

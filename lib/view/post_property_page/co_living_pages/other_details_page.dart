@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
 import 'package:token_app/utils/textfield.dart';
+import 'package:token_app/viewModel/afterLogin/post_property_provider/co_living_provider.dart';
 
 // ignore: must_be_immutable
 class OtherDetailsPage extends StatelessWidget {
   OtherDetailsPage({super.key});
 
-  TextEditingController ctr = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
+    final pro = context.read<CoLivingProvider>();
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
@@ -49,7 +50,7 @@ class OtherDetailsPage extends StatelessWidget {
               SizedBox(height: 10),
               AppTextField(
                 maxLines: 3,
-                controller: ctr,
+                controller: pro.aboutYourSelfCtr,
                 hintText: "Add about yourself",
               ),
 
@@ -69,28 +70,31 @@ class OtherDetailsPage extends StatelessWidget {
 
               Text("Insta Handle", style: textStyle15(FontWeight.bold)),
               SizedBox(height: 10),
-              AppTextField(controller: ctr, hintText: "Instagram link"),
+              AppTextField(
+                controller: pro.instaCtr,
+                hintText: "Instagram link",
+              ),
 
               SizedBox(height: 20),
 
               Text("FB Link", style: textStyle15(FontWeight.bold)),
               SizedBox(height: 10),
-              AppTextField(controller: ctr, hintText: "Facebook Link"),
+              AppTextField(controller: pro.fbCtr, hintText: "Facebook Link"),
 
               SizedBox(height: 20),
 
               Text("Linkedin", style: textStyle15(FontWeight.bold)),
               SizedBox(height: 10),
-              AppTextField(controller: ctr, hintText: "Likedin Link"),
+              AppTextField(
+                controller: pro.linkedinCtr,
+                hintText: "Likedin Link",
+              ),
 
               SizedBox(height: 20),
               AppButton(
                 text: "Complete & Posting",
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => OtherDetailsPage()),
-                  );
+                  pro.coLivingPost(context);
                 },
               ),
               SizedBox(height: 15),

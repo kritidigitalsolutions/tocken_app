@@ -9,8 +9,16 @@ import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provide
 
 class ContactAmenitiesPage extends StatefulWidget {
   final String? propertyType;
+  final String? type;
+  final String? proClasses;
   final bool? isSell;
-  const ContactAmenitiesPage({super.key, this.propertyType, this.isSell});
+  const ContactAmenitiesPage({
+    super.key,
+    this.propertyType,
+    this.isSell,
+    this.proClasses,
+    this.type,
+  });
 
   @override
   State<ContactAmenitiesPage> createState() => _ContactAmenitiesPageState();
@@ -222,7 +230,13 @@ class _ContactAmenitiesPageState extends State<ContactAmenitiesPage> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => PhotosPage()),
+                      MaterialPageRoute(
+                        builder: (_) => PhotosPage(
+                          propertyType: widget.propertyType,
+                          type: widget.type,
+                          proClasses: widget.proClasses,
+                        ),
+                      ),
                     );
                   },
                 ),

@@ -16,6 +16,13 @@ class PgPrice extends StatefulWidget {
 
 class _PgPriceState extends State<PgPrice> {
   @override
+  void initState() {
+    super.initState();
+    final provider = context.read<PgDetailsProvider>();
+    provider.initRoomControllers(provider.roomSharing.toList());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -147,11 +154,14 @@ class _PgPriceState extends State<PgPrice> {
                 const SizedBox(height: 16),
 
                 /// Add More Pricing
-                Text(
-                  "+ Add More Pricing Details",
-                  style: TextStyle(
-                    color: AppColors.mainColors,
-                    fontWeight: FontWeight.w600,
+                GestureDetector(
+                  onTap: () => _openMorePricingSheet(context, provider),
+                  child: Text(
+                    "+ Add More Pricing Details",
+                    style: TextStyle(
+                      color: AppColors.mainColors,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
 
@@ -289,6 +299,13 @@ class _PgPriceState extends State<PgPrice> {
                     }),
                   ],
                 ),
+                if (provider.lockPerdiod == "Custom") ...[
+                  SizedBox(height: 15),
+                  AppNumberField(
+                    controller: provider.customMonthCtr,
+                    hintText: "Enter custom month",
+                  ),
+                ],
 
                 const SizedBox(height: 32),
 
@@ -329,6 +346,74 @@ class _PgPriceState extends State<PgPrice> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(title, style: textStyle15(FontWeight.w600)),
+    );
+  }
+
+  void _openMorePricingSheet(BuildContext context, PgDetailsProvider p) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return Container(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  height: 4,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade400,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+              Text(
+                "Add more Pricing Details",
+                style: textStyle15(FontWeight.bold),
+              ),
+
+              const SizedBox(height: 16),
+              AppNumberField(
+                controller: p.maintenanceCtrl,
+                hintText: "Maintenance charges (per month)",
+                icon: Icon(Icons.currency_rupee_sharp),
+              ),
+
+              const SizedBox(height: 12),
+              AppNumberField(
+                controller: p.bookingCtrl,
+                hintText: "Booking amount",
+                icon: Icon(Icons.currency_rupee_sharp),
+              ),
+
+              const SizedBox(height: 12),
+              AppNumberField(
+                controller: p.otherCtrl,
+                hintText: "Other charges",
+                icon: Icon(Icons.currency_rupee_sharp),
+              ),
+
+              const SizedBox(height: 20),
+              AppButton(text: "Done", onTap: () => Navigator.pop(context)),
+            ],
+          ),
+        );
+      },
     );
   }
 

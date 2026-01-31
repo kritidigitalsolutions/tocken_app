@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:token_app/resources/app_colors.dart';
 import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/utils/text_style.dart';
+import 'package:token_app/utils/textfield.dart';
 import 'package:token_app/view/post_property_page/address_details_page.dart';
 import 'package:token_app/view/post_property_page/amenities_page.dart';
 import 'package:token_app/view/post_property_page/co_living_pages/profile_details_page.dart';
@@ -45,7 +46,30 @@ class RoomDetailsPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _label("Available from *"),
-                      _dateField(context, p),
+                      InkWell(
+                        onTap: () async {
+                          final date = await showDatePicker(
+                            context: context,
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(2100),
+                            initialDate: DateTime.now(),
+                          );
+                          if (date != null) {
+                            p.availableFrom =
+                                "${date.day}/${date.month}/${date.year}";
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: _inputDecoration(
+                            suffix: const Icon(Icons.calendar_today),
+                          ),
+                          child: Text(
+                            p.availableFrom == null
+                                ? "Select date"
+                                : "${p.availableFrom}",
+                          ),
+                        ),
+                      ),
 
                       const SizedBox(height: 20),
                       _label("BHK *"),
@@ -153,16 +177,28 @@ class RoomDetailsPage extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(
-                            child: _textField(
-                              label: "Total Floors *",
-                              controller: p.totalFloorsCtrl,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _label("Total Floor"),
+                                AppNumberField(
+                                  controller: p.totalFloorsCtrl,
+                                  hintText: "Total floor",
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: _textField(
-                              label: "Your Floor *",
-                              controller: p.yourFloorCtrl,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _label("Your Floor"),
+                                AppNumberField(
+                                  controller: p.yourFloorCtrl,
+                                  hintText: "Your floor",
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -181,39 +217,33 @@ class RoomDetailsPage extends StatelessWidget {
                           );
                         },
                       ),
+                      AppButton(
+                        text: "Save & Next",
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AddressDetailsPage(
+                                path: "CO-LIVING",
+                                isSharing: isSharing,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 15),
+                      AppButton(
+                        text: "Cancel",
+                        onTap: () {},
+                        textColor: AppColors.black,
+                        backgroundColor: AppColors.red.shade100,
+                      ),
                     ],
                   ),
                 ),
               ),
 
               /// ACTION BUTTONS
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: AppButton(
-                  text: "Save & Next",
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => AddressDetailsPage(
-                          path: "CO-LIVING",
-                          isSharing: isSharing,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(height: 15),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: AppButton(
-                  text: "Cancel",
-                  onTap: () {},
-                  textColor: AppColors.black,
-                  backgroundColor: AppColors.red.shade100,
-                ),
-              ),
             ],
           );
         },
@@ -227,28 +257,6 @@ class RoomDetailsPage extends StatelessWidget {
     padding: const EdgeInsets.only(bottom: 6),
     child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600)),
   );
-
-  Widget _dateField(BuildContext context, CoLivingProvider p) {
-    return InkWell(
-      onTap: () async {
-        final date = await showDatePicker(
-          context: context,
-          firstDate: DateTime.now(),
-          lastDate: DateTime(2100),
-          initialDate: DateTime.now(),
-        );
-        if (date != null) p.setDate(date);
-      },
-      child: InputDecorator(
-        decoration: _inputDecoration(suffix: const Icon(Icons.calendar_today)),
-        child: Text(
-          p.availableFrom == null
-              ? "Select date"
-              : "${p.availableFrom!.day}/${p.availableFrom!.month}/${p.availableFrom!.year}",
-        ),
-      ),
-    );
-  }
 
   Widget _dropdown(
     String? value,
@@ -265,23 +273,6 @@ class RoomDetailsPage extends StatelessWidget {
       decoration: InputDecoration(
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
-    );
-  }
-
-  Widget _textField({
-    required String label,
-    required TextEditingController controller,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _label(label),
-        TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          decoration: _inputDecoration(),
-        ),
-      ],
     );
   }
 

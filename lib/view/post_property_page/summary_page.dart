@@ -5,7 +5,10 @@ import 'package:token_app/utils/buttons.dart';
 import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provider.dart';
 
 class SummaryPage extends StatefulWidget {
-  const SummaryPage({super.key});
+  final String? propertyType;
+  final String? type;
+  final String? proClasses;
+  const SummaryPage({super.key, this.proClasses, this.propertyType, this.type});
 
   @override
   State<SummaryPage> createState() => _SummaryPageState();
@@ -84,6 +87,11 @@ class _SummaryPageState extends State<SummaryPage> {
             AppButton(
               text: "Complete & Posting",
               onTap: () {
+                if (widget.type == "Rent" &&
+                    widget.proClasses == "Residential") {
+                  pro.postProperty();
+                  return;
+                }
                 pro.pgPost();
               },
             ),

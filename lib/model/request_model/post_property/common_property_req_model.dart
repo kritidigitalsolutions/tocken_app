@@ -29,14 +29,23 @@ class LockInPeriod {
 }
 
 class Contact {
-  Contact({required this.phone, required this.phonePrivate});
+  Contact({
+    required this.phone,
+    required this.phonePrivate,
+    required this.amenities,
+    required this.preferences,
+  });
 
   final String? phone;
   final bool? phonePrivate;
+  final List<String> amenities;
+  final List<String> preferences;
 
   Map<String, dynamic> toJson() => {
     "phone": phone,
     "phonePrivate": phonePrivate,
+    "amenities": amenities.map((x) => x).toList(),
+    "preferences": preferences.map((x) => x).toList(),
   };
 }
 

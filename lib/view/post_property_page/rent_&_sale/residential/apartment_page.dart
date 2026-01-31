@@ -370,6 +370,7 @@ class _ApartmentDetailsPageState extends State<ApartmentDetailsPage> {
                                 builder: (_) => PricingPage(
                                   propertyType: widget.propertyType,
                                   type: widget.type,
+                                  propertyClasses: widget.propertyClass,
                                   isSell: widget.isSale,
                                 ),
                               ),
@@ -592,7 +593,7 @@ class _ApartmentDetailsPageState extends State<ApartmentDetailsPage> {
                               hint: "Select the flooring type",
                               value: provider.flooring,
                               items: provider
-                                  .facingList, // ← probably typo → should be flooringList?
+                                  .flooringTypeList, // ← probably typo → should be flooringList?
                               onChanged: (v) => provider.setFlooring(v ?? ''),
                             ),
                           ],
@@ -627,7 +628,7 @@ class _ApartmentDetailsPageState extends State<ApartmentDetailsPage> {
                               flex: 2,
                               child: AppNumberField(
                                 controller: provider
-                                    .carpetAreaCtr, // ← probably typo → builtUpAreaCtr?
+                                    .buildAreaCtr, // ← probably typo → builtUpAreaCtr?
                                 hintText: "Enter Built up area",
                               ),
                             ),
@@ -832,12 +833,16 @@ class _ApartmentDetailsPageState extends State<ApartmentDetailsPage> {
                         AppButton(
                           text: "Save & Next",
                           onTap: () {
+                            provider.type = widget.type;
+                            provider.propertyType = widget.propertyType;
+                            provider.propertyClasses = widget.propertyClass;
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (_) => PricingPage(
                                   propertyType: widget.propertyType,
                                   type: widget.type,
+                                  propertyClasses: widget.propertyClass,
                                   isSell: widget.isSale,
                                 ),
                               ),

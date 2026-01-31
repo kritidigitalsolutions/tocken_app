@@ -11,7 +11,16 @@ import 'package:token_app/viewModel/afterLogin/post_property_provider/pg_provide
 
 class PhotosPage extends StatefulWidget {
   final bool? isSharing;
-  const PhotosPage({super.key, this.isSharing = false});
+  final String? propertyType;
+  final String? type;
+  final String? proClasses;
+  const PhotosPage({
+    super.key,
+    this.isSharing = false,
+    this.proClasses,
+    this.propertyType,
+    this.type,
+  });
 
   @override
   State<PhotosPage> createState() => _PhotosPageState();
@@ -168,7 +177,9 @@ class _PhotosPageState extends State<PhotosPage> {
                         context,
                         MaterialPageRoute(
                           builder: (_) => SummaryPage(
-                            // images: _images.map((e) => e.path).toList(),
+                            propertyType: widget.propertyType,
+                            type: widget.type,
+                            proClasses: widget.proClasses,
                           ),
                         ),
                       );

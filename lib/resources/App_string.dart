@@ -252,4 +252,28 @@ class AppString {
     {"name": "Exhaust Fan", "key": "exhaustFan"},
     {"name": "Lights", "key": "lights"},
   ];
+
+  // co-living
+
+  static const List<String> minBudgetList = [
+    "1k",
+    "5k",
+    "10k",
+    "20k",
+    "25k",
+    "30k",
+    "40k",
+    "50k",
+  ];
+
+  static const List<String> maxBudgetList = [
+    "1k",
+    "5k",
+    "10k",
+    "20k",
+    "25k",
+    "30k",
+    "40k",
+    "50k+",
+  ];
 }

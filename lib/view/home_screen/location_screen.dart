@@ -74,6 +74,11 @@ class _LocationScreenState extends State<LocationScreen> {
                   if (widget.path == "USER_CITY") {
                     pref.setString("city", locationData['city']);
                   }
+                  if (widget.path == "CITY_ADDRESS") {
+                    postPropertyPro.cityCtr.text = locationData['city'];
+                    postPropertyPro.localityCtr.text = locationData['locality'];
+                    postPropertyPro.addressCtr.text = locationData["address"];
+                  }
 
                   // Success - you can now use the data
                   print(locationData['address']);
@@ -135,6 +140,10 @@ class _LocationScreenState extends State<LocationScreen> {
                             style: textStyle13(FontWeight.w400),
                           ),
                           onTap: () {
+                            if (widget.path == "CITY_ADDRESS") {
+                              postPropertyPro.cityCtr.text = item.city ?? '';
+                            }
+                            Navigator.pop(context);
                             print(item.displayName);
                             print(item.city);
                           },

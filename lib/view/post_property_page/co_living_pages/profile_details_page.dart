@@ -21,10 +21,6 @@ class ProfileDetailsPage extends StatefulWidget {
 }
 
 class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
-  String? selectedGender;
-
-  bool isPrivate = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -148,9 +144,9 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
                         child: Text("Keep my mobile number private"),
                       ),
                       Switch(
-                        value: isPrivate,
+                        value: provider.phonePrivacy,
                         onChanged: (val) {
-                          setState(() => isPrivate = val);
+                          provider.toggalePhone(val);
                         },
                       ),
                     ],
@@ -233,7 +229,7 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
                         : "Working as",
                   ),
                   AppTextField(
-                    controller: provider.lanCtr,
+                    controller: provider.occupationCtr,
                     hintText: provider.occupation == "Student"
                         ? "Bachelor of Engineering(CSE)"
                         : "Software Engineer",
@@ -294,6 +290,7 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
                 AppButton(
                   text: "Save & Next",
                   onTap: () {
+                    provider.propertyCategory = widget.needRoom;
                     if (widget.isShare) {
                       Navigator.push(
                         context,
@@ -339,18 +336,6 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600)),
-    );
-  }
-
-  Widget _genderChip(String text) {
-    return Container(
-      margin: const EdgeInsets.only(right: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade400),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(text),
     );
   }
 

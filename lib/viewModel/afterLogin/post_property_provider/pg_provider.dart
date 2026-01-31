@@ -5,9 +5,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:token_app/model/request_model/post_property/common_property_req_model.dart';
 import 'package:token_app/model/request_model/post_property/pg_req_model.dart';
 import 'package:token_app/model/request_model/post_property/rent_sell_req_model.dart';
+import 'package:token_app/model/response_model/auth/auth_response_model.dart';
 import 'package:token_app/repository/post_property_repo.dart';
 import 'package:token_app/resources/App_string.dart';
 import 'package:token_app/utils/app_snackbar.dart';
+import 'package:token_app/utils/local_storage.dart';
 
 enum SecurityDepositType { fixed, multiple, none }
 
@@ -16,6 +18,15 @@ class PgDetailsProvider extends ChangeNotifier {
     lengthCtr.addListener(validateArea);
     widthCtr.addListener(validateArea);
   }
+
+  //---------------------------------------------------
+  // form key
+  //-----------------------------------------------------
+
+  final GlobalKey<FormState> addressKey = GlobalKey();
+  String type = '';
+  String propertyType = '';
+  String propertyClasses = "";
 
   // ───────────────────────────────────────────────
   //  CONTROLLERS
@@ -34,6 +45,7 @@ class PgDetailsProvider extends ChangeNotifier {
 
   final rentCtr = TextEditingController();
   final leaseCtr = TextEditingController();
+  final rentIncrease = TextEditingController();
   final maintenanceCtrl = TextEditingController();
   final bookingCtrl = TextEditingController();
   final otherCtrl = TextEditingController();
@@ -50,6 +62,7 @@ class PgDetailsProvider extends ChangeNotifier {
   final meetingRoomCtr = TextEditingController();
   final seatsCtr = TextEditingController();
   final parkingCtr = TextEditingController();
+  final customMonthCtr = TextEditingController();
   final TextEditingController descController = TextEditingController();
 
   // ───────────────────────────────────────────────
@@ -150,6 +163,7 @@ class PgDetailsProvider extends ChangeNotifier {
 
   bool negotiable = false;
   bool utilitiesIncluded = false;
+  bool tax$Free = false;
   bool hideNumber = false;
   bool isBrokerAllow = false;
   bool isHotDeal = false;
@@ -211,6 +225,13 @@ class PgDetailsProvider extends ChangeNotifier {
   final Map<String, SecurityDepositType> roomSecurityType = {};
   final Map<String, TextEditingController> fixedDepositCtr = {};
   final Map<String, int> multipleOfRent = {};
+
+  void initRoomControllers(List<String> roomSharing) {
+    for (var room in roomSharing) {
+      fixedDepositCtr.putIfAbsent(room, () => TextEditingController());
+      roomAmountCtr.putIfAbsent(room, () => TextEditingController());
+    }
+  }
 
   TextEditingController getRoomController(String type) {
     return roomCountCtr.putIfAbsent(type, () => TextEditingController());
@@ -380,6 +401,11 @@ class PgDetailsProvider extends ChangeNotifier {
 
   void toggleutilitiesIncludede(bool value) {
     utilitiesIncluded = value;
+    notifyListeners();
+  }
+
+  void toggleTax$Free(bool value) {
+    tax$Free = value;
     notifyListeners();
   }
 
@@ -810,6 +836,20 @@ class PgDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> uploadImages({required String propertyId}) async {
+    try {
+      final response = await _repo.uploadPgImages(
+        propertyId: propertyId,
+        images: images,
+      );
+
+      debugPrint("Image upload success: ${response.data}");
+    } catch (e) {
+      debugPrint("Image upload error: $e");
+      rethrow;
+    } finally {}
+  }
+
   // ───────────────────────────────────────────────
   //  RESET / CLEAR ALL DATA
   // ───────────────────────────────────────────────
@@ -1003,10 +1043,12 @@ class PgDetailsProvider extends ChangeNotifier {
 
   Future<void> postProperty() async {
     try {
+      final User? userData = await LocalStorageService.getUser();
+      String phone = userData?.phone ?? '';
       final model = RentSellReqModel(
-        listingType: "Rent",
-        propertyType: "Residential",
-        propertyCategory: "Apartment",
+        listingType: type.toUpperCase(),
+        propertyType: propertyClasses.toUpperCase(),
+        propertyCategory: propertyType,
 
         residentialDetails: ResidentialDetails(
           ageOfProperty: propertyAge,
@@ -1054,15 +1096,15 @@ class PgDetailsProvider extends ChangeNotifier {
 
         pricing: Pricing(
           rent: Rent(
-            label: rentType,
-            rantAmount: int.tryParse(rentCtr.text),
+            pricingRoomtype: rentType,
+            rentAmount: int.tryParse(rentCtr.text),
             isElectricity: utilitiesIncluded,
             isNegotiable: negotiable,
+            leaseAmount: int.tryParse(leaseCtr.text),
+            numberOfYearLease: leaseYear,
+            istaxAndGov: tax$Free,
+            yearlyRentIncreaseByPercent: int.tryParse(rentIncrease.text),
           ),
-
-          amenities: _selectedService.map((e) {
-            return SecurityDeposit(label: e, amount: 0);
-          }).toList(),
 
           securityDeposit: SecurityDeposit(
             label: securityDep,
@@ -1072,29 +1114,34 @@ class PgDetailsProvider extends ChangeNotifier {
           noticePeriod: noticePeriod,
 
           lockInPeriod: LockInPeriod(
-            month: int.tryParse(leaseYear ?? "0"),
+            month: int.tryParse(customMonthCtr.text),
             lable: lockPerdiod,
           ),
         ),
 
         location: Location(
-          city: "Delhi", // replace with your controller
-          locality: "Noida",
-          society: "My Society",
+          city: cityCtr.text, // replace with your controller
+          locality: localityCtr.text,
+          society: addressCtr.text,
         ),
 
-        contact: Contact(phone: "6397892585", phonePrivate: hideNumber),
-
-        amenities: selectedArea.toList(),
-
-        preferences: selectedTenant.toList(),
+        contact: Contact(
+          phone: phone,
+          phonePrivate: hideNumber,
+          amenities: selectedAmenityTitles,
+          preferences: selectedRulesTitles,
+        ),
 
         images: [],
 
         description: descController.text,
       );
 
-      await _repo.postProperty(model);
+      final res = await _repo.postProperty(model);
+
+      String propertyId = res['data'];
+
+      await uploadImages(propertyId: propertyId);
 
       //  print("Success ====> $");
     } catch (e) {
@@ -1111,6 +1158,8 @@ class PgDetailsProvider extends ChangeNotifier {
     // showLoadingOverlay(context, message: "Posting your PG...");
 
     try {
+      final User? userData = await LocalStorageService.getUser();
+      String phone = userData?.phone ?? '';
       // ── Build RoomTypes list (this was the biggest missing part) ─────────────
       List<RoomType> roomTypesList = [];
 
@@ -1150,19 +1199,23 @@ class PgDetailsProvider extends ChangeNotifier {
 
       // ── Build Pricing (example – adjust according to your real needs) ────────
       final pricingObj = PGPricing(
-        addMore: [], // fill if you have extra charges
+        addMore: AddMore(
+          maintenanceCharge: int.tryParse(maintenanceCtrl.text),
+          bookingAmount: int.tryParse(bookingCtrl.text),
+          otherCharge: int.tryParse(otherCtrl.text),
+        ), // fill if you have extra charges
         rent: PGRent(
           isElectricity: utilitiesIncluded,
           isNegotiable: negotiable,
         ),
         mealsAvailable: mealsAvailable.isNotEmpty ? mealsAvailable : null,
         mealsType: mealType.isNotEmpty ? mealType : null,
-        mealsAvailableOnWeekend: [], // fill from mealTime if weekend
-        mealsAvailableOnWeekDay: [], // fill from mealTime if weekday
+        mealsAvailableOnWeekdays: mealTime
+            .toList(), // fill from mealTime if weekend
         mealsAmount: int.tryParse(mealAmountCtr.text) ?? 0,
         noticePeriod: noticePeriod,
         lockInPeriod: LockInPeriod(
-          month: int.tryParse(leaseYear ?? '0'),
+          month: int.tryParse(customMonthCtr.text),
           lable: lockPerdiod,
         ),
       );
@@ -1177,7 +1230,7 @@ class PgDetailsProvider extends ChangeNotifier {
 
       // ── Build Contact ────────────────────────────────────────────────────────
       final contactObj = PGContact(
-        phone: "1234567890", // ← replace with real phone (from auth?)
+        phone: phone, // ← replace with real phone (from auth?)
         phonePrivate: hideNumber,
         amenities: selectedAmenityTitles, // common areas
         pgRules: selectedRulesTitles, // if you have pg rules set
@@ -1186,8 +1239,6 @@ class PgDetailsProvider extends ChangeNotifier {
       );
 
       // ── Images (assuming List<String> urls or paths) ─────────────────────────
-      final List<String> uploadedImages =
-          images; // from your image picker/upload
 
       // ── Create model ─────────────────────────────────────────────────────────
       final model = PgReqModel(
@@ -1214,7 +1265,6 @@ class PgDetailsProvider extends ChangeNotifier {
         pricing: pricingObj,
         location: locationObj,
         contact: contactObj,
-        images: uploadedImages,
         description: descController.text
             .trim(), // or your description controller
       );
@@ -1222,7 +1272,11 @@ class PgDetailsProvider extends ChangeNotifier {
       print(model.toJson());
 
       // ── Call API ─────────────────────────────────────────────────────────────
-      await _repo.pgPostProperty(model);
+      final res = await _repo.pgPostProperty(model);
+
+      String propertyId = res['data'];
+
+      await uploadImages(propertyId: propertyId);
 
       // Success
       // hideLoadingOverlay(context);
